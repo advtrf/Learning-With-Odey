@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz — Learning with Odey</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Patrick+Hand&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── Quiz font override: Nunito for readability ── */
+    .quiz-page,
+    .quiz-page p,
+    .quiz-page span,
+    .quiz-page button,
+    .quiz-page input,
+    .quiz-page label,
+    .quiz-page div,
+    .quiz-page td,
+    .quiz-page th {
+      font-family: var(--font-ui) !important;
+    }
+
+    /* Keep handwritten only for decorative/title elements */
+    .start-screen h1,
+    .q-type-badge,
+    .timer-label,
+    .result-title,
+    .result-subtitle,
+    .odey-result-msg,
+    .nav-logo,
+    .nav-links a {
+      font-family: var(--font-hand) !important;
+    }
+
+    /* Readable sizes */
+    .q-text          { font-size: 1.05rem !important; font-weight: 600 !important; }
+    .mc-btn          { font-size: 0.95rem !important; }
+    .tf-label        { font-size: 1rem    !important; font-weight: 700 !important; }
+    .fill-input      { font-size: 1rem    !important; }
+    .match-item      { font-size: 0.92rem !important; }
+    .feedback-box    { font-size: 0.92rem !important; line-height: 1.6 !important; }
+    .result-breakdown { font-size: 0.92rem !important; }
+
+    .quiz-page { min-height: calc(100vh - var(--nav-height)); padding: 2rem 1rem 4rem; position: relative; z-index: 1; }
+
+    /* ── Start Screen ── */
+    .start-screen {
+      max-width: 620px; margin: 0 auto; text-align: center; padding: 2rem 1rem;
+      animation: fadeInUp 0.5s ease forwards;
+    }
+    .start-odey { width: 130px; animation: float 3s ease-in-out infinite; margin-bottom: 1rem; }
+    .start-screen h1 { color: var(--green); font-size: 2.5rem; margin-bottom: 0.3rem; }
+    .start-screen h1::after { display: none; }
+    .start-desc { font-family: var(--font-hand); font-size: 1.05rem; color: var(--ink-soft); margin-bottom: 1.5rem; line-height: 1.7; }
+    .quiz-info-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem;
+      margin-bottom: 2rem;
+    }
+    .quiz-info-card {
+      background: white; border: 2px solid var(--paper-lines); border-radius: var(--radius-md);
+      padding: 0.8rem 0.5rem; box-shadow: var(--shadow-sm);
+    }
+    .quiz-info-card .info-icon { font-size: 1.6rem; }
+    .quiz-info-card .info-label { font-family: var(--font-hand); font-size: 0.85rem; color: var(--ink-faint); margin-top: 0.2rem; }
+    .quiz-info-card .info-val { font-family: var(--font-hand); font-size: 1rem; font-weight: 700; color: var(--ink); }
+    .start-btn {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      background: var(--green-pale); color: var(--green); border: 2.5px solid var(--green);
+      font-family: var(--font-hand); font-size: 1.2rem; font-weight: 700;
+      padding: 0.8rem 2.5rem; border-radius: var(--radius-md); cursor: pointer;
+      box-shadow: var(--shadow-md); transition: all 0.2s;
+    }
+    .start-btn:hover { transform: translate(-2px,-3px); box-shadow: var(--shadow-lg); }
+
+    /* ── Quiz Screen ── */
+    .quiz-screen { display: none; max-width: 700px; margin: 0 auto; }
+    .quiz-screen.show { display: block; animation: fadeInUp 0.4s ease forwards; }
+
+    /* Header bar */
+    .quiz-header {
+      display: flex; align-items: center; gap: 1rem;
+      background: white; border: 2px solid var(--paper-lines);
+      border-radius: var(--radius-md); padding: 0.8rem 1.2rem;
+      margin-bottom: 1.2rem; box-shadow: var(--shadow-sm);
+    }
+    .q-counter { font-family: var(--font-hand); font-size: 0.9rem; color: var(--ink-faint); white-space: nowrap; }
+    .q-progress-bar {
+      flex: 1; height: 8px; background: var(--paper-dark);
+      border-radius: 4px; overflow: hidden; border: 1.5px solid var(--paper-lines);
+    }
+    .q-progress-fill { height: 100%; background: var(--green); border-radius: 4px; transition: width 0.4s ease; }
+    .q-score-badge {
+      font-family: var(--font-hand); font-size: 0.9rem; font-weight: 700;
+      color: var(--yellow); white-space: nowrap;
+    }
+
+    /* Timer */
+    .timer-wrap { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 1rem; }
+    .timer-ring { position: relative; width: 52px; height: 52px; }
+    .timer-ring svg { transform: rotate(-90deg); }
+    .timer-ring circle.bg { fill: none; stroke: var(--paper-dark); stroke-width: 4; }
+    .timer-ring circle.fg { fill: none; stroke: var(--green); stroke-width: 4; stroke-linecap: round;
+      stroke-dasharray: 132; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear, stroke 0.3s; }
+    .timer-num {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-hand); font-size: 1.1rem; font-weight: 700; color: var(--ink);
+    }
+    .timer-label { font-family: var(--font-hand); font-size: 0.85rem; color: var(--ink-faint); }
+
+    /* Question card */
+    .question-card {
+      background: white; border: 2.5px solid var(--paper-lines);
+      border-radius: var(--radius-lg); padding: 1.8rem 2rem;
+      box-shadow: var(--shadow-md); margin-bottom: 1rem;
+      position: relative; min-height: 200px;
+    }
+    .q-type-badge {
+      display: inline-block; font-family: var(--font-hand); font-size: 0.78rem; font-weight: 700;
+      letter-spacing: 0.8px; text-transform: uppercase;
+      padding: 0.15rem 0.7rem; border-radius: 99px; border: 1.5px solid;
+      margin-bottom: 0.8rem;
+    }
+    .badge-mc     { background: var(--blue-pale);   color: var(--blue);   border-color: var(--blue); }
+    .badge-tf     { background: var(--yellow-pale);  color: var(--yellow); border-color: var(--yellow); }
+    .badge-match  { background: var(--purple-pale);  color: var(--purple); border-color: var(--purple); }
+    .badge-fill   { background: var(--green-pale);   color: var(--green);  border-color: var(--green); }
+    .badge-drag   { background: var(--red-pale);     color: var(--red);    border-color: var(--red); }
+
+    .q-text { font-family: var(--font-hand); font-size: 1.15rem; color: var(--ink); line-height: 1.6; margin-bottom: 1.4rem; }
+
+    /* MC Options */
+    .mc-options { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+    .mc-btn {
+      display: flex; align-items: center; gap: 0.6rem;
+      background: var(--paper); border: 2px solid var(--paper-lines);
+      border-radius: var(--radius-md); padding: 0.7rem 1rem;
+      font-family: var(--font-hand); font-size: 1rem; color: var(--ink);
+      cursor: pointer; text-align: left; transition: all 0.15s;
+    }
+    .mc-btn:hover:not(:disabled) { background: var(--blue-pale); border-color: var(--blue); color: var(--blue); transform: translateY(-1px); }
+    .mc-btn .opt-letter {
+      width: 24px; height: 24px; border-radius: 50%; background: var(--paper-dark);
+      border: 2px solid var(--paper-lines); display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 700; flex-shrink: 0; transition: all 0.15s;
+    }
+    .mc-btn.correct  { background: var(--green-pale);  border-color: var(--green);  color: var(--green); }
+    .mc-btn.wrong    { background: var(--red-pale);    border-color: var(--red);    color: var(--red); }
+    .mc-btn.correct .opt-letter { background: var(--green); border-color: var(--green); color: white; }
+    .mc-btn.wrong   .opt-letter { background: var(--red);   border-color: var(--red);   color: white; }
+    .mc-btn:disabled { cursor: default; }
+
+    /* T/F */
+    .tf-options { display: flex; gap: 1rem; justify-content: center; }
+    .tf-btn {
+      flex: 1; max-width: 180px; padding: 1rem; border-radius: var(--radius-md);
+      border: 2.5px solid var(--paper-lines); background: var(--paper);
+      font-family: var(--font-hand); font-size: 1.3rem; font-weight: 700;
+      cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column;
+      align-items: center; gap: 0.3rem;
+    }
+    .tf-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .tf-btn.true-btn:hover:not(:disabled)  { background: var(--green-pale); border-color: var(--green); }
+    .tf-btn.false-btn:hover:not(:disabled) { background: var(--red-pale);   border-color: var(--red); }
+    .tf-btn.correct { background: var(--green-pale); border-color: var(--green); color: var(--green); }
+    .tf-btn.wrong   { background: var(--red-pale);   border-color: var(--red);   color: var(--red); }
+    .tf-btn:disabled { cursor: default; }
+    .tf-label { font-size: 0.9rem; }
+
+    /* Fill in blank */
+    .fill-wrap { display: flex; flex-direction: column; gap: 0.8rem; }
+    .fill-input {
+      width: 100%; padding: 0.7rem 1rem; font-family: var(--font-hand); font-size: 1.05rem;
+      border: 2.5px solid var(--paper-lines); border-radius: var(--radius-md);
+      background: var(--paper); color: var(--ink); outline: none; transition: border-color 0.2s;
+    }
+    .fill-input:focus { border-color: var(--green); }
+    .fill-input.correct { border-color: var(--green); background: var(--green-pale); }
+    .fill-input.wrong   { border-color: var(--red);   background: var(--red-pale); }
+    .fill-submit {
+      align-self: flex-start; padding: 0.6rem 1.5rem;
+      background: var(--blue-pale); color: var(--blue); border: 2px solid var(--blue);
+      border-radius: var(--radius-md); font-family: var(--font-hand); font-size: 1rem;
+      font-weight: 700; cursor: pointer; transition: all 0.15s;
+    }
+    .fill-submit:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+    .fill-submit:disabled { opacity: 0.5; cursor: default; }
+
+    /* Match pairs */
+    .match-container { display: flex; gap: 1.5rem; align-items: flex-start; }
+    .match-col { flex: 1; display: flex; flex-direction: column; gap: 0.5rem; }
+    .match-col-label { font-family: var(--font-hand); font-size: 0.8rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink-faint); margin-bottom: 0.2rem; }
+    .match-item {
+      padding: 0.6rem 1rem; border-radius: var(--radius-md); border: 2px solid var(--paper-lines);
+      background: var(--paper); font-family: var(--font-hand); font-size: 0.95rem;
+      cursor: pointer; transition: all 0.15s; user-select: none;
+    }
+    .match-item:hover:not(.matched):not(.selected-match) { border-color: var(--purple); background: var(--purple-pale); }
+    .match-item.selected-match { border-color: var(--purple); background: var(--purple-pale); color: var(--purple); font-weight: 700; }
+    .match-item.matched-correct { border-color: var(--green); background: var(--green-pale); color: var(--green); cursor: default; }
+    .match-item.matched-wrong   { border-color: var(--red);   background: var(--red-pale);   color: var(--red);   cursor: default; animation: shake 0.4s ease; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+    .match-lines { width: 40px; display: flex; flex-direction: column; justify-content: center; gap: 0.5rem; padding-top: 1.6rem; }
+
+    /* Drag & Drop */
+    .drag-instructions { font-family: var(--font-hand); font-size: 0.9rem; color: var(--ink-faint); margin-bottom: 1rem; }
+    .drag-items-pool {
+      display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.2rem;
+      min-height: 48px; padding: 0.5rem; background: var(--paper-dark);
+      border: 2px dashed var(--paper-lines); border-radius: var(--radius-md);
+    }
+    .drag-item {
+      padding: 0.4rem 0.9rem; border-radius: var(--radius-sm); border: 2px solid var(--blue);
+      background: var(--blue-pale); font-family: var(--font-hand); font-size: 0.9rem; color: var(--blue);
+      cursor: grab; user-select: none; transition: all 0.15s;
+    }
+    .drag-item:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+    .drag-item.dragging { opacity: 0.4; }
+    .drag-zones { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .drag-zone {
+      min-height: 90px; padding: 0.8rem; border-radius: var(--radius-md);
+      border: 2.5px dashed var(--paper-lines); background: white;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .drag-zone.drag-over { border-color: var(--blue); background: var(--blue-pale); }
+    .drag-zone-label { font-family: var(--font-hand); font-size: 0.85rem; font-weight: 700;
+      color: var(--ink-faint); margin-bottom: 0.5rem; }
+    .drag-zone .drag-item { margin-bottom: 0.3rem; cursor: default; }
+    .drag-zone.zone-correct { border-color: var(--green); background: var(--green-pale); }
+    .drag-zone.zone-wrong   { border-color: var(--red);   background: var(--red-pale); }
+
+    /* Feedback */
+    .feedback-box {
+      display: none; margin-top: 1rem; padding: 0.8rem 1.2rem;
+      border-radius: var(--radius-md); border: 2px solid;
+      font-family: var(--font-hand); font-size: 0.95rem; line-height: 1.5;
+      animation: popIn 0.3s ease forwards;
+    }
+    .feedback-box.show { display: flex; align-items: flex-start; gap: 0.7rem; }
+    .feedback-box.correct-fb { background: var(--green-pale); border-color: var(--green); color: var(--green); }
+    .feedback-box.wrong-fb   { background: var(--red-pale);   border-color: var(--red);   color: var(--red); }
+
+    /* Next button */
+    .next-btn {
+      display: none; width: 100%; margin-top: 1rem; padding: 0.85rem;
+      background: var(--blue-pale); color: var(--blue); border: 2.5px solid var(--blue);
+      border-radius: var(--radius-md); font-family: var(--font-hand); font-size: 1.1rem;
+      font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-sm);
+    }
+    .next-btn.show { display: block; animation: fadeInUp 0.3s ease forwards; }
+    .next-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+    /* ── Result Screen ── */
+    .result-screen {
+      display: none; max-width: 620px; margin: 0 auto; text-align: center;
+      padding: 2rem 1rem;
+    }
+    .result-screen.show { display: block; animation: fadeInUp 0.5s ease forwards; }
+    .result-odey { width: 140px; margin-bottom: 1rem; animation: float 3s ease-in-out infinite; }
+    .result-title { font-family: var(--font-hand); font-size: 2rem; color: var(--blue); margin-bottom: 0.3rem; }
+    .result-subtitle { font-family: var(--font-hand); font-size: 1rem; color: var(--ink-faint); margin-bottom: 1.5rem; }
+    .score-circle {
+      width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 1.5rem;
+      border: 6px solid var(--green); background: var(--green-pale);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      box-shadow: var(--shadow-lg);
+    }
+    .score-circle.mid  { border-color: var(--yellow); background: var(--yellow-pale); }
+    .score-circle.low  { border-color: var(--red);    background: var(--red-pale); }
+    .score-big { font-family: var(--font-hand); font-size: 3rem; font-weight: 700; line-height: 1; }
+    .score-of  { font-family: var(--font-hand); font-size: 0.9rem; color: var(--ink-faint); }
+    .odey-result-msg {
+      background: var(--yellow-pale); border: 1.5px dashed var(--yellow);
+      border-radius: var(--radius-md); padding: 1rem 1.2rem;
+      font-family: var(--font-hand); font-size: 1rem; color: var(--ink-soft);
+      font-style: italic; margin-bottom: 1.5rem; line-height: 1.6;
+    }
+    .result-breakdown {
+      background: white; border: 2px solid var(--paper-lines); border-radius: var(--radius-md);
+      padding: 1rem 1.5rem; margin-bottom: 1.5rem; text-align: left;
+    }
+    .result-breakdown h3 { font-size: 1rem; color: var(--ink-soft); margin-bottom: 0.7rem; }
+    .breakdown-row { display: flex; justify-content: space-between; align-items: center;
+      font-family: var(--font-hand); font-size: 0.95rem; padding: 0.3rem 0;
+      border-bottom: 1px dashed var(--paper-lines); }
+    .breakdown-row:last-child { border-bottom: none; }
+    .breakdown-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 0.4rem; }
+    .result-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+    @media (max-width: 600px) {
+      .mc-options { grid-template-columns: 1fr; }
+      .match-container { flex-direction: column; }
+      .drag-zones { grid-template-columns: 1fr; }
+      .quiz-info-grid { grid-template-columns: 1fr 1fr; }
+      .question-card { padding: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">Learning with <span>Odey</span></a>
+    <button class="nav-toggle" id="navToggle"><span></span><span></span><span></span></button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="materials.html">Materials</a></li>
+      <li><a href="quiz.html" class="active">Quiz</a></li>
+      <li><a href="minigames.html">Mini Games</a></li>
+      <li><a href="experiment.html">Experiment</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+  </nav>
+
+  <div class="page-content">
+    <div class="quiz-page">
+
+      <!-- ══ START SCREEN ══ -->
+      <div class="start-screen" id="startScreen">
+        <img src="assets/odey.png" class="start-odey" alt="Odey">
+        <h1>📝 Quiz Time!</h1>
+        <p class="start-desc">
+          Alright, Freund! Let's see how much you've learned about Additive and Addictive Substances.
+          Answer carefully — some questions are trickier than they look! Viel Erfolg! 🍀
+        </p>
+        <div class="quiz-info-grid">
+          <div class="quiz-info-card">
+            <div class="info-icon">❓</div>
+            <div class="info-val">20</div>
+            <div class="info-label">Questions</div>
+          </div>
+          <div class="quiz-info-card">
+            <div class="info-icon">⏱️</div>
+            <div class="info-val">20s</div>
+            <div class="info-label">Per question</div>
+          </div>
+          <div class="quiz-info-card">
+            <div class="info-icon">🏆</div>
+            <div class="info-val">5 Types</div>
+            <div class="info-label">Question types</div>
+          </div>
+        </div>
+        <button class="start-btn" onclick="startQuiz()">🚀 Start Quiz</button>
+      </div>
+
+      <!-- ══ QUIZ SCREEN ══ -->
+      <div class="quiz-screen" id="quizScreen">
+        <!-- Header -->
+        <div class="quiz-header">
+          <span class="q-counter" id="qCounter">Question 1 / 20</span>
+          <div class="q-progress-bar"><div class="q-progress-fill" id="qProgressFill" style="width:0%"></div></div>
+          <span class="q-score-badge">⭐ <span id="liveScore">0</span> pts</span>
+        </div>
+
+        <!-- Timer -->
+        <div class="timer-wrap">
+          <div class="timer-ring">
+            <svg width="52" height="52" viewBox="0 0 52 52">
+              <circle class="bg" cx="26" cy="26" r="21"/>
+              <circle class="fg" id="timerCircle" cx="26" cy="26" r="21"/>
+            </svg>
+            <div class="timer-num" id="timerNum">20</div>
+          </div>
+          <span class="timer-label">seconds remaining</span>
+        </div>
+
+        <!-- Question card -->
+        <div class="question-card" id="questionCard">
+          <div class="q-type-badge" id="qTypeBadge"></div>
+          <div class="q-text" id="qText"></div>
+          <div id="qBody"></div>
+          <div class="feedback-box" id="feedbackBox"></div>
+        </div>
+
+        <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question ▶</button>
+      </div>
+
+      <!-- ══ RESULT SCREEN ══ -->
+      <div class="result-screen" id="resultScreen">
+        <img src="assets/odey.png" class="result-odey" id="resultOdey" alt="Odey">
+        <div class="result-title" id="resultTitle"></div>
+        <div class="result-subtitle" id="resultSubtitle"></div>
+        <div class="score-circle" id="scoreCircle">
+          <div class="score-big" id="scoreBig"></div>
+          <div class="score-of" id="scoreOf"></div>
+        </div>
+        <div class="odey-result-msg" id="odeyMsg"></div>
+        <div class="result-breakdown" id="resultBreakdown"></div>
+        <div class="result-btns">
+          <button class="btn btn-green" onclick="restartQuiz()">🔄 Try Again</button>
+          <a href="materials.html" class="btn btn-blue">📖 Review Materials</a>
+          <a href="minigames.html" class="btn btn-yellow">🎮 Mini Games</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <p>© 2026 Fauzan Ahmad · <a href="/cdn-cgi/l/email-protection#3d5b5c48475c535c55505c597d484d5413585948"><span class="__cf_email__" data-cfemail="076166727d6669666f6a66634772776e29626372">[email&#160;protected]</span></a></p>
+  </footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+document.getElementById('navToggle').addEventListener('click', () => {
+  document.getElementById('navLinks').classList.toggle('open');
+});
+
+/* ══════════════════════════════════════════════
+   QUESTION BANK
+══════════════════════════════════════════════ */
+const ALL_QUESTIONS = [
+
+  /* ── MULTIPLE CHOICE (7) ── */
+  {
+    type: 'mc',
+    text: 'A food manufacturer adds Rhodamine B to make their chili sauce look more red and attractive. Why is this practice dangerous?',
+    options: [
+      'Rhodamine B changes the taste of the food',
+      'Rhodamine B is a textile dye that is toxic and carcinogenic',
+      'Rhodamine B is too expensive to use in food',
+      'Rhodamine B causes food to spoil faster'
+    ],
+    answer: 1,
+    explanation: 'Rhodamine B is a synthetic textile dye strictly banned by BPOM. It is toxic and carcinogenic — meaning it can cause cancer. It has no place in food production.'
+  },
+  {
+    type: 'mc',
+    text: 'Saccharin is used in many "sugar-free" beverages. Which statement BEST explains why saccharin is preferred over regular sugar in these products?',
+    options: [
+      'Saccharin provides more calories than sugar',
+      'Saccharin is a natural sweetener extracted from plants',
+      'Saccharin is approximately 300× sweeter than sugar with little to no calories',
+      'Saccharin improves the color and appearance of beverages'
+    ],
+    answer: 2,
+    explanation: 'Saccharin is a non-nutritive artificial sweetener that is about 300× sweeter than sugar, making it useful in diet/sugar-free products. It provides sweetness without adding significant calories.'
+  },
+  {
+    type: 'mc',
+    text: 'A student finds that their meatballs have an unusually firm, rubbery texture even after several days. This is most likely because the seller illegally added:',
+    options: [
+      'MSG, to enhance the savory flavor',
+      'Tartrazine, to give a yellow color',
+      'Borax, to improve texture and extend shelf life',
+      'Carrageenan, as a natural thickener'
+    ],
+    answer: 2,
+    explanation: 'Borax (sodium tetraborate) is an industrial cleaning compound that is BANNED from food. It is sometimes illegally added to meatballs to give a firm, chewy texture — but it is toxic and dangerous to health.'
+  },
+  {
+    type: 'mc',
+    text: 'Under Indonesian Law No. 35/2009, morphine is classified as a Schedule II narcotic. What does this classification mean compared to heroin (Schedule I)?',
+    options: [
+      'Morphine is more addictive than heroin and has no medical use',
+      'Morphine has limited accepted medical use but still carries a high addiction risk',
+      'Morphine is completely safe and freely available at pharmacies',
+      'Morphine is a psychotropic substance, not a narcotic'
+    ],
+    answer: 1,
+    explanation: 'Schedule II narcotics like morphine have limited medical use (e.g., as a strong painkiller of last resort) but still carry a high addiction risk. In contrast, Schedule I narcotics like heroin have NO accepted medical use and are entirely prohibited.'
+  },
+  {
+    type: 'mc',
+    text: 'Agar-agar, carrageenan, and gelatin are all used in food production. What do these three substances have in common?',
+    options: [
+      'They are all artificial sweeteners used to reduce sugar content',
+      'They are all synthetic preservatives that extend shelf life',
+      'They are all thickeners and gelling agents that improve food texture',
+      'They are all banned substances that are illegally used in street food'
+    ],
+    answer: 2,
+    explanation: 'Agar-agar (seaweed), carrageenan (red seaweed), and gelatin (animal-based) are all thickeners and gelling agents. They improve the texture and consistency of foods like jelly, pudding, ice cream, and dairy products.'
+  },
+  {
+    type: 'mc',
+    text: 'MSG has a controversial reputation, but scientists and agencies like the FDA consider it safe. Which statement about MSG is scientifically accurate according to the materials?',
+    options: [
+      'MSG is a synthetic chemical with no natural equivalent in food',
+      'MSG occurs naturally in foods like tomatoes, parmesan cheese, and soy sauce',
+      'MSG is classified as a banned additive by BPOM in Indonesia',
+      'MSG functions as a preservative that prevents microbial growth'
+    ],
+    answer: 1,
+    explanation: 'MSG (monosodium glutamate) is a flavor enhancer derived from glutamic acid — an amino acid that occurs naturally in tomatoes, parmesan, and soy sauce. When used within recommended limits, it is considered safe by both FDA and BPOM.'
+  },
+  {
+    type: 'mc',
+    text: 'Methamphetamine (shabu) and LSD are both addictive substances, but they belong to different categories. Which statement correctly distinguishes them?',
+    options: [
+      'Methamphetamine is a narcotic; LSD is a psychotropic hallucinogen',
+      'Methamphetamine is a psychotropic stimulant; LSD is a psychotropic hallucinogen',
+      'Both methamphetamine and LSD are Schedule I narcotics',
+      'Methamphetamine slows the CNS; LSD speeds up the CNS'
+    ],
+    answer: 1,
+    explanation: 'Both are psychotropic substances, but they act differently. Methamphetamine is a powerful CNS stimulant causing extreme alertness and paranoia. LSD is a hallucinogen that distorts perception and can trigger psychosis and flashbacks.'
+  },
+
+  /* ── TRUE OR FALSE (5) ── */
+  {
+    type: 'tf',
+    text: 'Formalin is a permitted food preservative in Indonesia as long as it is used in small doses below the Acceptable Daily Intake (ADI).',
+    answer: false,
+    explanation: 'FALSE. Formalin (formaldehyde solution) is STRICTLY BANNED from food use by BPOM — there is no "safe" dose for food. It is an industrial disinfectant and carcinogen. Any amount in food is illegal and dangerous.'
+  },
+  {
+    type: 'tf',
+    text: 'Caffeine is classified as a psychoactive substance because it affects the central nervous system by blocking adenosine receptors, reducing feelings of fatigue.',
+    answer: true,
+    explanation: 'TRUE. Caffeine (C₈H₁₀N₄O₂) is technically a psychoactive substance. It works by blocking adenosine receptors in the brain — adenosine normally causes drowsiness, so blocking it creates alertness. Excessive caffeine can cause anxiety, insomnia, and heart palpitations.'
+  },
+  {
+    type: 'tf',
+    text: 'Beta-carotene and chlorophyll are examples of synthetic colorants that are manufactured in laboratories and added to food for visual appeal.',
+    answer: false,
+    explanation: 'FALSE. Both beta-carotene and chlorophyll are NATURAL colorants. Beta-carotene is derived from carrots and other orange/yellow plants; chlorophyll comes from green plants. Natural colorants are plant, animal, or mineral-derived — not manufactured synthetically.'
+  },
+  {
+    type: 'tf',
+    text: 'Long-term alcohol consumption can cause liver cirrhosis and brain damage, making ethanol (C₂H₅OH) a substance with serious health risks despite being legal.',
+    answer: true,
+    explanation: 'TRUE. Chronic alcohol use causes fatty liver, cirrhosis, and brain damage. Ethanol is a CNS depressant — while legal, it carries significant long-term health risks and is addictive, which is why it is regulated.'
+  },
+  {
+    type: 'tf',
+    text: 'Vanillin and isoamyl acetate are examples of natural flavorings extracted directly from vanilla beans and bananas respectively.',
+    answer: false,
+    explanation: 'FALSE. Vanillin and isoamyl acetate are ARTIFICIAL (synthetic) aroma enhancers — they are chemical compounds that mimic the scent of vanilla and banana. They are used because using actual natural ingredients would be too costly or impractical at industrial scale.'
+  },
+
+  /* ── FILL IN THE BLANK (4) ── */
+  {
+    type: 'fill',
+    text: 'Tartrazine and Carmoisine are examples of synthetic colorants that are __ in Indonesia, while Rhodamine B and Metanil Yellow are strictly __ because they are toxic.',
+    answer: 'permitted',
+    hint: 'Think: allowed vs. forbidden. What word means "allowed within limits"?',
+    explanation: 'Tartrazine and Carmoisine are PERMITTED synthetic colorants (within regulated limits set by BPOM). Rhodamine B and Metanil Yellow are BANNED because they are toxic and carcinogenic — the key distinction is safety and BPOM regulation.'
+  },
+  {
+    type: 'fill',
+    text: 'The food additive category that prevents or slows the growth of bacteria, mold, and yeast to extend shelf life is called a ___.',
+    answer: 'preservative',
+    hint: 'This type of additive "preserves" food — what is it called?',
+    explanation: 'Preservatives inhibit microbial growth (bacteria, mold, yeast) to extend the shelf life of food products. Examples include salt, citric acid, and sodium benzoate. Formalin and borax are BANNED substances sometimes illegally used for this purpose.'
+  },
+  {
+    type: 'fill',
+    text: 'The active addictive compound in tobacco products that stimulates dopamine release and causes physical dependence is called ___.',
+    answer: 'nicotine',
+    hint: 'It starts with N — you can find it in cigarettes and vapes.',
+    explanation: 'Nicotine is the primary addictive compound in tobacco. It stimulates dopamine release in the brain, creating a reward response that leads to dependence. Long-term tobacco use also exposes the body to tar and carbon monoxide, causing lung cancer and cardiovascular disease.'
+  },
+  {
+    type: 'fill',
+    text: 'In Indonesia, the use of food additives is regulated by ___, the government agency responsible for food and drug safety.',
+    answer: 'bpom',
+    hint: '4-letter acronym — Badan Pengawas Obat dan Makanan',
+    explanation: 'BPOM (Badan Pengawas Obat dan Makanan) is Indonesia\'s equivalent of the FDA. It regulates which additives are permitted, at what doses, and in which products. All food additives must be approved by BPOM before being used.'
+  },
+
+  /* ── MATCH THE PAIRS (2) ── */
+  {
+    type: 'match',
+    text: 'Match each food additive to its correct function/category.',
+    pairs: [
+      { left: 'Chlorophyll',      right: 'Natural Colorant' },
+      { left: 'Aspartame',        right: 'Artificial Sweetener' },
+      { left: 'Sodium Benzoate',  right: 'Preservative' },
+      { left: 'Carrageenan',      right: 'Thickener' },
+    ],
+    explanation: 'Chlorophyll = natural green colorant from plants; Aspartame = artificial sweetener, 200× sweeter than sugar; Sodium Benzoate = preservative that inhibits mold/yeast in beverages; Carrageenan = thickener from red seaweed used in dairy and sauces.'
+  },
+  {
+    type: 'match',
+    text: 'Match each addictive substance to its correct classification under Indonesian law.',
+    pairs: [
+      { left: 'Heroin',          right: 'Schedule I Narcotic' },
+      { left: 'Morphine',        right: 'Schedule II Narcotic' },
+      { left: 'Ecstasy (MDMA)',  right: 'Psychotropic' },
+      { left: 'Tobacco',         right: 'Other Addictive Substance' },
+    ],
+    explanation: 'Heroin = no medical use, highest risk (Schedule I); Morphine = limited medical use as painkiller (Schedule II); Ecstasy/MDMA = psychotropic affecting serotonin system; Tobacco = legal but addictive substance not classified as narcotic or psychotropic.'
+  },
+
+  /* ── DRAG & DROP (2) ── */
+  {
+    type: 'drag',
+    text: 'Drag each substance into the correct category: PERMITTED food additive OR BANNED substance.',
+    items: ['Citric Acid', 'Formalin', 'Tartrazine', 'Rhodamine B', 'Agar-Agar', 'Borax'],
+    zones: [
+      { label: '✅ Permitted Food Additive', correct: ['Citric Acid', 'Tartrazine', 'Agar-Agar'] },
+      { label: '⛔ Banned Substance',        correct: ['Formalin', 'Rhodamine B', 'Borax'] },
+    ],
+    explanation: 'Permitted: Citric Acid (natural preservative), Tartrazine (synthetic colorant within limits), Agar-Agar (natural thickener). Banned: Formalin (industrial disinfectant — carcinogenic), Rhodamine B (toxic textile dye), Borax (industrial cleaner — toxic).'
+  },
+  {
+    type: 'drag',
+    text: 'Drag each substance into the correct group: Food ADDITIVE Substance OR ADDICTIVE Substance.',
+    items: ['Vanillin', 'Cocaine', 'Saccharin', 'Nicotine', 'MSG', 'Methamphetamine'],
+    zones: [
+      { label: '🧂 Food Additive Substance',  correct: ['Vanillin', 'Saccharin', 'MSG'] },
+      { label: '⚠️ Addictive Substance',       correct: ['Cocaine', 'Nicotine', 'Methamphetamine'] },
+    ],
+    explanation: 'Food Additives: Vanillin (aroma enhancer), Saccharin (artificial sweetener), MSG (flavor enhancer). Addictive Substances: Cocaine (Schedule I narcotic), Nicotine (tobacco compound — other addictive), Methamphetamine (psychotropic stimulant).'
+  },
+
+];
+
+
+/* ══════════════════════════════════════════════
+   QUIZ STATE
+══════════════════════════════════════════════ */
+let questions = [];
+let current   = 0;
+let score     = 0;
+let answered  = false;
+let timerInterval = null;
+let timeLeft  = 20;
+let typeBreakdown = {};
+let matchState = null;
+let dragState  = null;
+
+const TIMER_TOTAL = 20;
+const CIRCUMFERENCE = 2 * Math.PI * 21; // r=21 → 131.95
+
+/* ══════════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════════ */
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* ══════════════════════════════════════════════
+   START / RESTART
+══════════════════════════════════════════════ */
+function startQuiz() {
+  questions = shuffle(ALL_QUESTIONS);
+  current = 0; score = 0; answered = false;
+  typeBreakdown = { mc: [0,0], tf: [0,0], fill: [0,0], match: [0,0], drag: [0,0] };
+
+  document.getElementById('startScreen').style.display  = 'none';
+  document.getElementById('resultScreen').classList.remove('show');
+  document.getElementById('quizScreen').classList.add('show');
+
+  loadQuestion();
+}
+
+function restartQuiz() {
+  document.getElementById('resultScreen').classList.remove('show');
+  document.getElementById('startScreen').style.display = 'block';
+  document.getElementById('quizScreen').classList.remove('show');
+  clearInterval(timerInterval);
+}
+
+/* ══════════════════════════════════════════════
+   LOAD QUESTION
+══════════════════════════════════════════════ */
+function loadQuestion() {
+  answered = false;
+  const q = questions[current];
+
+  // Header
+  document.getElementById('qCounter').textContent = `Question ${current + 1} / ${questions.length}`;
+  document.getElementById('qProgressFill').style.width = `${(current / questions.length) * 100}%`;
+  document.getElementById('liveScore').textContent = score;
+
+  // Type badge
+  const badges = { mc:'badge-mc', tf:'badge-tf', fill:'badge-fill', match:'badge-match', drag:'badge-drag' };
+  const labels = { mc:'Multiple Choice', tf:'True or False', fill:'Fill in the Blank', match:'Match the Pairs', drag:'Drag & Drop' };
+  const badge = document.getElementById('qTypeBadge');
+  badge.className = 'q-type-badge ' + badges[q.type];
+  badge.textContent = labels[q.type];
+
+  // Question text
+  document.getElementById('qText').textContent = q.text;
+
+  // Body
+  const body = document.getElementById('qBody');
+  body.innerHTML = '';
+
+  if (q.type === 'mc')    renderMC(q, body);
+  if (q.type === 'tf')    renderTF(q, body);
+  if (q.type === 'fill')  renderFill(q, body);
+  if (q.type === 'match') renderMatch(q, body);
+  if (q.type === 'drag')  renderDrag(q, body);
+
+  // Feedback & next
+  const fb = document.getElementById('feedbackBox');
+  fb.className = 'feedback-box';
+  fb.innerHTML = '';
+  const nb = document.getElementById('nextBtn');
+  nb.className = 'next-btn';
+
+  // Animate card
+  const card = document.getElementById('questionCard');
+  card.style.animation = 'none';
+  void card.offsetWidth;
+  card.style.animation = 'popIn 0.35s ease forwards';
+
+  startTimer();
+}
+
+/* ══════════════════════════════════════════════
+   TIMER
+══════════════════════════════════════════════ */
+function startTimer() {
+  clearInterval(timerInterval);
+  timeLeft = TIMER_TOTAL;
+  updateTimerUI(timeLeft);
+
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerUI(timeLeft);
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      if (!answered) timeUp();
+    }
+  }, 1000);
+}
+
+function updateTimerUI(t) {
+  document.getElementById('timerNum').textContent = t;
+  const circle = document.getElementById('timerCircle');
+  const pct = t / TIMER_TOTAL;
+  circle.style.strokeDashoffset = CIRCUMFERENCE * (1 - pct);
+  circle.style.stroke = t > 10 ? 'var(--green)' : t > 5 ? 'var(--yellow)' : 'var(--red)';
+  document.getElementById('timerNum').style.color = t <= 5 ? 'var(--red)' : 'var(--ink)';
+}
+
+function timeUp() {
+  answered = true;
+  const q = questions[current];
+  updateBreakdown(q.type, false);
+  showFeedback(false, '⏰ Time\'s up! ' + q.explanation);
+  document.getElementById('nextBtn').classList.add('show');
+  disableAllInputs();
+}
+
+/* ══════════════════════════════════════════════
+   FEEDBACK
+══════════════════════════════════════════════ */
+function showFeedback(correct, explanation) {
+  const fb = document.getElementById('feedbackBox');
+  fb.className = 'feedback-box show ' + (correct ? 'correct-fb' : 'wrong-fb');
+  fb.innerHTML = `<span style="font-size:1.3rem">${correct ? '✅' : '❌'}</span>
+    <span>${correct ? '<strong>Correct! Wunderbar!</strong> ' : '<strong>Not quite.</strong> '}${explanation}</span>`;
+}
+
+function updateBreakdown(type, correct) {
+  if (!typeBreakdown[type]) typeBreakdown[type] = [0, 0];
+  if (correct) typeBreakdown[type][0]++;
+  typeBreakdown[type][1]++;
+}
+
+/* ══════════════════════════════════════════════
+   RENDER: MULTIPLE CHOICE
+══════════════════════════════════════════════ */
+function renderMC(q, body) {
+  const letters = ['A', 'B', 'C', 'D'];
+  const grid = document.createElement('div');
+  grid.className = 'mc-options';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'mc-btn';
+    btn.innerHTML = `<span class="opt-letter">${letters[i]}</span>${opt}`;
+    btn.addEventListener('click', () => {
+      if (answered) return;
+      answered = true;
+      clearInterval(timerInterval);
+      const correct = i === q.answer;
+      if (correct) score += 5;
+      updateBreakdown('mc', correct);
+
+      grid.querySelectorAll('.mc-btn').forEach((b, j) => {
+        b.disabled = true;
+        if (j === q.answer) b.classList.add('correct');
+        else if (j === i && !correct) b.classList.add('wrong');
+      });
+
+      showFeedback(correct, q.explanation);
+      document.getElementById('nextBtn').classList.add('show');
+    });
+    grid.appendChild(btn);
+  });
+  body.appendChild(grid);
+}
+
+/* ══════════════════════════════════════════════
+   RENDER: TRUE OR FALSE
+══════════════════════════════════════════════ */
+function renderTF(q, body) {
+  const wrap = document.createElement('div');
+  wrap.className = 'tf-options';
+
+  ['TRUE', 'FALSE'].forEach(label => {
+    const btn = document.createElement('button');
+    btn.className = `tf-btn ${label === 'TRUE' ? 'true-btn' : 'false-btn'}`;
+    btn.innerHTML = `<span style="font-size:2rem">${label === 'TRUE' ? '✅' : '❌'}</span><span class="tf-label">${label}</span>`;
+    btn.addEventListener('click', () => {
+      if (answered) return;
+      answered = true;
+      clearInterval(timerInterval);
+      const userAnswer = label === 'TRUE';
+      const correct = userAnswer === q.answer;
+      if (correct) score += 5;
+      updateBreakdown('tf', correct);
+
+      wrap.querySelectorAll('.tf-btn').forEach(b => {
+        b.disabled = true;
+        const isTrue = b.classList.contains('true-btn');
+        if (isTrue === q.answer) b.classList.add('correct');
+        else if (isTrue === userAnswer && !correct) b.classList.add('wrong');
+      });
+
+      showFeedback(correct, q.explanation);
+      document.getElementById('nextBtn').classList.add('show');
+    });
+    wrap.appendChild(btn);
+  });
+  body.appendChild(wrap);
+}
+
+/* ══════════════════════════════════════════════
+   RENDER: FILL IN THE BLANK
+══════════════════════════════════════════════ */
+function renderFill(q, body) {
+  const wrap = document.createElement('div');
+  wrap.className = 'fill-wrap';
+
+  const hint = document.createElement('p');
+  hint.style.cssText = 'font-family:var(--font-hand);font-size:0.85rem;color:var(--ink-faint);font-style:italic;';
+  hint.textContent = '💡 Hint: ' + q.hint;
+  wrap.appendChild(hint);
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'fill-input';
+  input.placeholder = 'Type your answer here...';
+  wrap.appendChild(input);
+
+  const submitBtn = document.createElement('button');
+  submitBtn.className = 'fill-submit';
+  submitBtn.textContent = 'Submit Answer';
+  wrap.appendChild(submitBtn);
+
+  const checkAnswer = () => {
+    if (answered) return;
+    const val = input.value.trim().toLowerCase().replace(/[₂₅]/g, match => ({'₂':'2','₅':'5'}[match]||match));
+    if (!val) return;
+    answered = true;
+    clearInterval(timerInterval);
+
+    const correct = val === q.answer.toLowerCase();
+    if (correct) score += 5;
+    updateBreakdown('fill', correct);
+
+    input.disabled = true;
+    submitBtn.disabled = true;
+    input.classList.add(correct ? 'correct' : 'wrong');
+
+    if (!correct) {
+      const ans = document.createElement('p');
+      ans.style.cssText = 'font-family:var(--font-hand);font-size:0.9rem;color:var(--green);margin-top:0.4rem;';
+      ans.textContent = '✅ Correct answer: ' + q.answer;
+      wrap.appendChild(ans);
+    }
+
+    showFeedback(correct, q.explanation);
+    document.getElementById('nextBtn').classList.add('show');
+  };
+
+  submitBtn.addEventListener('click', checkAnswer);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') checkAnswer(); });
+  body.appendChild(wrap);
+}
+
+/* ══════════════════════════════════════════════
+   RENDER: MATCH THE PAIRS
+══════════════════════════════════════════════ */
+function renderMatch(q, body) {
+  const pairs = shuffle(q.pairs.map((p,i) => ({...p, id: i})));
+  const rights = shuffle(pairs.map(p => p.right));
+
+  matchState = { selected: null, matched: 0, total: pairs.length, correct: 0 };
+
+  const container = document.createElement('div');
+  container.className = 'match-container';
+
+  const leftCol = document.createElement('div');
+  leftCol.className = 'match-col';
+  const leftLabel = document.createElement('div');
+  leftLabel.className = 'match-col-label';
+  leftLabel.textContent = 'Term';
+  leftCol.appendChild(leftLabel);
+
+  const rightCol = document.createElement('div');
+  rightCol.className = 'match-col';
+  const rightLabel = document.createElement('div');
+  rightLabel.className = 'match-col-label';
+  rightLabel.textContent = 'Definition';
+  rightCol.appendChild(rightLabel);
+
+  pairs.forEach(p => {
+    const item = document.createElement('div');
+    item.className = 'match-item';
+    item.textContent = p.left;
+    item.dataset.left = p.left;
+    item.dataset.right = p.right;
+    item.addEventListener('click', () => handleMatchClick(item, 'left', body));
+    leftCol.appendChild(item);
+  });
+
+  rights.forEach(r => {
+    const item = document.createElement('div');
+    item.className = 'match-item';
+    item.textContent = r;
+    item.dataset.value = r;
+    item.addEventListener('click', () => handleMatchClick(item, 'right', body));
+    rightCol.appendChild(item);
+  });
+
+  container.appendChild(leftCol);
+  container.appendChild(rightCol);
+  body.appendChild(container);
+}
+
+function handleMatchClick(item, side, body) {
+  if (answered) return;
+  if (item.classList.contains('matched-correct')) return;
+
+  if (side === 'left') {
+    // Deselect previous left
+    document.querySelectorAll('.match-item[data-left]').forEach(el => el.classList.remove('selected-match'));
+    item.classList.add('selected-match');
+    matchState.selected = item;
+  } else {
+    // Pair with selected left
+    if (!matchState.selected) return;
+    const leftItem = matchState.selected;
+    const correct = leftItem.dataset.right === item.dataset.value;
+
+    leftItem.classList.remove('selected-match');
+    leftItem.classList.add(correct ? 'matched-correct' : 'matched-wrong');
+    item.classList.add(correct ? 'matched-correct' : 'matched-wrong');
+    leftItem.style.pointerEvents = 'none';
+
+    if (correct) {
+      matchState.correct++;
+      score += 1;
+    } else {
+      // Re-enable after shake
+      setTimeout(() => {
+        leftItem.classList.remove('matched-wrong');
+        item.classList.remove('matched-wrong');
+        leftItem.style.pointerEvents = '';
+      }, 600);
+    }
+
+    matchState.matched = document.querySelectorAll('.matched-correct').length / 2;
+    matchState.selected = null;
+
+    if (matchState.matched >= matchState.total) {
+      answered = true;
+      clearInterval(timerInterval);
+      const allCorrect = matchState.correct === matchState.total;
+      updateBreakdown('match', allCorrect);
+      showFeedback(allCorrect, questions[current].explanation);
+      document.getElementById('nextBtn').classList.add('show');
+    }
+  }
+}
+
+/* ══════════════════════════════════════════════
+   RENDER: DRAG & DROP
+══════════════════════════════════════════════ */
+function renderDrag(q, body) {
+  const items = shuffle(q.items);
+  dragState = { placed: {}, zones: q.zones };
+
+  const instr = document.createElement('p');
+  instr.className = 'drag-instructions';
+  instr.textContent = '👆 Drag items from the pool below into the correct category box.';
+  body.appendChild(instr);
+
+  // Pool
+  const pool = document.createElement('div');
+  pool.className = 'drag-items-pool';
+  pool.id = 'dragPool';
+
+  items.forEach(item => {
+    const el = createDragItem(item);
+    pool.appendChild(el);
+  });
+
+  body.appendChild(pool);
+
+  // Zones
+  const zonesWrap = document.createElement('div');
+  zonesWrap.className = 'drag-zones';
+
+  q.zones.forEach((zone, zi) => {
+    const zoneEl = document.createElement('div');
+    zoneEl.className = 'drag-zone';
+    zoneEl.dataset.zone = zi;
+
+    const lbl = document.createElement('div');
+    lbl.className = 'drag-zone-label';
+    lbl.textContent = zone.label;
+    zoneEl.appendChild(lbl);
+
+    // Drag events
+    zoneEl.addEventListener('dragover', e => { e.preventDefault(); zoneEl.classList.add('drag-over'); });
+    zoneEl.addEventListener('dragleave', () => zoneEl.classList.remove('drag-over'));
+    zoneEl.addEventListener('drop', e => {
+      e.preventDefault();
+      zoneEl.classList.remove('drag-over');
+      const itemName = e.dataTransfer.getData('text/plain');
+      if (!itemName || answered) return;
+
+      // Remove from wherever it was
+      document.querySelectorAll(`.drag-item[data-name="${itemName}"]`).forEach(el => el.remove());
+
+      const newEl = createDragItem(itemName, false);
+      zoneEl.appendChild(newEl);
+      dragState.placed[itemName] = zi;
+    });
+
+    // Also allow dropping back to pool
+    zonesWrap.appendChild(zoneEl);
+  });
+
+  body.appendChild(zonesWrap);
+
+  // Pool drop-back
+  pool.addEventListener('dragover', e => { e.preventDefault(); pool.classList.add('drag-over'); });
+  pool.addEventListener('dragleave', () => pool.classList.remove('drag-over'));
+  pool.addEventListener('drop', e => {
+    e.preventDefault();
+    pool.classList.remove('drag-over');
+    const itemName = e.dataTransfer.getData('text/plain');
+    if (!itemName || answered) return;
+    document.querySelectorAll(`.drag-item[data-name="${itemName}"]`).forEach(el => el.remove());
+    delete dragState.placed[itemName];
+    const newEl = createDragItem(itemName);
+    pool.appendChild(newEl);
+  });
+
+  // Submit drag button
+  const submitBtn = document.createElement('button');
+  submitBtn.className = 'fill-submit';
+  submitBtn.style.marginTop = '1rem';
+  submitBtn.textContent = '✅ Submit Classification';
+  submitBtn.addEventListener('click', () => {
+    if (answered) return;
+    const total = q.items.length;
+    const placed = Object.keys(dragState.placed).length;
+    if (placed < total) {
+      alert('Please place ALL items before submitting!');
+      return;
+    }
+    answered = true;
+    clearInterval(timerInterval);
+
+    let correctCount = 0;
+    q.items.forEach(item => {
+      const zoneIdx = dragState.placed[item];
+      const correctZone = q.zones.findIndex(z => z.correct.includes(item));
+      if (zoneIdx === correctZone) correctCount++;
+    });
+
+    const allCorrect = correctCount === total;
+    if (allCorrect) score += 5;
+    else if (correctCount >= total / 2) score += 2;
+
+    updateBreakdown('drag', allCorrect);
+
+    // Color zones
+    document.querySelectorAll('.drag-zone').forEach((z, zi) => {
+      const zone = q.zones[zi];
+      const inZone = q.items.filter(item => dragState.placed[item] === zi);
+      const allRight = inZone.every(item => zone.correct.includes(item)) && inZone.length === zone.correct.length;
+      z.classList.add(allRight ? 'zone-correct' : 'zone-wrong');
+    });
+
+    submitBtn.disabled = true;
+    showFeedback(allCorrect, `${correctCount}/${total} correct. ` + q.explanation);
+    document.getElementById('nextBtn').classList.add('show');
+  });
+  body.appendChild(submitBtn);
+}
+
+function createDragItem(name, draggable = true) {
+  const el = document.createElement('div');
+  el.className = 'drag-item';
+  el.textContent = name;
+  el.dataset.name = name;
+  if (draggable) {
+    el.draggable = true;
+    el.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('text/plain', name);
+      el.classList.add('dragging');
+    });
+    el.addEventListener('dragend', () => el.classList.remove('dragging'));
+  }
+  return el;
+}
+
+/* ══════════════════════════════════════════════
+   DISABLE INPUTS (time up)
+══════════════════════════════════════════════ */
+function disableAllInputs() {
+  document.querySelectorAll('.mc-btn, .tf-btn, .fill-input, .fill-submit, .match-item').forEach(el => {
+    el.disabled = true;
+    el.style.pointerEvents = 'none';
+  });
+}
+
+/* ══════════════════════════════════════════════
+   NEXT QUESTION
+══════════════════════════════════════════════ */
+function nextQuestion() {
+  current++;
+  if (current >= questions.length) {
+    showResult();
+  } else {
+    loadQuestion();
+  }
+}
+
+/* ══════════════════════════════════════════════
+   SHOW RESULT
+══════════════════════════════════════════════ */
+function showResult() {
+  clearInterval(timerInterval);
+  document.getElementById('quizScreen').classList.remove('show');
+
+  const maxScore = questions.length * 5;
+  const pct = score / maxScore;
+
+  const rs = document.getElementById('resultScreen');
+  rs.classList.add('show');
+
+  // Score circle color
+  const circle = document.getElementById('scoreCircle');
+  circle.className = 'score-circle' + (pct >= 0.8 ? '' : pct >= 0.5 ? ' mid' : ' low');
+  document.getElementById('scoreBig').textContent = score;
+  document.getElementById('scoreOf').textContent = `/ ${maxScore} pts`;
+
+  // Title & Odey message
+  let title, subtitle, msg;
+  if (pct >= 0.9) {
+    title = '🏆 Outstanding!'; subtitle = 'You\'re a true science expert!';
+    msg = '"Ausgezeichnet!! You absolutely crushed it, Freund! I\'m so proud! 🎉 Maybe you should be the teacher next time!"';
+  } else if (pct >= 0.75) {
+    title = '🌟 Great Job!'; subtitle = 'You really know your stuff!';
+    msg = '"Sehr gut! That\'s really impressive, Freund! A few more rounds and you\'ll be unbeatable. Ja! 💪"';
+  } else if (pct >= 0.5) {
+    title = '📚 Good Effort!'; subtitle = 'You\'re getting there!';
+    msg = '"Nicht schlecht! Not bad at all! But I think a little review of the materials would help, ja? You\'ve got this! 📖"';
+  } else {
+    title = '🔄 Keep Trying!'; subtitle = 'Review and come back stronger!';
+    msg = '"Hmm... Das ist okay, Freund! Even the best scientists fail experiments sometimes. Review the materials and try again — I believe in you! 🚀"';
+  }
+
+  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultSubtitle').textContent = subtitle;
+  document.getElementById('odeyMsg').textContent = msg;
+
+  // Breakdown
+  const typeNames = { mc: 'Multiple Choice', tf: 'True or False', fill: 'Fill in the Blank', match: 'Match the Pairs', drag: 'Drag & Drop' };
+  const typeColors = { mc: 'var(--blue)', tf: 'var(--yellow)', fill: 'var(--green)', match: 'var(--purple)', drag: 'var(--red)' };
+  const bd = document.getElementById('resultBreakdown');
+  bd.innerHTML = '<h3>📊 Performance by Type</h3>';
+  Object.entries(typeBreakdown).forEach(([type, [c, t]]) => {
+    if (t === 0) return;
+    const row = document.createElement('div');
+    row.className = 'breakdown-row';
+    row.innerHTML = `
+      <span><span class="breakdown-dot" style="background:${typeColors[type]}"></span>${typeNames[type]}</span>
+         <span>${c}/${t}</span>
+    `;
+    bd.appendChild(row);
+  });
+}
+
+window.addEventListener('load', () => {
+  document.getElementById('nextBtn').addEventListener('click', nextQuestion);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Materials — Learning with Odey</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── Materials Page ── */
+    .materials-hero {
+      background: var(--paper-dark);
+      border-bottom: 2px solid var(--paper-lines);
+      padding: 2.5rem 2rem 2rem;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .materials-hero h1 {
+      color: var(--blue);
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      position: relative;
+      display: inline-block;
+    }
+
+    .materials-hero h1::after {
+      content: '';
+      position: absolute;
+      bottom: -5px; left: 0; right: 0;
+      height: 4px;
+      background: var(--yellow);
+      border-radius: 2px;
+      transform: rotate(-0.5deg);
+    }
+
+    .materials-hero p {
+      margin-top: 0.8rem;
+      font-family: var(--font-hand);
+      font-size: 1.05rem;
+      color: var(--ink-faint);
+    }
+
+    /* Hero doodles */
+    .hero-molecule {
+      position: absolute;
+      opacity: 0.07;
+      pointer-events: none;
+    }
+
+    /* ── Main Tab Switcher (Additive / Addictive) ── */
+    .main-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      padding: 2rem 1rem 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .main-tab-btn {
+      font-family: var(--font-hand);
+      font-size: 1.2rem;
+      font-weight: 700;
+      padding: 0.7rem 2rem;
+      border-radius: var(--radius-md) var(--radius-md) 0 0;
+      border: 2.5px solid var(--paper-lines);
+      border-bottom: none;
+      background: var(--paper-dark);
+      color: var(--ink-faint);
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      bottom: -2px;
+    }
+
+    .main-tab-btn.active-add  { background: var(--blue-pale);  color: var(--blue);  border-color: var(--blue); }
+    .main-tab-btn.active-addict { background: var(--red-pale); color: var(--red);   border-color: var(--red); }
+
+    /* ── Content Area ── */
+    .materials-content {
+      position: relative;
+      z-index: 1;
+      padding: 0 1.5rem 4rem;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .topic-panel {
+      display: none;
+      border: 2.5px solid var(--paper-lines);
+      border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md);
+      background: white;
+      padding: 2rem;
+      box-shadow: var(--shadow-md);
+      animation: fadeInUp 0.3s ease forwards;
+    }
+
+    .topic-panel.show { display: block; }
+    .topic-panel.additive  { border-color: var(--blue); }
+    .topic-panel.addictive { border-color: var(--red); }
+
+    /* ── Definition Block ── */
+    .definition-block {
+      display: flex;
+      gap: 1.5rem;
+      align-items: flex-start;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 2px dashed var(--paper-lines);
+    }
+
+    .definition-icon {
+      font-size: 3.5rem;
+      flex-shrink: 0;
+      animation: float 4s ease-in-out infinite;
+    }
+
+    .definition-text h2 {
+      color: var(--blue);
+      margin-bottom: 0.5rem;
+    }
+
+    .definition-text.red h2 { color: var(--red); }
+
+    .definition-text p {
+      font-size: 1rem;
+      line-height: 1.75;
+    }
+
+    /* ── Odey Comment ── */
+    .odey-comment {
+      display: flex;
+      align-items: flex-end;
+      gap: 1rem;
+      margin: 1.5rem 0;
+      padding: 0.8rem 1rem;
+      background: var(--yellow-pale);
+      border: 1.5px dashed var(--yellow);
+      border-radius: var(--radius-md);
+    }
+
+    .odey-comment-img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      flex-shrink: 0;
+      animation: wobble 4s ease-in-out infinite;
+    }
+
+    .odey-comment-text {
+      font-family: var(--font-hand);
+      font-size: 0.95rem;
+      color: var(--ink-soft);
+      font-style: italic;
+    }
+
+    /* ── Sub-tabs (classifications) ── */
+    .sub-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 0;
+      border-bottom: 2px solid var(--paper-lines);
+      padding-bottom: 0;
+    }
+
+    .sub-tab-btn {
+      font-family: var(--font-hand);
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 0.4rem 1rem;
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      border: 2px solid var(--paper-lines);
+      border-bottom: none;
+      background: var(--paper-dark);
+      color: var(--ink-faint);
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      bottom: -2px;
+    }
+
+    .sub-tab-btn.active {
+      background: white;
+      color: var(--blue);
+      border-color: var(--blue);
+      bottom: -2px;
+      padding-bottom: calc(0.4rem + 2px);
+    }
+
+    .sub-tab-btn.active.red-tab { color: var(--red); border-color: var(--red); }
+
+    .sub-panel {
+      display: none;
+      padding: 1.5rem 0.5rem;
+      animation: fadeInUp 0.25s ease forwards;
+    }
+
+    .sub-panel.show { display: block; }
+
+    /* ── Classification Card ── */
+    .class-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .class-icon {
+      font-size: 2.2rem;
+      background: var(--blue-pale);
+      border-radius: var(--radius-md);
+      padding: 0.5rem 0.7rem;
+      border: 2px solid var(--blue-light);
+    }
+
+    .class-icon.red { background: var(--red-pale); border-color: var(--red-light); }
+    .class-icon.green { background: var(--green-pale); border-color: var(--green-light); }
+    .class-icon.yellow { background: var(--yellow-pale); border-color: var(--yellow-light); }
+    .class-icon.purple { background: var(--purple-pale); border-color: #b0a0d0; }
+
+    .class-header h3 { color: var(--blue); margin-bottom: 0.2rem; }
+    .class-header h3.red { color: var(--red); }
+    .class-header .class-subtitle {
+      font-family: var(--font-hand);
+      font-size: 0.9rem;
+      color: var(--ink-faint);
+    }
+
+    .class-desc {
+      font-size: 0.98rem;
+      line-height: 1.75;
+      margin-bottom: 1.2rem;
+    }
+
+    /* ── Example Cards (flip) ── */
+    .examples-label {
+      font-family: var(--font-hand);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 0.7rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .flip-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.8rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .flip-card {
+      height: 110px;
+      perspective: 800px;
+      cursor: pointer;
+    }
+
+    .flip-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: var(--radius-md);
+    }
+
+    .flip-card.flipped .flip-inner { transform: rotateY(180deg); }
+
+    .flip-front, .flip-back {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      border-radius: var(--radius-md);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0.6rem;
+      text-align: center;
+      border: 2px solid;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .flip-front {
+      background: var(--blue-pale);
+      border-color: var(--blue-light);
+    }
+
+    .flip-front.green-card { background: var(--green-pale); border-color: var(--green-light); }
+    .flip-front.red-card   { background: var(--red-pale);   border-color: var(--red-light); }
+    .flip-front.yellow-card { background: var(--yellow-pale); border-color: var(--yellow-light); }
+    .flip-front.purple-card { background: var(--purple-pale); border-color: #b0a0d0; }
+
+    .flip-front .card-emoji { font-size: 1.6rem; margin-bottom: 0.3rem; }
+    .flip-front .card-name  {
+      font-family: var(--font-hand);
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.2;
+    }
+
+    .flip-back {
+      background: var(--ink);
+      border-color: var(--ink);
+      color: white;
+      transform: rotateY(180deg);
+    }
+
+    .flip-back .back-label {
+      font-family: var(--font-hand);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      opacity: 0.6;
+      margin-bottom: 0.3rem;
+    }
+
+    .flip-back .back-text {
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      line-height: 1.4;
+      opacity: 0.9;
+    }
+
+    .flip-hint {
+      font-family: var(--font-hand);
+      font-size: 0.78rem;
+      color: var(--ink-faint);
+      margin-bottom: 1rem;
+      font-style: italic;
+    }
+
+    /* ── Use/Effect Table ── */
+    .info-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      margin-top: 1rem;
+    }
+
+    .info-table th {
+      background: var(--blue-pale);
+      color: var(--blue);
+      font-family: var(--font-hand);
+      font-weight: 700;
+      padding: 0.6rem 1rem;
+      text-align: left;
+      border: 2px solid var(--blue-light);
+    }
+
+    .info-table th.red-th { background: var(--red-pale); color: var(--red); border-color: var(--red-light); }
+
+    .info-table td {
+      padding: 0.6rem 1rem;
+      border: 1.5px solid var(--paper-lines);
+      color: var(--ink-soft);
+      vertical-align: top;
+    }
+
+    .info-table tr:nth-child(even) td { background: var(--paper); }
+
+    /* ── Divider ── */
+    .section-divider {
+      border: none;
+      border-top: 2px dashed var(--paper-lines);
+      margin: 1.5rem 0;
+    }
+
+    /* ── Navigation CTA ── */
+    .nav-cta {
+      margin-top: 3rem;
+      padding: 2rem;
+      background: var(--paper-dark);
+      border: 2px dashed var(--paper-lines);
+      border-radius: var(--radius-lg);
+      text-align: center;
+    }
+
+    .nav-cta h3 {
+      color: var(--ink-soft);
+      margin-bottom: 0.5rem;
+      font-size: 1.3rem;
+    }
+
+    .nav-cta p {
+      font-family: var(--font-hand);
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .nav-cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* Progress bar at top */
+    .read-progress {
+      position: fixed;
+      top: var(--nav-height);
+      left: 0;
+      height: 3px;
+      background: var(--blue);
+      z-index: 999;
+      transition: width 0.1s linear;
+      width: 0%;
+    }
+
+    @media (max-width: 700px) {
+      .definition-block { flex-direction: column; }
+      .flip-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+      .topic-panel { padding: 1.2rem; }
+      .main-tab-btn { font-size: 1rem; padding: 0.6rem 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Read progress bar -->
+  <div class="read-progress" id="readProgress"></div>
+
+  <!-- ── Navigation ── -->
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">Learning with <span>Odey</span></a>
+    <button class="nav-toggle" id="navToggle">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="materials.html" class="active">Materials</a></li>
+      <li><a href="quiz.html">Quiz</a></li>
+      <li><a href="minigames.html">Mini Games</a></li>
+      <li><a href="experiment.html">Experiment</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+  </nav>
+
+  <div class="page-content">
+
+    <!-- ── Hero ── -->
+    <div class="materials-hero">
+      <!-- Background molecule doodles -->
+      <svg class="hero-molecule" style="top:10px;right:40px;width:120px;" viewBox="0 0 120 120">
+        <circle cx="60" cy="60" r="10" fill="#4a6fa5"/>
+        <circle cx="20" cy="30" r="7"  fill="#4a7c59"/>
+        <circle cx="100" cy="30" r="7" fill="#a0453a"/>
+        <circle cx="20" cy="90" r="7"  fill="#b8922a"/>
+        <circle cx="100" cy="90" r="7" fill="#6b5b8a"/>
+        <line x1="60" y1="60" x2="20" y2="30" stroke="#2c2416" stroke-width="2"/>
+        <line x1="60" y1="60" x2="100" y2="30" stroke="#2c2416" stroke-width="2"/>
+        <line x1="60" y1="60" x2="20" y2="90" stroke="#2c2416" stroke-width="2"/>
+        <line x1="60" y1="60" x2="100" y2="90" stroke="#2c2416" stroke-width="2"/>
+      </svg>
+      <svg class="hero-molecule" style="bottom:5px;left:30px;width:80px;" viewBox="0 0 80 80">
+        <circle cx="40" cy="40" r="8" fill="#4a6fa5"/>
+        <circle cx="10" cy="40" r="6" fill="#a0453a"/>
+        <circle cx="70" cy="40" r="6" fill="#a0453a"/>
+        <circle cx="40" cy="10" r="6" fill="#4a7c59"/>
+        <circle cx="40" cy="70" r="6" fill="#4a7c59"/>
+        <line x1="40" y1="40" x2="10" y2="40" stroke="#2c2416" stroke-width="2"/>
+        <line x1="40" y1="40" x2="70" y2="40" stroke="#2c2416" stroke-width="2"/>
+        <line x1="40" y1="40" x2="40" y2="10" stroke="#2c2416" stroke-width="2"/>
+        <line x1="40" y1="40" x2="40" y2="70" stroke="#2c2416" stroke-width="2"/>
+      </svg>
+
+      <h1>📚 Materials</h1>
+      <p>Additive &amp; Addictive Substances — IPA Grade 8 · Merdeka Curriculum</p>
+    </div>
+
+    <!-- ── Main Tabs ── -->
+    <div class="main-tabs">
+      <button class="main-tab-btn active-add"  id="tabAdditive"  onclick="switchMain('additive')">🧂 Additive Substances</button>
+      <button class="main-tab-btn"             id="tabAddictive" onclick="switchMain('addictive')">⚠️ Addictive Substances</button>
+    </div>
+
+    <div class="materials-content">
+
+      <!-- ══════════════════════════════════════
+           PANEL A: ADDITIVE SUBSTANCES
+      ══════════════════════════════════════ -->
+      <div class="topic-panel additive show" id="panelAdditive">
+
+        <!-- Definition -->
+        <div class="definition-block">
+          <div class="definition-icon">🧃</div>
+          <div class="definition-text">
+            <h2>What are Additive Substances?</h2>
+            <p>
+              <strong>Food additives</strong> are natural or synthetic substances intentionally added to food or beverages
+              during processing, packaging, or storage. Their purpose is to improve taste, appearance, texture,
+              nutritional value, or shelf life — <em>not</em> to be consumed as food on their own.
+              In Indonesia, the use of food additives is regulated by BPOM (Food and Drug Supervisory Agency).
+            </p>
+          </div>
+        </div>
+
+        <!-- Odey comment -->
+        <div class="odey-comment">
+          <img src="assets/odey.png" class="odey-comment-img" alt="Odey">
+          <span class="odey-comment-text">
+            "So basically.. additives are why your instant noodles taste AMAZING but your homemade soup tastes is delicious!🍜"
+          </span>
+        </div>
+
+        <!-- Sub-tabs: classifications -->
+        <div class="sub-tabs" id="addSubTabs">
+          <button class="sub-tab-btn active" onclick="switchSub('add','colorant')">🍭 Colorants</button>
+          <button class="sub-tab-btn" onclick="switchSub('add','sweetener')">🍬 Sweeteners</button>
+          <button class="sub-tab-btn" onclick="switchSub('add','preservative')">🥓 Preservatives</button>
+          <button class="sub-tab-btn" onclick="switchSub('add','flavoring')">🍟 Flavorings</button>
+          <button class="sub-tab-btn" onclick="switchSub('add','aroma')">🍲 Aroma Enhancers</button>
+          <button class="sub-tab-btn" onclick="switchSub('add','thickener')">🍮 Thickeners</button>
+        </div>
+
+        <!-- ── Colorants ── -->
+        <div class="sub-panel show" id="add-colorant">
+          <div class="class-header">
+            <div class="class-icon">🍭</div>
+            <div>
+              <h3>Colorants (Food Coloring)</h3>
+              <span class="class-subtitle">Improve visual appeal of food &amp; beverages</span>
+            </div>
+          </div>
+          <p class="class-desc">
+            Colorants are substances added to restore color lost during processing or to make food more visually
+            appealing. They are divided into <strong>natural colorants</strong> (derived from plants, animals, or minerals)
+            and <strong>synthetic colorants</strong> (chemically manufactured). While both are permitted with proper
+            dosage, some synthetic dyes such as Rhodamine B and Metanil Yellow are <strong>strictly banned</strong>
+            because they are toxic and carcinogenic.
+          </p>
+          <div class="examples-label">🃏 Examples — click a card to flip!</div>
+          <p class="flip-hint">Tap any card to reveal its use in food</p>
+          <div class="flip-grid">
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front"><div class="card-emoji">🍃</div><div class="card-name">Chlorophyll</div></div>
+                <div class="flip-back"><div class="back-label">Use For</div><div class="back-text">Natural green color in jellies, cakes, and drinks</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front"><div class="card-emoji">🌿</div><div class="card-name">Curcumin</div></div>
+                <div class="flip-back"><div class="back-label">Use For</div><div class="back-text">Yellow/orange color from turmeric used in rice dishes & snacks</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front"><div class="card-emoji">🥕</div><div class="card-name">Beta-Carotene</div></div>
+                <div class="flip-back"><div class="back-label">Use For</div><div class="back-text">Orange-yellow color in margarine, cheese, and fruit drinks</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front green-card"><div class="card-emoji">🔴</div><div class="card-name">Carmoisine (Red 3)</div></div>
+                <div class="flip-back"><div class="back-label">Use For</div><div class="back-text">Synthetic red color in syrup, candy, and beverages</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front yellow-card"><div class="card-emoji">🟡</div><div class="card-name">Tartrazine</div></div>
+                <div class="flip-back"><div class="back-label">Use For</div><div class="back-text">Synthetic yellow color in noodles, chips, and cereal</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front red-card"><div class="card-emoji">☠️</div><div class="card-name">Rhodamine B</div></div>
+                <div class="flip-back"><div class="back-label">⛔ BANNED</div><div class="back-text">Toxic textile dye illegally used in food can causes cancer</div></div>
+              </div>
+            </div>
+          </div>
+          <table class="info-table">
+            <thead><tr><th>Type</th><th>Example</th><th>Found In</th></tr></thead>
+            <tbody>
+              <tr><td>Natural</td><td>Chlorophyll, Curcumin, Caramel</td><td>Pandan cake, turmeric rice, dark sauces</td></tr>
+              <tr><td>Synthetic (Permitted)</td><td>Tartrazine, Carmoisine, Brilliant Blue</td><td>Sweets, beverages, flavored snacks</td></tr>
+              <tr><td>Synthetic (Banned)</td><td>Rhodamine B, Metanil Yellow</td><td>Illegal use in street food (dangerous)!</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ── Sweeteners ── -->
+        <div class="sub-panel" id="add-sweetener">
+          <div class="class-header">
+            <div class="class-icon yellow">🍬</div>
+            <div>
+              <h3>Sweeteners</h3>
+              <span class="class-subtitle">Provide sweet taste, some are low or zero calorie</span>
+            </div>
+          </div>
+          <p class="class-desc">
+            Sweeteners are food additives that give a sweet flavor to food and beverages. They can be classified as
+            <strong>nutritive sweeteners</strong> (provide calories, e.g. sucrose, fructose) or
+            <strong>non-nutritive / artificial sweeteners</strong> (extremely sweet with little to no calories,
+            e.g. saccharin, aspartame). Artificial sweeteners are widely used in "diet" or "sugar free" products
+            and are generally safe within the Acceptable Daily Intake (ADI) set by WHO.
+          </p>
+          <div class="odey-comment">
+            <img src="assets/odey.png" class="odey-comment-img" alt="Odey">
+            <span class="odey-comment-text">"Do you know that Saccharin is 300× sweeter than sugar? wait, THREE HUNDRED TIMES? That is wild~"</span>
+          </div>
+          <div class="examples-label">🃏 Examples — click a card to flip!</div>
+          <p class="flip-hint">Tap any card to reveal its use in food</p>
+          <div class="flip-grid">
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front yellow-card"><div class="card-emoji">🍚</div><div class="card-name">Sucrose</div></div>
+                <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Common table sugar — baked goods, beverages, candy</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front yellow-card"><div class="card-emoji">🌽</div><div class="card-name">Fructose</div></div>
+                <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Fruit-derived sugar used in fruit juices and jams</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front"><div class="card-emoji">⚗️</div><div class="card-name">Saccharin</div></div>
+                <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Artificial sweetener, 300× sweeter than sugar — diet drinks</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front"><div class="card-emoji">🥤</div><div class="card-name">Aspartame</div></div>
+                <div class="flip-back"><div class="back-label">Use</div><div class="back-text">200× sweeter than sugar — sugar-free gum and soft drinks</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front green-card"><div class="card-emoji">🍃</div><div class="card-name">Stevia</div></div>
+                <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Natural zero-calorie sweetener from stevia plant — health drinks</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front yellow-card"><div class="card-emoji">🧁</div><div class="card-name">Sorbitol</div></div>
+                <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Sugar alcohol — diabetic-friendly foods and chewing gum</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Preservatives ── -->
+        <div class="sub-panel" id="add-preservative">
+          <div class="class-header">
+            <div class="class-icon green">🥓</div>
+            <div>
+              <h3>Preservatives</h3>
+              <span class="class-subtitle">Inhibit microbial growth to extend shelf life</span>
+            </div>
+          </div>
+          <p class="class-desc">
+            Preservatives prevent or slow the growth of bacteria, mold, and yeast that cause food spoilage.
+            They extend the shelf life of products without necessarily changing taste or appearance.
+            Like all additives, their use is strictly regulated. Some preservatives such as
+            <strong>formalin</strong> (formaldehyde) and <strong>borax</strong> are <strong>strictly prohibited</strong>
+            in food as they are hazardous to human health.
+          </p>
+          <div class="examples-label">🃏 Examples — click a card to flip!</div>
+          <p class="flip-hint">Tap any card to reveal its use in food</p>
+          <div class="flip-grid">
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front green-card"><div class="card-emoji">🧂</div><div class="card-name">Salt (NaCl)</div></div>
+                <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Natural preservative — salted fish, pickles, cured meats</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front green-card"><div class="card-emoji">🍋</div><div class="card-name">Citric Acid</div></div>
+                <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Prevents oxidation and microbial growth — canned fruits, juices</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front"><div class="card-emoji">🔬</div><div class="card-name">Sodium Benzoate</div></div>
+                <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Inhibits mold/yeast — soft drinks, ketchup, salad dressings</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front"><div class="card-emoji">🧈</div><div class="card-name">Sorbic Acid</div></div>
+                <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Prevents mold — cheese, baked goods, dried fruits</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front red-card"><div class="card-emoji">☠️</div><div class="card-name">Formalin</div></div>
+                <div class="flip-back"><div class="back-label">⛔ BANNED</div><div class="back-text">Industrial disinfectant — illegally used in tofu/noodles. Carcinogenic!</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front red-card"><div class="card-emoji">☠️</div><div class="card-name">Borax</div></div>
+                <div class="flip-back"><div class="back-label">⛔ BANNED</div><div class="back-text">Industrial cleaner — illegally added to meatballs. Toxic!</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Flavorings ── -->
+        <div class="sub-panel" id="add-flavoring">
+          <div class="class-header">
+            <div class="class-icon">🍟</div>
+            <div>
+              <h3>Flavorings (Flavor Enhancers)</h3>
+              <span class="class-subtitle">Enhance or intensify the savory taste of food</span>
+            </div>
+          </div>
+          <p class="class-desc">
+            Flavor enhancers do not have a strong taste on their own, but they amplify the existing flavors
+            — especially the <em>umami</em> (savory) taste — in food. The most well-known is
+            <strong>Monosodium Glutamate (MSG)</strong>, derived from glutamic acid. When used within
+            recommended limits, MSG is considered safe by FDA and BPOM. Natural flavorings include
+            ingredients like salt, sugar, vinegar, and various spices.
+          </p>
+          <div class="odey-comment">
+            <img src="assets/odey.png" class="odey-comment-img" alt="Odey">
+            <span class="odey-comment-text">"MSG has a bad reputation... but it literally occurs naturally in tomatoes, parmesan, and soy sauce. Science defending MSG? Ja, absolut! 🍅"</span>
+          </div>
+          <div class="examples-label">🃏 Examples — click a card to flip!</div>
+          <p class="flip-hint">Tap any card to reveal its use in food</p>
+          <div class="flip-grid">
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front"><div class="card-emoji">🧂</div><div class="card-name">MSG</div></div>
+                <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Enhances savory/umami taste — instant noodles, chips, soups</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front"><div class="card-emoji">⚗️</div><div class="card-name">Disodium Inosinate</div></div>
+                <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Synergizes with MSG to boost umami — processed snacks</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front green-card"><div class="card-emoji">🌿</div><div class="card-name">Herbs &amp; Spices</div></div>
+                <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Natural flavorings — pepper, garlic, ginger, coriander</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Aroma Enhancers ── -->
+        <div class="sub-panel" id="add-aroma">
+          <div class="class-header">
+            <div class="class-icon purple">🍲</div>
+            <div>
+              <h3>Aroma Enhancers (Artificial Flavorings)</h3>
+              <span class="class-subtitle">Give food a characteristic scent and flavor profile</span>
+            </div>
+          </div>
+          <p class="class-desc">
+            Artificial flavorings are chemical compounds that mimic the aroma and taste of natural ingredients.
+            They are widely used in processed foods when using actual natural ingredients would be too costly
+            or impractical. Common examples include vanillin (artificial vanilla), ethyl butyrate (artificial
+            pineapple), and isoamyl acetate (artificial banana).
+          </p>
+          <div class="examples-label">🃏 Examples — click a card to flip!</div>
+          <p class="flip-hint">Tap any card to reveal its use in food</p>
+          <div class="flip-grid">
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front purple-card"><div class="card-emoji">🍦</div><div class="card-name">Vanillin</div></div>
+                <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Artificial vanilla aroma — ice cream, cakes, biscuits</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front purple-card"><div class="card-emoji">🍍</div><div class="card-name">Ethyl Butyrate</div></div>
+                <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Artificial pineapple/fruit aroma — sweets, beverages</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front purple-card"><div class="card-emoji">🍌</div><div class="card-name">Isoamyl Acetate</div></div>
+                <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Artificial banana aroma — candy, flavored milk</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front purple-card"><div class="card-emoji">🍓</div><div class="card-name">Ethyl Acetate</div></div>
+                <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Fruity aroma — strawberry/cherry flavored products</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Thickeners ── -->
+        <div class="sub-panel" id="add-thickener">
+          <div class="class-header">
+            <div class="class-icon yellow">🍮</div>
+            <div>
+              <h3>Thickeners &amp; Stabilizers</h3>
+              <span class="class-subtitle">Improve texture, consistency, and stability of food</span>
+            </div>
+          </div>
+          <p class="class-desc">
+            Thickeners and stabilizers give food products a desirable texture — smooth, creamy, or gel-like.
+            They prevent ingredients from separating (e.g., oil and water in salad dressing) and improve
+            the mouthfeel of products. Most come from natural sources like seaweed (agar, carrageenan)
+            or plant starches.
+          </p>
+          <div class="examples-label">🃏 Examples — click a card to flip!</div>
+          <p class="flip-hint">Tap any card to reveal its use in food</p>
+          <div class="flip-grid">
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front green-card"><div class="card-emoji">🌊</div><div class="card-name">Agar-Agar</div></div>
+                <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Seaweed-based gelling agent — jelly, pudding, ice cream</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front green-card"><div class="card-emoji">🟤</div><div class="card-name">Carrageenan</div></div>
+                <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Red seaweed extract — dairy products, sauces, infant formula</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front yellow-card"><div class="card-emoji">🌾</div><div class="card-name">Modified Starch</div></div>
+                <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Thickens soups, gravies, and canned foods</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front"><div class="card-emoji">🍮</div><div class="card-name">Gelatin</div></div>
+                <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Animal-based gelling agent — gummies, marshmallows, panna cotta</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end panelAdditive -->
+
+
+      <!-- ══════════════════════════════════════
+           PANEL B: ADDICTIVE SUBSTANCES
+      ══════════════════════════════════════ -->
+      <div class="topic-panel addictive" id="panelAddictive">
+
+        <!-- Definition -->
+        <div class="definition-block">
+          <div class="definition-icon">⚠️</div>
+          <div class="definition-text red">
+            <h2>What are Addictive Substances?</h2>
+            <p>
+              <strong>Addictive substances</strong> are chemical compounds that affect the central nervous system,
+              altering mood, perception, or consciousness. Regular use leads to <strong>dependence</strong> — the body
+              craves the substance to function normally. In Indonesia, they are regulated under Law No. 35/2009
+              (Narcotics) and Law No. 5/1997 (Psychotropics).
+              Misuse can cause severe physical and psychological damage.
+            </p>
+          </div>
+        </div>
+
+        <div class="odey-comment">
+          <img src="assets/odey.png" class="odey-comment-img" alt="Odey">
+          <span class="odey-comment-text">"This topic is serious, Freund. But knowing about it is your best defense. Wissen ist Macht — knowledge is power. 💪"</span>
+        </div>
+
+        <!-- Sub-tabs -->
+        <div class="sub-tabs" id="addictSubTabs">
+          <button class="sub-tab-btn active" onclick="switchSub('addict','narcotic')">💊 Narcotics</button>
+          <button class="sub-tab-btn" onclick="switchSub('addict','psychotropic')">🧠 Psychotropics</button>
+          <button class="sub-tab-btn" onclick="switchSub('addict','other')">🚬 Other Addictive Substances</button>
+        </div>
+
+        <!-- ── Narcotics ── -->
+        <div class="sub-panel show" id="addict-narcotic">
+          <div class="class-header">
+            <div class="class-icon red">💊</div>
+            <div>
+              <h3 class="red">Narcotics</h3>
+              <span class="class-subtitle">Substances that reduce pain and cause strong dependence</span>
+            </div>
+          </div>
+          <p class="class-desc">
+            Narcotics are substances derived from plants or synthesized chemically that cause reduced or lost
+            consciousness and relieve pain. Under Indonesian law, narcotics are classified into
+            <strong>three schedules</strong> based on their medical use potential and addiction risk.
+            Misuse leads to physical dependence, withdrawal symptoms, and potentially death by overdose.
+          </p>
+          <table class="info-table">
+            <thead>
+              <tr>
+                <th class="red-th">Schedule</th>
+                <th class="red-th">Characteristics</th>
+                <th class="red-th">Examples</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Schedule I</strong></td>
+                <td>Very high addiction risk; NO medical use; prohibited entirely</td>
+                <td>Heroin (putaw), cocaine, marijuana (high THC)</td>
+              </tr>
+              <tr>
+                <td><strong>Schedule II</strong></td>
+                <td>High addiction risk; limited medical use (last resort only)</td>
+                <td>Morphine, pethidine, fentanyl</td>
+              </tr>
+              <tr>
+                <td><strong>Schedule III</strong></td>
+                <td>Moderate addiction risk; used in therapy under strict supervision</td>
+                <td>Codeine (cough medicine), buprenorphine</td>
+              </tr>
+            </tbody>
+          </table>
+          <hr class="section-divider">
+          <div class="examples-label">🃏 Narcotic Examples — flip to see effects</div>
+          <p class="flip-hint">Tap any card to reveal medical effects</p>
+          <div class="flip-grid">
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front red-card"><div class="card-emoji">🌺</div><div class="card-name">Morphine</div></div>
+                <div class="flip-back"><div class="back-label">Effect</div><div class="back-text">Strong painkiller; misuse causes respiratory depression, overdose death</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front red-card"><div class="card-emoji">💉</div><div class="card-name">Heroin</div></div>
+                <div class="flip-back"><div class="back-label">Effect</div><div class="back-text">Euphoria followed by severe withdrawal; HIV risk from needles</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front red-card"><div class="card-emoji">🌿</div><div class="card-name">Cannabis</div></div>
+                <div class="flip-back"><div class="back-label">Effect</div><div class="back-text">Altered perception, memory impairment, lung damage when smoked</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front red-card"><div class="card-emoji">🥄</div><div class="card-name">Cocaine</div></div>
+                <div class="flip-back"><div class="back-label">Effect</div><div class="back-text">Intense stimulation; heart attack risk; severe psychological dependence</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Psychotropics ── -->
+        <div class="sub-panel" id="addict-psychotropic">
+          <div class="class-header">
+            <div class="class-icon red">🧠</div>
+            <div>
+              <h3 class="red">Psychotropic Substances</h3>
+              <span class="class-subtitle">Affect mental state, emotion, and behavior</span>
+            </div>
+          </div>
+          <p class="class-desc">
+            Psychotropics act on the brain and nervous system to alter perception, emotion, and behavior.
+            Unlike narcotics, they do not necessarily relieve physical pain. They include
+            <strong>stimulants</strong> (speed up CNS), <strong>depressants</strong> (slow down CNS),
+            and <strong>hallucinogens</strong> (distort perception). They are also classified in schedules
+            (I–IV) under Indonesian law.
+          </p>
+          <div class="flip-grid">
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front red-card"><div class="card-emoji">⚡</div><div class="card-name">Methamphetamine (Shabu)</div></div>
+                <div class="flip-back"><div class="back-label">Effect</div><div class="back-text">Extreme stimulant; paranoia, heart failure, brain damage</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front red-card"><div class="card-emoji">💊</div><div class="card-name">Ecstasy (MDMA)</div></div>
+                <div class="flip-back"><div class="back-label">Effect</div><div class="back-text">Euphoria, hyperthermia, dehydration; damages serotonin system</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front red-card"><div class="card-emoji">😵</div><div class="card-name">LSD</div></div>
+                <div class="flip-back"><div class="back-label">Effect</div><div class="back-text">Powerful hallucinogen; triggers psychosis, flashbacks</div></div>
+              </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-inner">
+                <div class="flip-front red-card"><div class="card-emoji">💤</div><div class="card-name">Benzodiazepines</div></div>
+                <div class="flip-back"><div class="back-label">Effect</div><div class="back-text">Depressants (sedatives); used medically but misuse causes amnesia, dependence</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Other Addictive Substances ── -->
+        <div class="sub-panel" id="addict-other">
+          <div class="class-header">
+            <div class="class-icon yellow">🚬</div>
+            <div>
+              <h3>Other Addictive Substances</h3>
+              <span class="class-subtitle">Legal but harmful substances found in daily life</span>
+            </div>
+          </div>
+          <p class="class-desc">
+            Not all addictive substances are illegal. Many are encountered in everyday life.
+            Despite being legally available, they carry significant health risks and can cause dependence.
+            These include <strong>nicotine</strong> (tobacco), <strong>alcohol</strong> (ethanol),
+            and <strong>caffeine</strong>. These substances are not classified as narcotics or psychotropics
+            but are regulated due to their addictive nature.
+          </p>
+          <div class="odey-comment">
+            <img src="assets/odey.png" class="odey-comment-img" alt="Odey">
+            <span class="odey-comment-text">"Kafee... I mean, caffeine is the world's most widely consumed psychoactive substance. Your morning coffee is literally chemistry, Freund. ☕"</span>
+          </div>
+          <table class="info-table">
+            <thead>
+              <tr>
+                <th class="red-th">Substance</th>
+                <th class="red-th">Active Compound</th>
+                <th class="red-th">Short-term Effects</th>
+                <th class="red-th">Long-term Effects</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>🚬 Tobacco</td>
+                <td>Nicotine, tar, CO</td>
+                <td>Increased heart rate, alertness</td>
+                <td>Lung cancer, cardiovascular disease, COPD</td>
+              </tr>
+              <tr>
+                <td>🍺 Alcohol</td>
+                <td>Ethanol (C₂H₅OH)</td>
+                <td>Relaxation, impaired judgment</td>
+                <td>Liver cirrhosis, brain damage, addiction</td>
+              </tr>
+              <tr>
+                <td>☕ Caffeine</td>
+                <td>Caffeine (C₈H₁₀N₄O₂)</td>
+                <td>Alertness, reduced fatigue</td>
+                <td>Anxiety, insomnia, heart palpitations (excess)</td>
+              </tr>
+              <tr>
+                <td>🧴 Inhalants</td>
+                <td>Solvents, aerosols</td>
+                <td>Brief euphoria, dizziness</td>
+                <td>Severe brain &amp; organ damage, sudden death</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div><!-- end panelAddictive -->
+
+      <!-- ── Bottom Navigation CTA ── -->
+      <div class="nav-cta">
+        <h3>Great work studying the materials! 🎉</h3>
+        <p>Now choose what to do next, Freund — Wunderbar!</p>
+        <div class="nav-cta-buttons">
+          <a href="quiz.html"       class="btn btn-green">📝 Take the Quiz</a>
+          <a href="minigames.html"  class="btn btn-yellow">🎮 Play Mini Games</a>
+          <a href="experiment.html" class="btn btn-red">🔬 Do the Experiment</a>
+        </div>
+      </div>
+
+    </div><!-- end materials-content -->
+  </div><!-- end page-content -->
+
+  <footer class="site-footer">
+    <p>© 2026 Fauzan Ahmad · <a href="/cdn-cgi/l/email-protection#5f393e2a253e313e37323e3b1f2a2f36713a3b2a"><span class="__cf_email__" data-cfemail="98fef9ede2f9f6f9f0f5f9fcd8ede8f1b6fdfced">[email&#160;protected]</span></a></p>
+  </footer>
+
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    /* ── Nav toggle ── */
+    document.getElementById('navToggle').addEventListener('click', () => {
+      document.getElementById('navLinks').classList.toggle('open');
+    });
+
+    /* ── Read progress bar ── */
+    window.addEventListener('scroll', () => {
+      const el  = document.documentElement;
+      const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
+      document.getElementById('readProgress').style.width = pct + '%';
+    });
+
+    /* ── Main tab switch (Additive / Addictive) ── */
+    function switchMain(topic) {
+      const panels = { additive: 'panelAdditive', addictive: 'panelAddictive' };
+      const tabs   = { additive: 'tabAdditive',   addictive: 'tabAddictive' };
+
+      Object.keys(panels).forEach(k => {
+        document.getElementById(panels[k]).classList.toggle('show', k === topic);
+        const btn = document.getElementById(tabs[k]);
+        btn.className = 'main-tab-btn';
+        if (k === topic) btn.classList.add(k === 'additive' ? 'active-add' : 'active-addict');
+      });
+    }
+
+    /* ── Sub-tab switch ── */
+    function switchSub(group, id) {
+      // Hide all sub-panels in this group
+      const prefix = group === 'add' ? 'add-' : 'addict-';
+      document.querySelectorAll(`[id^="${prefix}"]`).forEach(p => p.classList.remove('show'));
+
+      // Show selected
+      document.getElementById(`${prefix}${id}`).classList.add('show');
+
+      // Update tab buttons
+      const tabContainer = group === 'add' ? 'addSubTabs' : 'addictSubTabs';
+            document.getElementById(tabContainer).querySelectorAll('.sub-tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('onclick').includes(id)) btn.classList.add('active');
+      });
+    }
+  </script>
+
+</body>
+</html>

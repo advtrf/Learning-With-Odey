@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Learning with Odey</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── Home-specific styles ── */
+    .home-hero {
+      min-height: calc(100vh - var(--nav-height));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-doodles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .doodle-star {
+      position: absolute;
+      font-family: var(--font-hand);
+      color: var(--yellow);
+      opacity: 0.25;
+      font-size: 1.5rem;
+      animation: float 4s ease-in-out infinite;
+    }
+
+    .doodle-circle {
+      position: absolute;
+      border-radius: 50%;
+      border: 2.5px dashed;
+      opacity: 0.12;
+    }
+
+    /* ── Welcome Banner ── */
+    .welcome-banner {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .welcome-banner h1 {
+      font-size: clamp(2rem, 6vw, 3.5rem);
+      color: var(--blue);
+      position: relative;
+      display: inline-block;
+    }
+
+    .welcome-banner h1 span {
+      color: var(--green);
+    }
+
+    .welcome-banner h1::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 0; right: 0;
+      height: 4px;
+      background: var(--yellow);
+      border-radius: 2px;
+      transform: rotate(-0.8deg);
+    }
+
+    .welcome-banner .subtitle-home {
+      font-family: var(--font-hand);
+      font-size: 1.1rem;
+      color: var(--ink-faint);
+      margin-top: 0.8rem;
+    }
+
+    .scribble-line {
+      width: 100%;
+      max-width: 400px;
+      height: 12px;
+      margin: 0.5rem auto 1.5rem;
+      opacity: 0.35;
+    }
+
+    /* ── Dialog Scene: Odey LEFT, Bubble RIGHT ── */
+    .dialog-scene {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 2rem;
+      width: 100%;
+      max-width: 760px;
+      cursor: pointer;
+    }
+
+    /* ── Odey LEFT ── */
+    .odey-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .odey-img {
+      width: 170px;
+      height: auto;
+      filter: drop-shadow(3px 6px 0px rgba(44,36,22,0.18));
+      animation: float 3.5s ease-in-out infinite;
+      user-select: none;
+    }
+
+    .odey-nametag {
+      margin-top: 6px;
+      background: var(--blue-pale);
+      border: 2px solid var(--blue);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-hand);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--blue);
+      padding: 0.1rem 0.8rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .odey-reaction {
+      position: absolute;
+      top: 0px;
+      right: -10px;
+      font-size: 1.6rem;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    @keyframes reactionPop {
+      0%   { opacity: 0; transform: translateY(0) scale(0.5); }
+      30%  { opacity: 1; transform: translateY(-20px) scale(1.2); }
+      70%  { opacity: 1; transform: translateY(-30px) scale(1); }
+      100% { opacity: 0; transform: translateY(-40px) scale(0.8); }
+    }
+
+    .odey-reaction.pop {
+      animation: reactionPop 0.8s ease forwards;
+    }
+
+    /* ── Bubble RIGHT ── */
+    .dialog-bubble-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      min-height: 140px;
+      justify-content: center;
+    }
+
+    .dialog-bubble {
+      background: white;
+      border: 2.5px solid var(--ink);
+      border-radius: 18px;
+      padding: 1.2rem 1.6rem;
+      font-family: var(--font-hand);
+      font-size: 1.15rem;
+      line-height: 1.6;
+      box-shadow: var(--shadow-md);
+      width: 100%;
+      position: relative;
+    }
+
+    /* Tail pointing LEFT toward Odey */
+    .dialog-bubble::before {
+      content: '';
+      position: absolute;
+      top: 28px;
+      left: -22px;
+      border-width: 12px 22px 12px 0;
+      border-style: solid;
+      border-color: transparent var(--ink) transparent transparent;
+      z-index: 1;
+    }
+
+    .dialog-bubble::after {
+      content: '';
+      position: absolute;
+      top: 30px;
+      left: -17px;
+      border-width: 10px 18px 10px 0;
+      border-style: solid;
+      border-color: transparent white transparent transparent;
+      z-index: 2;
+    }
+
+    .typing-cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1.1em;
+      background: var(--blue);
+      margin-left: 2px;
+      vertical-align: middle;
+      animation: blink 0.7s steps(1) infinite;
+    }
+
+    .click-hint {
+      font-family: var(--font-hand);
+      font-size: 0.85rem;
+      color: var(--ink-faint);
+      margin-top: 0.5rem;
+      padding-left: 0.5rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .click-hint.visible { opacity: 1; }
+    .click-arrow { animation: float 1s ease-in-out infinite; display: inline-block; }
+
+    /* ── Progress Dots ── */
+    .dialog-progress {
+      display: flex;
+      gap: 6px;
+      margin-top: 1.2rem;
+      justify-content: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .progress-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      border: 2px solid var(--blue);
+      background: transparent;
+      transition: background 0.3s;
+    }
+
+    .progress-dot.done    { background: var(--blue); }
+    .progress-dot.current { background: var(--blue-light); box-shadow: 0 0 0 2px var(--blue-pale); }
+
+    /* ── Final CTA ── */
+    .home-cta {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      margin-top: 2.5rem;
+    }
+
+    .home-cta.visible {
+      display: flex;
+      animation: fadeInUp 0.5s ease forwards;
+    }
+
+    .cta-text {
+      font-family: var(--font-hand);
+      font-size: 1.2rem;
+      color: var(--ink-soft);
+      text-align: center;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .cta-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius-md);
+      border: 2.5px solid;
+      font-family: var(--font-hand);
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+      box-shadow: var(--shadow-md);
+      cursor: pointer;
+    }
+
+    .cta-btn:hover { transform: translate(-2px, -3px); box-shadow: var(--shadow-lg); }
+    .cta-btn-icon  { font-size: 2rem; }
+
+    .cta-btn.blue   { background: var(--blue-pale);   color: var(--blue);   border-color: var(--blue); }
+    .cta-btn.green  { background: var(--green-pale);  color: var(--green);  border-color: var(--green); }
+    .cta-btn.red    { background: var(--red-pale);    color: var(--red);    border-color: var(--red); }
+    .cta-btn.yellow { background: var(--yellow-pale); color: var(--yellow); border-color: var(--yellow); }
+    .cta-btn.purple { background: var(--purple-pale); color: var(--purple); border-color: var(--purple); }
+
+    .restart-btn {
+      background: none; border: none;
+      font-family: var(--font-hand); font-size: 0.9rem;
+      color: var(--ink-faint); cursor: pointer; text-decoration: underline; padding: 0;
+    }
+    .restart-btn:hover { color: var(--blue); }
+
+    @media (max-width: 600px) {
+      .dialog-scene { flex-direction: column; align-items: center; }
+      .odey-img { width: 120px; }
+      .dialog-bubble { font-size: 1rem; }
+      .dialog-bubble::before { top:-22px; left:30px; border-width:0 14px 22px 0; border-color:transparent transparent var(--ink) transparent; }
+      .dialog-bubble::after  { top:-17px; left:32px; border-width:0 11px 17px 0; border-color:transparent transparent white transparent; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">Learning with <span>Odey</span></a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="materials.html">Materials</a></li>
+      <li><a href="quiz.html">Quiz</a></li>
+      <li><a href="minigames.html">Mini Games</a></li>
+      <li><a href="experiment.html">Experiment</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+  </nav>
+
+  <div class="page-content">
+
+    <section class="home-hero">
+
+    <div class="hero-doodles" aria-hidden="true">
+      <span class="doodle-star" style="top:8%;left:5%;font-size:2rem;animation-delay:0s;">✦</span>
+      <span class="doodle-star" style="top:20%;right:8%;font-size:1.2rem;animation-delay:1s;">✧</span>
+      <span class="doodle-star" style="top:60%;left:3%;font-size:1.8rem;animation-delay:2s;">✦</span>
+      <span class="doodle-star" style="bottom:20%;right:5%;font-size:1rem;animation-delay:0.5s;">★</span>
+      <span class="doodle-star" style="top:40%;right:3%;font-size:2.5rem;animation-delay:1.5s;color:var(--blue);">⊕</span>
+      <span class="doodle-star" style="bottom:35%;left:8%;font-size:1.4rem;animation-delay:0.8s;color:var(--green);">❋</span>
+      <div class="doodle-circle" style="width:180px;height:180px;border-color:var(--blue);top:5%;right:12%;animation:float 6s ease-in-out infinite;"></div>
+      <div class="doodle-circle" style="width:100px;height:100px;border-color:var(--green);bottom:15%;left:10%;animation:float 5s ease-in-out infinite 1s;"></div>
+      <div class="doodle-circle" style="width:60px;height:60px;border-color:var(--red);top:45%;left:7%;animation:float 4s ease-in-out infinite 2s;"></div>
+      <svg class="doodle-corner" style="bottom:5%;left:2%;width:120px;opacity:0.08;" viewBox="0 0 120 60">
+        <text x="5" y="20" font-family="Caveat" font-size="14" fill="#4a6fa5">H₂O + NaCl</text>
+        <text x="5" y="42" font-family="Caveat" font-size="12" fill="#4a7c59">C₆H₁₂O₆</text>
+      </svg>
+      <svg class="doodle-corner" style="top:10%;right:1%;width:100px;opacity:0.08;" viewBox="0 0 100 80">
+        <text x="5" y="20" font-family="Caveat" font-size="13" fill="#a0453a">aditif</text>
+        <text x="5" y="42" font-family="Caveat" font-size="13" fill="#6b5b8a">adiktif</text>
+        <text x="5" y="64" font-family="Caveat" font-size="12" fill="#b8922a">zat kimia</text>
+      </svg>
+    </div>
+
+      <div class="welcome-banner">
+        <h1>Learning with <span>Odey</span></h1>
+        <p class="subtitle-home">An interactive science learning experience for junior high school</p>
+      </div>
+
+      <svg class="scribble-line" viewBox="0 0 400 12" fill="none">
+        <path d="M0 6 Q50 2 100 6 Q150 10 200 6 Q250 2 300 6 Q350 10 400 6"
+              stroke="#b8922a" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+      </svg>
+
+      <!-- Dialog: Odey LEFT | Bubble RIGHT -->
+      <div class="dialog-scene" id="dialogScene">
+
+        <div class="odey-wrapper">
+          <img src="assets/odey.png" alt="Odey the Robot Astronaut" class="odey-img" id="odeyImg">
+          <div class="odey-nametag">Odey 🤖</div>
+          <div class="odey-reaction" id="odeyReaction"></div>
+        </div>
+
+        <div class="dialog-bubble-wrapper">
+          <div class="dialog-bubble" id="dialogBubble">
+            <span id="dialogText"></span><span class="typing-cursor" id="cursor"></span>
+          </div>
+          <div class="click-hint" id="clickHint">
+            <span class="click-arrow">▶</span> Click anywhere to continue
+          </div>
+        </div>
+
+      </div>
+
+      <div class="dialog-progress" id="progressDots"></div>
+
+      <div class="home-cta" id="homeCta">
+        <p class="cta-text">Where would you like to start, <em>Freund</em>? 🚀</p>
+        <div class="cta-buttons">
+          <a href="materials.html" class="cta-btn blue"><span class="cta-btn-icon">📖</span>Materials</a>
+          <a href="quiz.html"      class="cta-btn green"><span class="cta-btn-icon">📝</span>Quiz</a>
+          <a href="minigames.html" class="cta-btn yellow"><span class="cta-btn-icon">🎮</span>Mini Games</a>
+          <a href="experiment.html" class="cta-btn red"><span class="cta-btn-icon">🔬</span>Experiment</a>
+          <a href="about.html"     class="cta-btn purple"><span class="cta-btn-icon">👨‍🎓</span>About</a>
+        </div>
+        <button class="restart-btn" id="restartBtn">↩ Talk to Odey again</button>
+      </div>
+
+    </section>
+  </div>
+
+  <footer class="site-footer">
+    <p>© 2026 Fauzan Ahmad · <a href="/cdn-cgi/l/email-protection#402621353a212e21282d2124003530296e252435"><span class="__cf_email__" data-cfemail="9dfbfce8e7fcf3fcf5f0fcf9dde8edf4b3f8f9e8">[email&#160;protected]</span></a></p>
+  </footer>
+
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    /* Nav toggle */
+    document.getElementById('navToggle').addEventListener('click', () => {
+      document.getElementById('navLinks').classList.toggle('open');
+    });
+
+    /* Dialog data */
+    const DIALOGS = [
+      { text: "Hallo explorer! Guten Tag! My name is Odey your friendly astro guider!", reaction: "🤖" },
+      { text: "I was built by my good friend, Fauzan to help YOU explore the fascinating world of science. Pretty cool, ja?", reaction: "🚀" },
+      { text: "This website is all about Additive and Addictive Substances. Sounds serious, but we'll make it fun, I promise! Hehe~", reaction: "😄" },
+      { text: "You'll find interactive Materials, a Quiz to test your knowledge, a fun Mini Games, a hands-on Experiment, and more!", reaction: "📚" },
+      { text: "Think of this as your digital science notebook — except way more exciting than writing lines. Natürlich!", reaction: "✍️" },
+      { text: "Ready to dive in? Choose where you'd like to start below, my suggestion is start from materials ehe~. I'll be cheering for you all the way, Freund!", reaction: "🌟" }
+    ];
+
+    let currentDialog = 0;
+    let isTyping      = false;
+    let typeTimeout   = null;
+
+    const els = {
+      bubble:   document.getElementById('dialogBubble'),
+      text:     document.getElementById('dialogText'),
+      cursor:   document.getElementById('cursor'),
+      hint:     document.getElementById('clickHint'),
+      dots:     document.getElementById('progressDots'),
+      reaction: document.getElementById('odeyReaction'),
+      cta:      document.getElementById('homeCta'),
+      scene:    document.getElementById('dialogScene'),
+    };
+
+    function buildDots() {
+      els.dots.innerHTML = '';
+      DIALOGS.forEach((_, i) => {
+        const d = document.createElement('div');
+        d.className = 'progress-dot';
+        if (i < currentDialog)   d.classList.add('done');
+        if (i === currentDialog) d.classList.add('current');
+        els.dots.appendChild(d);
+      });
+    }
+
+    function typeText(text) {
+      els.text.textContent = '';
+      els.cursor.style.display = 'inline-block';
+      isTyping = true;
+      els.hint.classList.remove('visible');
+      let i = 0;
+      function tick() {
+        if (i < text.length) {
+          els.text.textContent += text[i++];
+          typeTimeout = setTimeout(tick, 28);
+        } else {
+          isTyping = false;
+          els.cursor.style.display = 'none';
+          if (currentDialog < DIALOGS.length - 1) els.hint.classList.add('visible');
+        }
+      }
+      tick();
+    }
+
+    function skipTyping() {
+      clearTimeout(typeTimeout);
+      els.text.textContent = DIALOGS[currentDialog].text;
+      isTyping = false;
+      els.cursor.style.display = 'none';
+      if (currentDialog < DIALOGS.length - 1) els.hint.classList.add('visible');
+    }
+
+    function showReaction(emoji) {
+      els.reaction.textContent = emoji;
+      els.reaction.classList.remove('pop');
+      void els.reaction.offsetWidth;
+      els.reaction.classList.add('pop');
+    }
+
+    function popBubble() {
+      els.bubble.style.animation = 'none';
+      void els.bubble.offsetWidth;
+      els.bubble.style.animation = 'popIn 0.3s ease forwards';
+    }
+
+    function advance() {
+      if (isTyping) { skipTyping(); return; }
+
+      if (currentDialog >= DIALOGS.length - 1) {
+        els.scene.style.opacity = '0.4';
+        els.scene.style.pointerEvents = 'none';
+        els.cta.classList.add('visible');
+        return;
+      }
+
+      currentDialog++;
+      buildDots();
+      showReaction(DIALOGS[currentDialog].reaction);
+      popBubble();
+      typeText(DIALOGS[currentDialog].text);
+    }
+
+    function reset() {
+      currentDialog = 0;
+      els.scene.style.opacity = '1';
+      els.scene.style.pointerEvents = '';
+      els.cta.classList.remove('visible');
+      buildDots();
+      popBubble();
+      typeText(DIALOGS[0].text);
+    }
+
+    /* Events */
+    els.scene.addEventListener('click', advance);
+    document.addEventListener('keydown', e => {
+      if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); advance(); }
+    });
+    document.getElementById('restartBtn').addEventListener('click', reset);
+
+    /* Init */
+    buildDots();
+    typeText(DIALOGS[0].text);
+  </script>
+
+</body>
+</html>

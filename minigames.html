@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini Games - Learning with Odey</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Patrick+Hand&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+:root {
+  /* Paper & Ink */
+  --paper:        #f5f0e8;
+  --paper-dark:   #ede7d9;
+  --paper-lines:  #d6cfc0;
+  --ink:          #2c2416;
+  --ink-soft:     #5a5040;
+  --ink-faint:    #9a8e7a;
+
+  /* Crayon / Pencil Colors (muted, dusty) */
+  --blue:         #4a6fa5;
+  --blue-light:   #7a9cc4;
+  --blue-pale:    #c8d9ed;
+  --green:        #4a7c59;
+  --green-light:  #7aaa8a;
+  --green-pale:   #c4dbc9;
+  --red:          #a0453a;
+  --red-light:    #c47a72;
+  --red-pale:     #e8c4c0;
+  --yellow:       #b8922a;
+  --yellow-light: #d4b060;
+  --yellow-pale:  #f0dfa0;
+  --purple:       #6b5b8a;
+  --purple-pale:  #d0c4e0;
+
+  /* Typography */
+  --font-hand:    'Caveat', cursive;
+  --font-body:    'Patrick Hand', cursive;
+  --font-ui:      'Nunito', sans-serif;
+
+  /* Spacing */
+  --nav-height:   64px;
+  --radius-sm:    6px;
+  --radius-md:    12px;
+  --radius-lg:    20px;
+
+  /* Shadows (pencil/sketch feel) */
+  --shadow-sm:    2px 3px 0px rgba(44,36,22,0.15);
+  --shadow-md:    4px 6px 0px rgba(44,36,22,0.15);
+  --shadow-lg:    6px 10px 0px rgba(44,36,22,0.12);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  font-family: var(--font-body);
+  background-color: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  height: var(--nav-height);
+  background: var(--paper-dark);
+  border-bottom: 2px solid var(--paper-lines);
+  display: flex;
+  align-items: center;
+  padding: 0 2rem;
+  gap: 1rem;
+  box-shadow: 0 2px 8px rgba(44,36,22,0.08);
+}
+.navbar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--blue) 0px,
+    var(--blue) 18px,
+    transparent 18px,
+    transparent 28px
+  );
+  opacity: 0.5;
+}
+.nav-logo {
+  font-family: var(--font-hand);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--blue);
+  text-decoration: none;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+.nav-logo span {
+  color: var(--green);
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  list-style: none;
+  margin-left: auto;
+}
+.nav-links a {
+  font-family: var(--font-hand);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  text-decoration: none;
+  padding: 0.4rem 0.9rem;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+  position: relative;
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 0.9rem;
+  right: 0.9rem;
+  height: 2px;
+  background: var(--blue);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s ease;
+}
+.nav-links a:hover {
+  color: var(--blue);
+}
+.nav-links a:hover::after,
+.nav-links a.active::after {
+  transform: scaleX(1);
+}
+.nav-links a.active {
+  color: var(--blue);
+}
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  margin-left: auto;
+  padding: 4px;
+}
+.nav-toggle span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--ink);
+  border-radius: 2px;
+  transition: all 0.3s;
+}
+.navbar { padding: 0 1rem; }
+.nav-links {
+    display: none;
+    position: absolute;
+    top: var(--nav-height);
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    background: var(--paper-dark);
+    border-bottom: 2px solid var(--paper-lines);
+    padding: 1rem;
+    gap: 0.5rem;
+    z-index: 999;
+  }
+.nav-links.open { display: flex; }
+.nav-toggle { display: flex; }
+
+.site-footer {
+  position: relative;
+  z-index: 1;
+  background: var(--paper-dark);
+  border-top: 2px solid var(--paper-lines);
+  padding: 1.5rem 2rem;
+  text-align: center;
+  font-family: var(--font-hand);
+  font-size: 0.95rem;
+  color: var(--ink-faint);
+}
+.site-footer a {
+  color: var(--blue);
+  text-decoration: none;
+}
+
+.page-content {
+  position: relative;
+  z-index: 1;
+  min-height: calc(100vh - var(--nav-height));
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes wobble {
+  0%, 100% { transform: rotate(-1deg); }
+  50% { transform: rotate(1deg); }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes scribble {
+  from { stroke-dashoffset: 1000; }
+  to   { stroke-dashoffset: 0; }
+}
+@keyframes popIn {
+  0%   { transform: scale(0.8); opacity: 0; }
+  70%  { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+</style>
+  <style>
+    .games-page{min-height:calc(100vh - var(--nav-height));padding:0 0 4rem;position:relative;z-index:1}
+    .games-hero{background:var(--paper-dark);border-bottom:2px solid var(--paper-lines);padding:2rem 2rem 0;text-align:center;overflow:hidden}
+    .games-hero h1{color:var(--yellow);font-size:clamp(1.8rem,4vw,2.8rem);display:inline-block;position:relative}
+    .games-hero h1::after{content:'';position:absolute;bottom:-5px;left:0;right:0;height:4px;background:var(--green);border-radius:2px;transform:rotate(-0.5deg)}
+    .games-hero p{font-family:var(--font-hand);color:var(--ink-faint);margin:.6rem 0 0}
+    .game-tabs{display:flex;overflow-x:auto;gap:.4rem;padding:1.2rem 1.5rem 0;justify-content:center;flex-wrap:wrap}
+    .game-tab{display:flex;flex-direction:column;align-items:center;gap:.3rem;padding:.7rem 1.2rem;border-radius:var(--radius-md) var(--radius-md) 0 0;border:2px solid var(--paper-lines);border-bottom:none;background:var(--paper-dark);color:var(--ink-faint);font-family:var(--font-hand);font-size:.95rem;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
+    .game-tab .tab-icon{font-size:1.4rem}
+    .game-tab.active{background:white;color:var(--blue);border-color:var(--blue);position:relative;bottom:-2px;padding-bottom:calc(.7rem + 2px)}
+    .game-tab:nth-child(2).active{color:var(--green);border-color:var(--green)}
+    .game-tab:nth-child(3).active{color:var(--red);border-color:var(--red)}
+    .game-tab:nth-child(4).active{color:var(--purple);border-color:var(--purple)}
+    .game-tab:nth-child(5).active{color:var(--yellow);border-color:var(--yellow)}
+    .game-panel{display:none;background:white;border:2px solid var(--paper-lines);border-radius:0 var(--radius-md) var(--radius-md) var(--radius-md);margin:0 1.5rem;padding:1.5rem;box-shadow:var(--shadow-md)}
+    .game-panel.show{display:block;animation:fadeInUp .3s ease forwards}
+    .game-header{display:flex;align-items:center;gap:1rem;margin-bottom:1.2rem;flex-wrap:wrap}
+    .game-title{font-family:var(--font-hand);font-size:1.6rem;color:var(--blue)}
+    .game-desc{font-family:var(--font-ui);font-size:.9rem;color:var(--ink-faint);flex:1}
+    .game-score-badge{font-family:var(--font-hand);font-size:1rem;font-weight:700;background:var(--yellow-pale);border:2px solid var(--yellow);border-radius:var(--radius-sm);padding:.2rem .8rem;color:var(--yellow)}
+    .reset-btn{font-family:var(--font-ui);font-size:.9rem;padding:.5rem 1.2rem;border-radius:var(--radius-sm);border:2px solid var(--paper-lines);background:var(--paper-dark);color:var(--ink-soft);cursor:pointer;transition:all .15s}
+    .reset-btn:hover{border-color:var(--blue);color:var(--blue)}
+    /* WORD SEARCH */
+    #wsGrid{display:inline-grid;gap:2px;user-select:none;border:2px solid var(--paper-lines);border-radius:var(--radius-sm);background:var(--paper-dark);padding:4px}
+    .ws-cell{width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-family:var(--font-ui);font-size:.82rem;font-weight:700;background:white;border-radius:3px;cursor:pointer;text-transform:uppercase;transition:background .1s;border:1px solid var(--paper-lines)}
+    .ws-cell.selecting{background:var(--blue-pale);color:var(--blue)}
+    .ws-cell.found0{background:var(--green-pale);color:var(--green);border-color:var(--green-light)}
+    .ws-cell.found1{background:var(--yellow-pale);color:var(--yellow);border-color:var(--yellow-light)}
+    .ws-cell.found2{background:var(--red-pale);color:var(--red);border-color:var(--red-light)}
+    .ws-cell.found3{background:var(--purple-pale);color:var(--purple);border-color:#b0a0d0}
+    .ws-wordlist{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem}
+    .ws-word{font-family:var(--font-ui);font-size:.85rem;font-weight:600;padding:.25rem .7rem;border-radius:99px;border:2px solid var(--paper-lines);background:var(--paper);color:var(--ink-soft);transition:all .3s}
+    .ws-word.found{text-decoration:line-through;background:var(--green-pale);border-color:var(--green);color:var(--green)}
+    .ws-layout{display:flex;gap:1.5rem;align-items:flex-start;flex-wrap:wrap}
+    .ws-side{flex:1;min-width:160px}
+    .ws-side h4{font-family:var(--font-hand);color:var(--ink-soft);margin-bottom:.5rem}
+    /* CROSSWORD */
+    .cw-wrapper{overflow-x:auto}
+    .cw-grid{display:inline-grid;gap:1px;background:var(--ink);border:2px solid var(--ink)}
+    .cw-cell{width:34px;height:34px;position:relative;background:white;display:flex;align-items:center;justify-content:center}
+    .cw-cell.black{background:var(--ink)}
+    .cw-cell input{width:100%;height:100%;border:none;outline:none;text-align:center;font-family:var(--font-ui);font-size:.9rem;font-weight:700;text-transform:uppercase;background:transparent;padding:0;color:var(--ink);cursor:pointer}
+    .cw-cell input:focus{background:var(--blue-pale)}
+    .cw-cell input.ok{background:var(--green-pale);color:var(--green)}
+    .cw-cell input.no{background:var(--red-pale);color:var(--red)}
+    .cw-num{position:absolute;top:1px;left:2px;font-size:.48rem;font-weight:700;color:var(--ink-faint);line-height:1}
+    .cw-clues{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.2rem}
+    .cw-clue-group h4{font-family:var(--font-hand);color:var(--blue);margin-bottom:.5rem}
+    .cw-clue{font-family:var(--font-ui);font-size:.84rem;color:var(--ink-soft);margin-bottom:.3rem}
+    .cw-clue span{font-weight:700;color:var(--ink)}
+    .cw-check-btn{margin-top:1rem;padding:.6rem 1.5rem;background:var(--green-pale);color:var(--green);border:2px solid var(--green);border-radius:var(--radius-md);font-family:var(--font-ui);font-size:.95rem;font-weight:700;cursor:pointer;transition:all .15s}
+    .cw-check-btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-sm)}
+    .cw-result{font-family:var(--font-ui);font-size:.95rem;margin-top:.8rem;font-weight:600}
+    /* SORTER */
+    .sorter-arena{text-align:center;padding:1rem 0}
+    .sorter-card{display:inline-block;padding:1rem 2.5rem;border:3px solid var(--ink);border-radius:var(--radius-lg);font-family:var(--font-ui);font-size:1.3rem;font-weight:800;background:white;box-shadow:var(--shadow-lg);margin-bottom:1.5rem;min-width:200px;text-align:center}
+    @keyframes flashG{0%,100%{background:white}50%{background:var(--green-pale)}}
+    @keyframes flashR{0%,100%{background:white}50%{background:var(--red-pale)}}
+    .flash-correct{animation:flashG .4s ease}
+    .flash-wrong{animation:flashR .4s ease}
+    .sorter-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:1rem}
+    .sort-btn{flex:1;max-width:200px;padding:.9rem 1rem;border-radius:var(--radius-md);border:3px solid;font-family:var(--font-ui);font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s}
+    .sort-btn:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
+    .sort-btn.additive{background:var(--blue-pale);color:var(--blue);border-color:var(--blue)}
+    .sort-btn.addictive{background:var(--red-pale);color:var(--red);border-color:var(--red)}
+    .sort-btn.banned{background:var(--yellow-pale);color:var(--yellow);border-color:var(--yellow)}
+    .sort-btn:disabled{opacity:.5;cursor:default;transform:none}
+    .sorter-stats{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:1rem}
+    .stat-box{text-align:center;padding:.4rem .9rem;background:var(--paper-dark);border:1.5px solid var(--paper-lines);border-radius:var(--radius-sm)}
+    .stat-label{font-family:var(--font-hand);font-size:.75rem;color:var(--ink-faint)}
+    .stat-val{font-family:var(--font-ui);font-size:1.1rem;font-weight:700;color:var(--ink)}
+    .sorter-timer-bar{height:8px;background:var(--paper-dark);border-radius:4px;margin-bottom:1rem;overflow:hidden;border:1.5px solid var(--paper-lines)}
+    .sorter-timer-fill{height:100%;background:var(--green);border-radius:4px;transition:width .5s linear,background .3s}
+    /* MEMORY */
+    .memory-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;max-width:520px;margin:0 auto}
+    .mem-card{height:80px;perspective:600px;cursor:pointer}
+    .mem-inner{width:100%;height:100%;transform-style:preserve-3d;transition:transform .45s ease;position:relative;border-radius:var(--radius-md)}
+    .mem-card.flipped .mem-inner,.mem-card.matched .mem-inner{transform:rotateY(180deg)}
+    .mem-card.matched .mem-back{background:var(--green-pale);border-color:var(--green)}
+    .mem-front,.mem-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;padding:.4rem;text-align:center;border:2px solid;font-family:var(--font-ui)}
+    .mem-front{background:var(--blue);border-color:var(--blue);color:white;font-size:1.4rem}
+    .mem-back{background:white;border-color:var(--paper-lines);transform:rotateY(180deg);font-size:.75rem;font-weight:700;line-height:1.3;color:var(--ink)}
+    .mem-stats{display:flex;gap:1.5rem;justify-content:center;margin-bottom:1rem;flex-wrap:wrap}
+    .mem-win-msg{display:none;text-align:center;padding:1rem;background:var(--green-pale);border:2px solid var(--green);border-radius:var(--radius-md);font-family:var(--font-hand);font-size:1.2rem;color:var(--green);margin-top:1rem}
+    .mem-win-msg.show{display:block;animation:popIn .4s ease forwards}
+    /* DANGER */
+    .danger-arena{text-align:center;padding:1rem 0}
+    .danger-card{display:inline-flex;flex-direction:column;align-items:center;gap:.5rem;padding:1.5rem 2rem;border:3px solid var(--paper-lines);border-radius:var(--radius-lg);background:white;box-shadow:var(--shadow-lg);margin-bottom:1.5rem;min-width:220px}
+    .danger-substance{font-family:var(--font-ui);font-size:1.4rem;font-weight:800;color:var(--ink)}
+    .danger-hint{font-family:var(--font-ui);font-size:.85rem;color:var(--ink-faint);font-style:italic}
+    .danger-btns{display:flex;gap:1.5rem;justify-content:center;margin-bottom:1rem}
+    .danger-btn{padding:.9rem 2rem;border-radius:var(--radius-md);border:3px solid;font-family:var(--font-ui);font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s}
+    .danger-btn:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
+    .danger-btn.safe{background:var(--green-pale);color:var(--green);border-color:var(--green)}
+    .danger-btn.danger{background:var(--red-pale);color:var(--red);border-color:var(--red)}
+    .danger-btn:disabled{opacity:.5;cursor:default;transform:none}
+    .danger-feedback{display:none;padding:.8rem 1.2rem;border-radius:var(--radius-md);border:2px solid;font-family:var(--font-ui);font-size:.9rem;margin-bottom:.8rem;line-height:1.5}
+    .danger-feedback.show{display:block;animation:popIn .3s ease forwards}
+    .danger-feedback.correct{background:var(--green-pale);border-color:var(--green);color:var(--green)}
+    .danger-feedback.wrong{background:var(--red-pale);border-color:var(--red);color:var(--red)}
+    .danger-lives{font-size:1.3rem;margin-bottom:.5rem;letter-spacing:2px}
+    .danger-progress-text{font-family:var(--font-hand);font-size:.9rem;color:var(--ink-faint);margin-bottom:.5rem}
+    /* SHARED */
+    .game-result{display:none;text-align:center;padding:1.5rem;background:var(--paper-dark);border:2px dashed var(--paper-lines);border-radius:var(--radius-lg);margin-top:1rem}
+    .game-result.show{display:block;animation:fadeInUp .4s ease forwards}
+    .game-result h3{font-family:var(--font-hand);font-size:1.5rem;margin-bottom:.5rem}
+    .game-result p{font-family:var(--font-ui);color:var(--ink-soft);margin-bottom:1rem}
+    @media(max-width:600px){.game-panel{margin:0 .5rem;padding:1rem}.game-tab{padding:.5rem .8rem;font-size:.8rem}.ws-cell{width:24px;height:24px;font-size:.68rem}.cw-cell{width:28px;height:28px}.memory-grid{gap:.4rem}.mem-card{height:64px}.cw-clues{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<nav class="navbar">
+  <a href="index.html" class="nav-logo">Learning with <span>Odey</span></a>
+  <button class="nav-toggle" id="navToggle"><span></span><span></span><span></span></button>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="materials.html">Materials</a></li>
+    <li><a href="quiz.html">Quiz</a></li>
+    <li><a href="minigames.html" class="active">Mini Games</a></li>
+    <li><a href="experiment.html">Experiment</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
+</nav>
+<div class="page-content">
+<div class="games-page">
+  <div class="games-hero">
+    <h1>Mini Games</h1>
+    <p>Take a break and have fun with Odey! Viel Spass, Freund!</p>
+    <div class="game-tabs" id="gameTabs">
+      <button class="game-tab active" onclick="switchGame(0)"><span class="tab-icon">&#128269;</span>Word Search</button>
+      <button class="game-tab"        onclick="switchGame(1)"><span class="tab-icon">&#9999;&#65039;</span>Crossword</button>
+      <button class="game-tab"        onclick="switchGame(2)"><span class="tab-icon">&#9889;</span>Sorter</button>
+      <button class="game-tab"        onclick="switchGame(3)"><span class="tab-icon">&#127183;</span>Memory</button>
+      <button class="game-tab"        onclick="switchGame(4)"><span class="tab-icon">&#128678;</span>Danger?</button>
+    </div>
+  </div>
+
+  <!-- GAME 1: WORD SEARCH -->
+  <div class="game-panel show" id="game0">
+    <div class="game-header">
+      <div><div class="game-title">Word Search</div><div class="game-desc">Find all hidden words! Click the first and last letter of each word.</div></div>
+      <span class="game-score-badge">Found: <span id="wsFound">0</span> / <span id="wsTotal">0</span></span>
+      <button class="reset-btn" onclick="initWordSearch()">Reset</button>
+    </div>
+    <div class="ws-layout">
+      <div><div id="wsGrid"></div></div>
+      <div class="ws-side">
+        <h4>Find these words:</h4>
+        <div class="ws-wordlist" id="wsWordList"></div>
+        <div class="game-result" id="wsResult">
+          <h3>All Found!</h3>
+          <p>Wunderbar! You found every word, Freund!</p>
+          <button class="reset-btn" onclick="initWordSearch()">Play Again</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME 2: CROSSWORD -->
+  <div class="game-panel" id="game1">
+    <div class="game-header">
+      <div><div class="game-title">Crossword Puzzle</div><div class="game-desc">Fill in the crossword using the clues. Click a cell to type.</div></div>
+      <button class="reset-btn" onclick="initCrossword()">Reset</button>
+    </div>
+    <div class="cw-wrapper"><div id="cwGrid"></div></div>
+    <button class="cw-check-btn" onclick="checkCrossword()">Check Answers</button>
+    <div class="cw-result" id="cwResult"></div>
+    <div class="cw-clues" id="cwClues"></div>
+  </div>
+
+  <!-- GAME 3: SORTER -->
+  <div class="game-panel" id="game2">
+    <div class="game-header">
+      <div><div class="game-title">Substance Sorter</div><div class="game-desc">Sort each substance into the correct category as fast as you can!</div></div>
+      <button class="reset-btn" onclick="initSorter()">Restart</button>
+    </div>
+    <div class="sorter-arena">
+      <div class="sorter-stats">
+        <div class="stat-box"><div class="stat-label">Score</div><div class="stat-val" id="sortScore">0</div></div>
+        <div class="stat-box"><div class="stat-label">Streak</div><div class="stat-val" id="sortStreak">0</div></div>
+        <div class="stat-box"><div class="stat-label">Left</div><div class="stat-val" id="sortRemain">18</div></div>
+        <div class="stat-box"><div class="stat-label">Time</div><div class="stat-val" id="sortTime">60s</div></div>
+      </div>
+      <div class="sorter-timer-bar"><div class="sorter-timer-fill" id="sortTimerFill" style="width:100%"></div></div>
+      <div class="sorter-card" id="sortCard">Press Start!</div>
+      <div class="sorter-btns">
+        <button class="sort-btn additive"  onclick="sortAnswer('additive')">Food Additive</button>
+        <button class="sort-btn addictive" onclick="sortAnswer('addictive')">Addictive Substance</button>
+        <button class="sort-btn banned"    onclick="sortAnswer('banned')">Banned in Food</button>
+      </div>
+    </div>
+    <div class="game-result" id="sortResult">
+      <h3 id="sortResultTitle"></h3><p id="sortResultMsg"></p>
+      <button class="reset-btn" onclick="initSorter()">Play Again</button>
+    </div>
+  </div>
+
+  <!-- GAME 4: MEMORY -->
+  <div class="game-panel" id="game3">
+    <div class="game-header">
+      <div><div class="game-title">Memory Match</div><div class="game-desc">Flip cards to find matching pairs: substance name and its category!</div></div>
+      <button class="reset-btn" onclick="initMemory()">Shuffle</button>
+    </div>
+    <div class="mem-stats">
+      <div class="stat-box"><div class="stat-label">Moves</div><div class="stat-val" id="memMoves">0</div></div>
+      <div class="stat-box"><div class="stat-label">Pairs Found</div><div class="stat-val" id="memPairs">0 / 8</div></div>
+    </div>
+    <div class="memory-grid" id="memGrid"></div>
+    <div class="mem-win-msg" id="memWin">All pairs matched in <span id="memFinalMoves">0</span> moves! Ausgezeichnet!</div>
+  </div>
+
+  <!-- GAME 5: DANGER -->
+  <div class="game-panel" id="game4">
+    <div class="game-header">
+      <div><div class="game-title">Danger or Safe?</div><div class="game-desc">Is this substance safe in food, or dangerous/banned? You have 3 lives!</div></div>
+      <button class="reset-btn" onclick="initDanger()">Restart</button>
+    </div>
+    <div class="danger-arena">
+      <div class="danger-lives" id="dangerLives">hearts</div>
+      <div class="danger-progress-text" id="dangerProgress">Question 1 / 15</div>
+      <div class="danger-card" id="dangerCard">
+        <div class="danger-substance" id="dangerSubstance">-</div>
+        <div class="danger-hint" id="dangerHint">-</div>
+      </div>
+      <div class="danger-feedback" id="dangerFeedback"></div>
+      <div class="danger-btns">
+        <button class="danger-btn safe"   id="dangerSafeBtn"   onclick="dangerAnswer(true)">SAFE</button>
+        <button class="danger-btn danger" id="dangerDangerBtn" onclick="dangerAnswer(false)">DANGEROUS</button>
+      </div>
+      <div class="stat-box" style="display:inline-block">
+        <div class="stat-label">Score</div><div class="stat-val" id="dangerScore">0</div>
+      </div>
+    </div>
+    <div class="game-result" id="dangerResult">
+      <h3 id="dangerResultTitle"></h3><p id="dangerResultMsg"></p>
+      <button class="reset-btn" onclick="initDanger()">Play Again</button>
+    </div>
+  </div>
+
+</div>
+</div>
+<footer class="site-footer">
+  <p>2026 Fauzan Ahmad</p>
+</footer>
+<script>
+document.getElementById('navToggle').addEventListener('click',function(){
+  document.getElementById('navLinks').classList.toggle('open');
+});
+
+function switchGame(idx){
+  document.querySelectorAll('.game-panel').forEach(function(p,i){p.classList.toggle('show',i===idx);});
+  document.querySelectorAll('.game-tab').forEach(function(t,i){t.classList.toggle('active',i===idx);});
+}
+
+function shuffle(arr){
+  var a=arr.slice();
+  for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}
+  return a;
+}
+
+/* ========== WORD SEARCH ========== */
+var WS_WORDS=['NICOTINE','MORPHINE','CAFFEINE','SACCHARIN','FORMALIN','BORAX','TARTRAZINE','ASPARTAME','CARRAGEENAN','HEROIN'];
+var COLS=14,ROWS=12;
+var wsGrid=[],wsWordData=[],wsSelecting=false,wsFirst=null,wsFoundCount=0,wsCurrentPath=[];
+
+function initWordSearch(){
+  wsGrid=[];wsWordData=[];wsFoundCount=0;wsSelecting=false;wsFirst=null;wsCurrentPath=[];
+  document.getElementById('wsFound').textContent='0';
+  document.getElementById('wsTotal').textContent=WS_WORDS.length;
+  document.getElementById('wsResult').classList.remove('show');
+  for(var r=0;r<ROWS;r++){wsGrid.push([]);for(var c=0;c<COLS;c++)wsGrid[r].push('');}
+  var dirs=[[0,1],[1,0],[1,1],[0,-1],[-1,0],[-1,-1],[1,-1],[-1,1]];
+  WS_WORDS.forEach(function(word){
+    var placed=false,tries=0;
+    while(!placed&&tries++<300){
+      var dir=dirs[Math.floor(Math.random()*dirs.length)];
+      var r=Math.floor(Math.random()*ROWS),c=Math.floor(Math.random()*COLS);
+      var er=r+dir[0]*(word.length-1),ec=c+dir[1]*(word.length-1);
+      if(er<0||er>=ROWS||ec<0||ec>=COLS)continue;
+      var ok=true,cells=[];
+      for(var i=0;i<word.length;i++){
+        var nr=r+dir[0]*i,nc=c+dir[1]*i;
+        if(wsGrid[nr][nc]!==''&&wsGrid[nr][nc]!==word[i]){ok=false;break;}
+        cells.push([nr,nc]);
+      }
+      if(ok){cells.forEach(function(p,i){wsGrid[p[0]][p[1]]=word[i];});wsWordData.push({word:word,cells:cells,found:false});placed=true;}
+    }
+  });
+  var ABC='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  for(var r=0;r<ROWS;r++)for(var c=0;c<COLS;c++)if(!wsGrid[r][c])wsGrid[r][c]=ABC[Math.floor(Math.random()*26)];
+  renderWS();
+}
+
+function renderWS(){
+  var el=document.getElementById('wsGrid');
+  el.style.gridTemplateColumns='repeat('+COLS+',1fr)';
+  el.innerHTML='';
+  for(var r=0;r<ROWS;r++){
+    for(var c=0;c<COLS;c++){
+      var cell=document.createElement('div');
+      cell.className='ws-cell';cell.textContent=wsGrid[r][c];
+      cell.dataset.r=r;cell.dataset.c=c;
+      cell.addEventListener('mousedown',wsDown);
+      cell.addEventListener('mouseenter',wsEnter);
+      cell.addEventListener('mouseup',wsUp);
+      el.appendChild(cell);
+    }
+  }
+  var wl=document.getElementById('wsWordList');wl.innerHTML='';
+  WS_WORDS.forEach(function(w){
+    var span=document.createElement('span');span.className='ws-word';span.textContent=w;span.id='wsw-'+w;wl.appendChild(span);
+  });
+}
+
+function wsDown(e){
+  wsSelecting=true;wsFirst={r:+this.dataset.r,c:+this.dataset.c};
+  wsCurrentPath=[[+this.dataset.r,+this.dataset.c]];
+  document.querySelectorAll('.ws-cell.selecting').forEach(function(el){el.classList.remove('selecting');});
+  this.classList.add('selecting');
+}
+function wsEnter(e){
+  if(!wsSelecting||!wsFirst)return;
+  document.querySelectorAll('.ws-cell.selecting').forEach(function(el){el.classList.remove('selecting');});
+  var r2=+this.dataset.r,c2=+this.dataset.c;
+  var cells=getCellsBetween(wsFirst.r,wsFirst.c,r2,c2);
+  wsCurrentPath=cells;
+  var allCells=document.querySelectorAll('.ws-cell');
+  cells.forEach(function(p){allCells[p[0]*COLS+p[1]].classList.add('selecting');});
+}
+function wsUp(){
+  if(!wsSelecting)return;
+  wsSelecting=false;
+  document.querySelectorAll('.ws-cell.selecting').forEach(function(el){el.classList.remove('selecting');});
+  checkWS(wsCurrentPath);wsCurrentPath=[];
+}
+document.addEventListener('mouseup',function(){
+  if(wsSelecting){wsSelecting=false;document.querySelectorAll('.ws-cell.selecting').forEach(function(el){el.classList.remove('selecting');});}
+});
+function getCellsBetween(r1,c1,r2,c2){
+  var dr=r2-r1,dc=c2-c1,len=Math.max(Math.abs(dr),Math.abs(dc));
+  if(len===0)return[[r1,c1]];
+  if(dr!==0&&dc!==0&&Math.abs(dr)!==Math.abs(dc))return[];
+  var sr=dr===0?0:dr/Math.abs(dr),sc=dc===0?0:dc/Math.abs(dc),cells=[];
+  for(var i=0;i<=len;i++)cells.push([r1+sr*i,c1+sc*i]);
+  return cells;
+}
+function checkWS(path){
+  if(path.length<2)return;
+  var sel=path.map(function(p){return wsGrid[p[0]][p[1]];}).join('');
+  var rev=sel.split('').reverse().join('');
+  var allCells=document.querySelectorAll('.ws-cell');
+  wsWordData.forEach(function(wd,wi){
+    if(wd.found)return;
+    if(sel===wd.word||rev===wd.word){
+      wd.found=true;wsFoundCount++;
+      var cls='found'+(wi%4);
+      path.forEach(function(p){allCells[p[0]*COLS+p[1]].classList.add(cls);});
+      var wEl=document.getElementById('wsw-'+wd.word);if(wEl)wEl.classList.add('found');
+      document.getElementById('wsFound').textContent=wsFoundCount;
+      if(wsFoundCount>=WS_WORDS.length)document.getElementById('wsResult').classList.add('show');
+    }
+  });
+}
+
+/* ========== CROSSWORD ========== */
+var CW_SIZE=10;
+var CW_WORDS=[
+  {word:'NICOTINE', r:0,c:0,dir:'across',num:1, clue:'Addictive compound in tobacco (8)'},
+  {word:'ETHANOL',  r:1,c:0,dir:'across',num:3, clue:'Active compound in alcohol; C2H5OH (7)'},
+  {word:'SACCHARIN',r:2,c:0,dir:'across',num:4, clue:'Artificial sweetener 300x sweeter than sugar (9)'},
+  {word:'MSG',      r:3,c:3,dir:'across',num:5, clue:'Flavor enhancer that intensifies savory taste (3)'},
+  {word:'CAFFEINE', r:5,c:0,dir:'across',num:6, clue:'Legal stimulant in coffee and tea (8)'},
+  {word:'BORAX',    r:7,c:2,dir:'across',num:8, clue:'Banned industrial compound illegally used in food (5)'},
+  {word:'MORPHINE', r:8,c:0,dir:'across',num:9, clue:'Schedule II narcotic painkiller (8)'},
+  {word:'COCAINE',  r:0,c:9,dir:'down',  num:2, clue:'Schedule I narcotic and powerful stimulant (7)'}
+];
+var cwAnswer=[];
+
+function initCrossword(){
+  cwAnswer=[];
+  for(var r=0;r<CW_SIZE;r++){cwAnswer.push([]);for(var c=0;c<CW_SIZE;c++)cwAnswer[r].push(null);}
+  CW_WORDS.forEach(function(w){
+    for(var i=0;i<w.word.length;i++){
+      var nr=w.dir==='across'?w.r:w.r+i;
+      var nc=w.dir==='across'?w.c+i:w.c;
+      if(nr<CW_SIZE&&nc<CW_SIZE)cwAnswer[nr][nc]=w.word[i];
+    }
+  });
+  var nums={};
+  CW_WORDS.forEach(function(w){nums[w.r+','+w.c]=w.num;});
+  var grid=document.getElementById('cwGrid');
+  grid.className='cw-grid';
+  grid.style.gridTemplateColumns='repeat('+CW_SIZE+',1fr)';
+  grid.innerHTML='';
+  for(var r=0;r<CW_SIZE;r++){
+    for(var c=0;c<CW_SIZE;c++){
+      var cell=document.createElement('div');
+      if(cwAnswer[r][c]!==null){
+        cell.className='cw-cell';
+        if(nums[r+','+c]){var n=document.createElement('div');n.className='cw-num';n.textContent=nums[r+','+c];cell.appendChild(n);}
+        var inp=document.createElement('input');
+        inp.maxLength=1;inp.dataset.r=r;inp.dataset.c=c;
+        (function(rr,cc,el){
+          el.addEventListener('input',function(){
+            el.value=el.value.toUpperCase().slice(-1);
+            var next=grid.querySelector('input[data-r="'+rr+'"][data-c="'+(cc+1)+'"]')||grid.querySelector('input[data-r="'+(rr+1)+'"][data-c="'+cc+'"]');
+            if(next&&el.value)next.focus();
+          });
+          el.addEventListener('keydown',function(e){
+            if(e.key==='Backspace'&&!el.value){
+              var prev=grid.querySelector('input[data-r="'+rr+'"][data-c="'+(cc-1)+'"]')||grid.querySelector('input[data-r="'+(rr-1)+'"][data-c="'+cc+'"]');
+              if(prev){prev.value='';prev.focus();}
+            }
+          });
+        })(r,c,inp);
+        cell.appendChild(inp);
+      } else {
+        cell.className='cw-cell black';
+      }
+      grid.appendChild(cell);
+    }
+  }
+  var across=CW_WORDS.filter(function(w){return w.dir==='across';});
+  var down=CW_WORDS.filter(function(w){return w.dir==='down';});
+  var cluesEl=document.getElementById('cwClues');
+  cluesEl.innerHTML='<div class="cw-clue-group"><h4>Across</h4>'+across.map(function(w){return '<div class="cw-clue"><span>'+w.num+'.</span> '+w.clue+'</div>';}).join('')+'</div><div class="cw-clue-group"><h4>Down</h4>'+down.map(function(w){return '<div class="cw-clue"><span>'+w.num+'.</span> '+w.clue+'</div>';}).join('')+'</div>';
+  document.getElementById('cwResult').textContent='';
+}
+
+function checkCrossword(){
+  var grid=document.getElementById('cwGrid');var correct=0,total=0;
+  for(var r=0;r<CW_SIZE;r++){
+    for(var c=0;c<CW_SIZE;c++){
+      if(cwAnswer[r]&&cwAnswer[r][c]!==null){
+        total++;
+        var inp=grid.querySelector('input[data-r="'+r+'"][data-c="'+c+'"]');
+        if(!inp)continue;
+        inp.classList.remove('ok','no');
+        if(inp.value.toUpperCase()===cwAnswer[r][c]){inp.classList.add('ok');correct++;}
+        else if(inp.value)inp.classList.add('no');
+      }
+    }
+  }
+  var pct=Math.round(correct/total*100);
+  var res=document.getElementById('cwResult');
+  res.style.color=pct===100?'var(--green)':pct>=60?'var(--yellow)':'var(--red)';
+  res.textContent=pct===100?'Perfect! Wunderbar! '+correct+'/'+total+' correct!':correct+'/'+total+' correct ('+pct+'%) - keep trying!';
+}
+
+/* ========== SORTER ========== */
+var SORTER_ITEMS=[
+  {name:'MSG',cat:'additive'},{name:'Tartrazine',cat:'additive'},{name:'Saccharin',cat:'additive'},
+  {name:'Agar-Agar',cat:'additive'},{name:'Vanillin',cat:'additive'},{name:'Aspartame',cat:'additive'},
+  {name:'Citric Acid',cat:'additive'},{name:'Carrageenan',cat:'additive'},
+  {name:'Heroin',cat:'addictive'},{name:'Cocaine',cat:'addictive'},{name:'Nicotine',cat:'addictive'},
+  {name:'Morphine',cat:'addictive'},{name:'Caffeine',cat:'addictive'},{name:'Methamphetamine',cat:'addictive'},
+  {name:'Formalin',cat:'banned'},{name:'Borax',cat:'banned'},{name:'Rhodamine B',cat:'banned'},{name:'Metanil Yellow',cat:'banned'}
+];
+var sortQueue=[],sortIdx=0,sortScore=0,sortStreak=0,sortTimer=null,sortTimeLeft=60,sortActive=false;
+
+function initSorter(){
+  sortQueue=shuffle(SORTER_ITEMS);sortIdx=0;sortScore=0;sortStreak=0;sortTimeLeft=60;sortActive=true;
+  document.getElementById('sortScore').textContent=0;document.getElementById('sortStreak').textContent=0;
+  document.getElementById('sortRemain').textContent=sortQueue.length;
+  document.getElementById('sortTimerFill').style.width='100%';
+  document.getElementById('sortTimerFill').style.background='var(--green)';
+  document.getElementById('sortResult').classList.remove('show');
+  document.querySelectorAll('.sort-btn').forEach(function(b){b.disabled=false;});
+  showSortCard();clearInterval(sortTimer);
+  sortTimer=setInterval(function(){
+    sortTimeLeft--;
+    document.getElementById('sortTime').textContent=sortTimeLeft+'s';
+    var pct=(sortTimeLeft/60)*100;
+    document.getElementById('sortTimerFill').style.width=pct+'%';
+    document.getElementById('sortTimerFill').style.background=sortTimeLeft>20?'var(--green)':sortTimeLeft>10?'var(--yellow)':'var(--red)';
+    if(sortTimeLeft<=0){clearInterval(sortTimer);endSorter('time');}
+  },1000);
+}
+function showSortCard(){
+  if(sortIdx>=sortQueue.length){endSorter('complete');return;}
+  var card=document.getElementById('sortCard');card.textContent=sortQueue[sortIdx].name;
+  document.getElementById('sortRemain').textContent=sortQueue.length-sortIdx;
+}
+function sortAnswer(cat){
+  if(!sortActive||sortIdx>=sortQueue.length)return;
+  var correct=sortQueue[sortIdx].cat===cat;
+  var card=document.getElementById('sortCard');
+  card.className='sorter-card';void card.offsetWidth;
+  card.className='sorter-card '+(correct?'flash-correct':'flash-wrong');
+  if(correct){sortScore+=10+(sortStreak*2);sortStreak++;}else{sortStreak=0;}
+  sortIdx++;
+  document.getElementById('sortScore').textContent=sortScore;
+  document.getElementById('sortStreak').textContent=sortStreak;
+  setTimeout(showSortCard,300);
+}
+function endSorter(reason){
+  sortActive=false;clearInterval(sortTimer);
+  document.querySelectorAll('.sort-btn').forEach(function(b){b.disabled=true;});
+  document.getElementById('sortResultTitle').textContent=reason==='complete'?'All Done!':'Time Up!';
+  document.getElementById('sortResultMsg').textContent=reason==='complete'?'You sorted all '+sortQueue.length+' substances! Score: '+sortScore+' pts.':'Sorted '+sortIdx+' / '+sortQueue.length+'. Score: '+sortScore+' pts.';
+  document.getElementById('sortResult').classList.add('show');
+}
+
+/* ========== MEMORY ========== */
+var MEM_PAIRS=[
+  {a:'MSG',b:'Flavor Enhancer'},{a:'Tartrazine',b:'Synthetic Colorant'},
+  {a:'Saccharin',b:'Artificial Sweetener'},{a:'Agar-Agar',b:'Thickener'},
+  {a:'Heroin',b:'Schedule I Narcotic'},{a:'Morphine',b:'Schedule II Narcotic'},
+  {a:'Methamphetamine',b:'Psychotropic'},{a:'Nicotine',b:'Tobacco Compound'}
+];
+var EMOJIS=['&#129474;','&#127912;','&#127852;','&#127754;','&#128137;','&#128138;','&#9889;','&#128684;'];
+var memFlipped=[],memMatched=0,memMoves=0,memLocked=false;
+
+function initMemory(){
+  memFlipped=[];memMatched=0;memMoves=0;memLocked=false;
+  document.getElementById('memMoves').textContent=0;
+  document.getElementById('memPairs').textContent='0 / '+MEM_PAIRS.length;
+  document.getElementById('memWin').classList.remove('show');
+  var cards=[];
+  MEM_PAIRS.forEach(function(p,i){
+    cards.push({id:i,side:'a',text:p.a,em:EMOJIS[i]});
+    cards.push({id:i,side:'b',text:p.b,em:EMOJIS[i]});
+  });
+  var sh=shuffle(cards);
+  var grid=document.getElementById('memGrid');grid.innerHTML='';
+  sh.forEach(function(card){
+    var div=document.createElement('div');div.className='mem-card';
+    div.dataset.id=card.id;div.dataset.side=card.side;
+    div.innerHTML='<div class="mem-inner"><div class="mem-front">&#127183;</div><div class="mem-back">'+card.em+'<br>'+card.text+'</div></div>';
+    div.addEventListener('click',function(){memFlip(div);});
+    grid.appendChild(div);
+  });
+}
+function memFlip(card){
+  if(memLocked||card.classList.contains('flipped')||card.classList.contains('matched'))return;
+  card.classList.add('flipped');memFlipped.push(card);
+  if(memFlipped.length===2){
+    memLocked=true;memMoves++;
+    document.getElementById('memMoves').textContent=memMoves;
+    var a=memFlipped[0],b=memFlipped[1];
+    if(a.dataset.id===b.dataset.id&&a.dataset.side!==b.dataset.side){
+      a.classList.add('matched');b.classList.add('matched');
+      memMatched++;memFlipped=[];
+      document.getElementById('memPairs').textContent=memMatched+' / '+MEM_PAIRS.length;
+      memLocked=false;
+      if(memMatched===MEM_PAIRS.length){
+        document.getElementById('memFinalMoves').textContent=memMoves;
+        document.getElementById('memWin').classList.add('show');
+      }
+    } else {
+      setTimeout(function(){a.classList.remove('flipped');b.classList.remove('flipped');memFlipped=[];memLocked=false;},1000);
+    }
+  }
+}
+
+/* ========== DANGER ========== */
+var DANGER_ITEMS=[
+  {name:'Tartrazine',safe:true, hint:'Synthetic yellow colorant permitted by BPOM'},
+  {name:'Formalin',  safe:false,hint:'Industrial disinfectant - carcinogenic'},
+  {name:'Saccharin', safe:true, hint:'Artificial sweetener; safe within ADI limits'},
+  {name:'Borax',     safe:false,hint:'Industrial cleaning compound - banned from food'},
+  {name:'Agar-Agar', safe:true, hint:'Natural thickener from seaweed'},
+  {name:'Rhodamine B',safe:false,hint:'Textile dye - causes cancer'},
+  {name:'MSG',       safe:true, hint:'Flavor enhancer; regulated and safe in normal doses'},
+  {name:'Methanol',  safe:false,hint:'Industrial solvent - can cause blindness and death'},
+  {name:'Vanillin',  safe:true, hint:'Artificial vanilla aroma - permitted additive'},
+  {name:'Metanil Yellow',safe:false,hint:'Banned synthetic dye - toxic'},
+  {name:'Citric Acid',safe:true,hint:'Natural preservative found in citrus fruits'},
+  {name:'Lead Acetate',safe:false,hint:'Heavy metal compound - highly toxic'},
+  {name:'Aspartame', safe:true, hint:'Low-calorie sweetener approved by WHO'},
+  {name:'Sudan Red',  safe:false,hint:'Industrial azo dye - carcinogenic, banned'},
+  {name:'Carrageenan',safe:true,hint:'Seaweed-based thickener; permitted additive'}
+];
+var dangerQueue=[],dangerIdx=0,dangerLives=3,dangerScore=0,dangerActive=false,dangerWait=false;
+
+function initDanger(){
+  dangerQueue=shuffle(DANGER_ITEMS);dangerIdx=0;dangerLives=3;dangerScore=0;dangerActive=true;dangerWait=false;
+  updateHearts();document.getElementById('dangerScore').textContent=0;
+  document.getElementById('dangerResult').classList.remove('show');
+  document.getElementById('dangerFeedback').className='danger-feedback';
+  document.getElementById('dangerFeedback').textContent='';
+  document.getElementById('dangerSafeBtn').disabled=false;
+  document.getElementById('dangerDangerBtn').disabled=false;
+  showDangerCard();
+}
+function showDangerCard(){
+  if(dangerIdx>=dangerQueue.length){endDanger('complete');return;}
+  var item=dangerQueue[dangerIdx];
+  document.getElementById('dangerSubstance').textContent=item.name;
+  document.getElementById('dangerHint').textContent=item.hint;
+  document.getElementById('dangerProgress').textContent='Question '+(dangerIdx+1)+' / '+dangerQueue.length;
+  document.getElementById('dangerFeedback').className='danger-feedback';
+  document.getElementById('dangerSafeBtn').disabled=false;
+  document.getElementById('dangerDangerBtn').disabled=false;
+  dangerWait=false;
+}
+function dangerAnswer(userSafe){
+  if(!dangerActive||dangerWait)return;
+  dangerWait=true;
+  document.getElementById('dangerSafeBtn').disabled=true;
+  document.getElementById('dangerDangerBtn').disabled=true;
+  var item=dangerQueue[dangerIdx];var correct=(userSafe===item.safe);
+  var fb=document.getElementById('dangerFeedback');
+  if(correct){dangerScore+=10;fb.className='danger-feedback show correct';fb.textContent='Correct! '+item.name+' is '+(item.safe?'a permitted additive':'dangerous/banned')+'. +10 pts';}
+  else{dangerLives--;updateHearts();fb.className='danger-feedback show wrong';fb.textContent='Wrong! '+item.name+' is actually '+(item.safe?'safe (permitted additive)':'DANGEROUS and banned')+'. -1 life';}
+  document.getElementById('dangerScore').textContent=dangerScore;
+  dangerIdx++;
+  if(dangerLives<=0){setTimeout(function(){endDanger('lives');},1200);return;}
+  if(dangerIdx>=dangerQueue.length){setTimeout(function(){endDanger('complete');},1200);return;}
+  setTimeout(showDangerCard,1400);
+}
+function updateHearts(){
+  var h='';for(var i=0;i<3;i++)h+=i<dangerLives?'red ':' ';
+  document.getElementById('dangerLives').textContent=h.trim();
+  // Use text fallback since emojis can cause encoding issues
+  var hearts='';
+  for(var i=0;i<3;i++){hearts+=(i<dangerLives?'[heart]':'[empty]')+' ';}
+  document.getElementById('dangerLives').textContent=
+    Array(3).fill(0).map(function(_,i){return i<dangerLives?'(v)':'(x)';}).join(' ');
+}
+function endDanger(reason){
+  dangerActive=false;
+  document.getElementById('dangerResultTitle').textContent=reason==='complete'?'Completed!':'No More Lives!';
+  document.getElementById('dangerResultMsg').textContent=reason==='complete'?'All '+dangerQueue.length+' substances done! Score: '+dangerScore+' pts. Sehr gut!':'Got '+(dangerIdx-1)+' questions. Score: '+dangerScore+' pts. Try again!';
+  document.getElementById('dangerResult').classList.add('show');
+}
+
+/* ========== INIT ========== */
+window.addEventListener('load',function(){
+  initWordSearch();
+  initCrossword();
+  initMemory();
+  initDanger();
+  document.getElementById('sortCard').textContent='Press the Start button below!';
+});
+</script>
+</body>
+</html>

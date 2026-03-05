@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About - Learning with Odey</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .about-page{max-width:820px;margin:0 auto;padding:2.5rem 1.5rem 5rem;position:relative;z-index:1}
+    .about-hero{text-align:center;margin-bottom:2rem}
+    .about-hero h1{color:var(--blue);font-size:clamp(1.8rem,4vw,2.6rem);display:inline-block;position:relative}
+    .about-hero h1::after{content:'';position:absolute;bottom:-5px;left:0;right:0;height:4px;background:var(--yellow);border-radius:2px;transform:rotate(-0.5deg)}
+    .about-hero p{font-family:var(--font-hand);color:var(--ink-faint);margin-top:.7rem}
+    /* Profile card */
+    .profile-card{display:flex;gap:2rem;align-items:flex-start;background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);padding:2rem;box-shadow:var(--shadow-md);margin-bottom:2rem;position:relative}
+    .profile-card::before{content:'';position:absolute;top:10px;left:10px;right:-6px;bottom:-6px;background:var(--paper-dark);border-radius:var(--radius-lg);z-index:-1;border:2px solid var(--paper-lines)}
+    .profile-photo-wrap{flex-shrink:0;text-align:center}
+    .profile-photo{width:130px;height:130px;border-radius:50%;object-fit:cover;border:4px solid var(--blue);box-shadow:var(--shadow-md);display:block;margin:0 auto .8rem}
+    .profile-photo-fallback{width:130px;height:130px;border-radius:50%;background:var(--blue-pale);border:4px solid var(--blue);display:flex;align-items:center;justify-content:center;font-size:3rem;margin:0 auto .8rem}
+    .profile-odey-img{width:56px;animation:float 3s ease-in-out infinite;margin-top:.3rem}
+    .profile-info{flex:1}
+    .profile-name{font-family:var(--font-hand);font-size:2rem;color:var(--blue);position:relative;display:inline-block;margin-bottom:.1rem}
+    .profile-name::after{content:'';position:absolute;bottom:-3px;left:0;right:0;height:3px;background:var(--yellow);border-radius:2px;transform:rotate(-0.5deg)}
+    .profile-title{font-family:var(--font-hand);font-size:1rem;color:var(--green);font-weight:700;margin:.5rem 0 .8rem}
+    .profile-tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem}
+    .ptag{font-family:var(--font-ui);font-size:.78rem;font-weight:600;padding:.2rem .7rem;border-radius:99px;border:1.5px solid}
+    .ptag.blue{color:var(--blue);border-color:var(--blue);background:var(--blue-pale)}
+    .ptag.green{color:var(--green);border-color:var(--green);background:var(--green-pale)}
+    .ptag.yellow{color:var(--yellow);border-color:var(--yellow);background:var(--yellow-pale)}
+    .ptag.purple{color:var(--purple);border-color:var(--purple);background:var(--purple-pale)}
+    .profile-bio{font-family:var(--font-ui);font-size:.93rem;line-height:1.8;color:var(--ink-soft)}
+    .profile-email{display:inline-flex;align-items:center;gap:.5rem;margin-top:.8rem;font-family:var(--font-ui);font-size:.88rem;color:var(--blue);text-decoration:none;border-bottom:1.5px dashed var(--blue);padding-bottom:1px}
+    .profile-email:hover{color:var(--green);border-color:var(--green)}
+    /* Section cards */
+    .about-card{background:white;border:2px solid var(--paper-lines);border-radius:var(--radius-lg);padding:1.5rem 1.8rem;box-shadow:var(--shadow-sm);margin-bottom:1.5rem}
+    .about-card-title{font-family:var(--font-hand);font-size:1.3rem;color:var(--blue);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+    .about-card-title.green{color:var(--green)}
+    .about-card-title.yellow{color:var(--yellow)}
+    .about-card-title.sdg{color:#2d9c4e}
+    .about-p{font-family:var(--font-ui);font-size:.93rem;line-height:1.8;color:var(--ink-soft);margin-bottom:.8rem}
+    .about-p:last-child{margin-bottom:0}
+    /* Experience list */
+    .exp-list{display:flex;flex-direction:column;gap:.8rem}
+    .exp-item{display:flex;gap:1rem;align-items:flex-start;padding:.8rem 1rem;background:var(--paper);border:1.5px solid var(--paper-lines);border-radius:var(--radius-md)}
+    .exp-icon{font-size:1.5rem;flex-shrink:0;margin-top:.1rem}
+    .exp-item-title{font-family:var(--font-ui);font-size:.92rem;font-weight:700;color:var(--ink)}
+    .exp-item-desc{font-family:var(--font-ui);font-size:.84rem;color:var(--ink-faint);margin-top:.15rem;line-height:1.5}
+    /* Quote */
+    .quote-box{background:var(--yellow-pale);border-left:4px solid var(--yellow);border-radius:0 var(--radius-md) var(--radius-md) 0;padding:1rem 1.2rem;margin:.8rem 0;font-family:var(--font-hand);font-size:1.05rem;color:var(--ink-soft);font-style:italic;line-height:1.7}
+    /* Tech stack */
+    .tech-row{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:.8rem}
+    .tech-chip{display:flex;align-items:center;gap:.5rem;padding:.4rem .9rem;border-radius:var(--radius-sm);border:1.5px solid var(--paper-lines);background:var(--paper);font-family:var(--font-ui);font-size:.84rem;font-weight:600;color:var(--ink-soft)}
+    /* SDG box */
+    .sdg-box{display:flex;align-items:center;gap:1rem;background:#e8f5ec;border:2px solid #2d9c4e;border-radius:var(--radius-md);padding:1rem 1.2rem}
+    .sdg-circle{width:52px;height:52px;border-radius:50%;background:#2d9c4e;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;color:white;text-align:center}
+    .sdg-circle .n{font-size:1.3rem;font-weight:900;line-height:1}
+    .sdg-circle .l{font-size:.38rem;font-weight:700;text-transform:uppercase;line-height:1.3}
+    .sdg-text h4{font-size:.93rem;font-weight:700;color:#1a6e33;margin-bottom:.2rem}
+    .sdg-text p{font-size:.86rem;color:#2d5a38;line-height:1.6;margin:0}
+    /* Odey farewell */
+    .odey-farewell{display:flex;gap:1.5rem;align-items:center;padding:1.5rem;background:var(--paper-dark);border:2px dashed var(--paper-lines);border-radius:var(--radius-lg);margin-top:1.5rem}
+    .odey-farewell img{width:90px;animation:float 3s ease-in-out infinite;flex-shrink:0}
+    .odey-farewell-text{font-family:var(--font-hand);font-size:1rem;color:var(--ink-soft);line-height:1.7;font-style:italic}
+    .odey-farewell-text strong{color:var(--blue);font-style:normal}
+    @media(max-width:600px){.profile-card{flex-direction:column;align-items:center;text-align:center}.profile-tags{justify-content:center}.about-page{padding:1.5rem 1rem 4rem}.about-card{padding:1.2rem}}
+  </style>
+</head>
+<body>
+<nav class="navbar">
+  <a href="index.html" class="nav-logo">Learning with <span>Odey</span></a>
+  <button class="nav-toggle" id="navToggle"><span></span><span></span><span></span></button>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="materials.html">Materials</a></li>
+    <li><a href="quiz.html">Quiz</a></li>
+    <li><a href="minigames.html">Mini Games</a></li>
+    <li><a href="experiment.html">Experiment</a></li>
+    <li><a href="about.html" class="active">About</a></li>
+  </ul>
+</nav>
+
+<div class="page-content">
+<div class="about-page">
+
+  <div class="about-hero">
+    <h1>About</h1>
+    <p>The person behind Learning with Odey</p>
+  </div>
+
+  <!-- Profile -->
+  <div class="profile-card">
+    <div class="profile-photo-wrap">
+      <img src="assets/profile.jpg" class="profile-photo" alt="Fauzan Ahmad"
+           onerror="this.style.display='none';document.getElementById('pfallback').style.display='flex'">
+      <div class="profile-photo-fallback" id="pfallback" style="display:none">&#128105;&#8205;&#127891;</div>
+      <img src="assets/odey.png" class="profile-odey-img" alt="Odey">
+    </div>
+    <div class="profile-info">
+      <div class="profile-name">Fauzan Ahmad</div>
+      <div class="profile-title">Science Education &bull; Universitas Pendidikan Indonesia</div>
+      <div class="profile-tags">
+        <span class="ptag blue">Science Education</span>
+        <span class="ptag green">Instructional Design</span>
+        <span class="ptag yellow">Technology Integration</span>
+        <span class="ptag purple">AR Development</span>
+      </div>
+      <p class="profile-bio">
+        An undergraduate student in the <strong>International Program on Science Education</strong>
+        at Universitas Pendidikan Indonesia (UPI). Passionate about bridging science, education,
+        and technology to create learning experiences that are meaningful, inquiry-driven,
+        and accessible for all students.
+      </p>
+      <a href="mailto:fauzanahmad@upi.edu" class="profile-email">fauzanahmad@upi.edu</a>
+    </div>
+  </div>
+
+  <!-- Academic Focus -->
+  <div class="about-card">
+    <div class="about-card-title">Greetings!</div>
+    <p class="about-p">Hello everyone, congratulation you are the chosen one who has traveled all the way here. Anyway talking about science, for me, science education has never been simply about memorizing formulas or repeating established theories. Science feels like a deeply human way of uncovering the mysteries of the universe. It gives us the tools to ask meaningful questions about the world and, through careful observation and evidence, gradually move closer to the truth. In that sense, learning science is not just an academic responsibility but a personal journey toward understanding.</p>
+    <p class="about-p">When we truly engage with science, we gain more than correct answers. We develop a sense of wonder. Realizing that the movement of planets, the growth of plants, and even the behavior of light follow patterns that can be understood changes the way we see our surroundings. It reminds us that the world is not random or chaotic, but structured in ways we are capable of exploring. This awareness naturally leads to appreciation. To me, science education should cultivate that awareness, helping learners become not only knowledgeable, but also more attentive, reflective, and respectful toward the world they inhabit.</p>
+  </div>
+
+  <!-- Experience -->
+  <div class="about-card">
+    <div class="about-card-title green">Experience</div>
+    <div class="exp-list">
+      <div class="exp-item">
+        <div class="exp-icon">&#127891;</div>
+        <div>
+          <div class="exp-item-title">Microteaching</div>
+          <div class="exp-item-desc">Hands-on teaching practice in simulated and real classroom settings, developing lesson delivery, classroom management, and student engagement skills.</div>
+        </div>
+      </div>
+      <div class="exp-item">
+        <div class="exp-icon">&#128218;</div>
+        <div>
+          <div class="exp-item-title">Private Tutoring</div>
+          <div class="exp-item-desc">One-on-one science and academic tutoring for junior and senior high school students, adapting teaching strategies to individual learning styles.</div>
+        </div>
+      </div>
+      <div class="exp-item">
+        <div class="exp-icon">&#129680;</div>
+        <div>
+          <div class="exp-item-title">PlanetARy - Augmented Reality Project</div>
+          <div class="exp-item-desc">Developer and designer of an AR-based learning application for planetary science, featuring Odey the robot astronaut as the interactive guide character. This project is where Odey was born!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- About the website -->
+  <div class="about-card">
+    <div class="about-card-title">About This Website</div>
+    <p class="about-p"><strong>Learning with Odey</strong> was built as an interactive science learning resource for Grade 8 junior high school students (SMP), following the <strong>Kurikulum Merdeka</strong>. It covers <em>Additive and Addictive Substances</em> through interactive materials, inquiry-based experiments, a quiz, educational mini games, and more - all aligned with SDG 3.</p>
+    <p class="about-p">The website uses a <em>student's sketchbook</em> aesthetic: warm, handwritten fonts, notebook lines, and a calm color palette - because learning should feel safe and approachable, not stressful. Odey serves as a friendly guide throughout, adding humor and encouragement along the way.</p>
+    <div class="tech-row">
+      <div class="tech-chip">HTML5</div>
+      <div class="tech-chip">CSS3</div>
+      <div class="tech-chip">Vanilla JavaScript</div>
+      <div class="tech-chip">VS Code</div>
+      <div class="tech-chip">GitHub Pages</div>
+    </div>
+  </div>
+
+  <!-- SDG -->
+  <div class="about-card">
+    <div class="about-card-title sdg">SDG 3 Commitment</div>
+    <div class="sdg-box">
+      <div class="sdg-circle"><div class="n">3</div><div class="l">Good Health &amp; Well-Being</div></div>
+      <div class="sdg-text">
+        <h4>Aligned with SDG 3 - Good Health and Well-Being</h4>
+        <p>By educating students about food additives, banned substances, and addictive compounds, Learning with Odey contributes to health literacy and informed decision-making - key pillars of achieving SDG 3 for the next generation.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Odey farewell -->
+  <div class="odey-farewell">
+    <img src="assets/odey.png" alt="Odey">
+    <div class="odey-farewell-text">
+      "Hallo! I am <strong>Odey</strong> - Fauzan's robot astronaut companion since the PlanetARy project.
+      I have traveled through the solar system, and now I am here to help you explore the world
+      of science chemistry! Auf Wiedersehen for now, Freund - and remember:
+      stay curious, stay healthy, and never stop asking <em>Warum?</em> (Why?)"
+    </div>
+  </div>
+
+</div>
+</div>
+
+<footer class="site-footer">
+  <p>2026 Fauzan Ahmad &middot; <a href="mailto:fauzanahmad@upi.edu">fauzanahmad@upi.edu</a></p>
+</footer>
+
+<script>
+document.getElementById('navToggle').addEventListener('click',function(){
+  document.getElementById('navLinks').classList.toggle('open');
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Experiment — Learning with Odey</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Patrick+Hand&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .exp-page{min-height:calc(100vh - var(--nav-height));padding:0 0 4rem;position:relative;z-index:1}
+    .exp-hero{background:var(--paper-dark);border-bottom:2px solid var(--paper-lines);padding:2rem 2rem 0;text-align:center;position:relative;overflow:hidden}
+    .exp-hero h1{color:var(--green);font-size:clamp(1.8rem,4vw,2.8rem);display:inline-block;position:relative}
+    .exp-hero h1::after{content:'';position:absolute;bottom:-5px;left:0;right:0;height:4px;background:var(--blue);border-radius:2px;transform:rotate(-0.5deg)}
+    .exp-hero p{font-family:var(--font-hand);color:var(--ink-faint);margin:.6rem 0 0;font-size:1rem}
+    .sdg-badge{display:inline-flex;align-items:center;gap:.5rem;background:#2d9c4e;color:white;border-radius:var(--radius-md);padding:.4rem 1rem;font-family:var(--font-ui);font-size:.85rem;font-weight:700;margin:.8rem 0 0;box-shadow:var(--shadow-sm)}
+    .exp-tabs{display:flex;justify-content:center;gap:.4rem;padding:1.2rem 1.5rem 0;flex-wrap:wrap}
+    .exp-tab{display:flex;align-items:center;gap:.5rem;padding:.65rem 1.2rem;border-radius:var(--radius-md) var(--radius-md) 0 0;border:2px solid var(--paper-lines);border-bottom:none;background:var(--paper-dark);color:var(--ink-faint);font-family:var(--font-hand);font-size:.95rem;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
+    .exp-tab.active-blue  {background:white;color:var(--blue);  border-color:var(--blue);  position:relative;bottom:-2px;padding-bottom:calc(.65rem + 2px)}
+    .exp-tab.active-green {background:white;color:var(--green); border-color:var(--green); position:relative;bottom:-2px;padding-bottom:calc(.65rem + 2px)}
+    .exp-tab.active-red   {background:white;color:var(--red);   border-color:var(--red);   position:relative;bottom:-2px;padding-bottom:calc(.65rem + 2px)}
+    .exp-panel{display:none;margin:0 1.5rem;border:2px solid var(--paper-lines);border-radius:0 var(--radius-md) var(--radius-md) var(--radius-md);background:white;box-shadow:var(--shadow-md);font-family:var(--font-ui)}
+    .exp-panel.show{display:block;animation:fadeInUp .3s ease forwards}
+    .exp-panel.blue-panel  {border-color:var(--blue)}
+    .exp-panel.green-panel {border-color:var(--green)}
+    .exp-panel.red-panel   {border-color:var(--red)}
+    .ws-progress{padding:.5rem 2rem;background:var(--paper-dark);border-bottom:1px solid var(--paper-lines);display:flex;align-items:center;gap:.8rem}
+    .ws-progress-label{font-family:var(--font-hand);font-size:.82rem;color:var(--ink-faint)}
+    .ws-progress-bar{flex:1;height:6px;background:var(--paper-lines);border-radius:3px;overflow:hidden}
+    .ws-progress-fill{height:100%;background:var(--blue);border-radius:3px;transition:width .3s}
+    .ws-progress-fill.green-fill{background:var(--green)}
+    .ws-progress-fill.red-fill{background:var(--red)}
+    .ws-progress-pct{font-family:var(--font-hand);font-size:.82rem;font-weight:700;color:var(--blue)}
+    .ws-progress-pct.green-pct{color:var(--green)}
+    .ws-progress-pct.red-pct{color:var(--red)}
+    .ws-header{padding:1.5rem 2rem 1rem;border-bottom:2px dashed var(--paper-lines)}
+    .ws-header-top{display:flex;align-items:flex-start;gap:1rem;flex-wrap:wrap}
+    .exp-number{font-family:var(--font-hand);font-size:1rem;font-weight:700;padding:.2rem .8rem;border-radius:99px;border:2px solid;white-space:nowrap}
+    .exp-number.blue  {color:var(--blue); border-color:var(--blue); background:var(--blue-pale)}
+    .exp-number.green {color:var(--green);border-color:var(--green);background:var(--green-pale)}
+    .exp-number.red   {color:var(--red);  border-color:var(--red);  background:var(--red-pale)}
+    .ws-title{font-family:var(--font-hand);font-size:1.5rem;color:var(--ink);line-height:1.2;flex:1}
+    .ws-sdg-note{display:inline-flex;align-items:center;gap:.4rem;background:#e8f5ec;border:1.5px solid #2d9c4e;border-radius:var(--radius-sm);padding:.3rem .8rem;font-size:.82rem;font-weight:600;color:#1a6e33;margin-top:.6rem}
+    .ws-section{padding:1.2rem 2rem;border-bottom:1.5px dashed var(--paper-lines)}
+    .ws-section:last-child{border-bottom:none}
+    .ws-section-title{font-family:var(--font-hand);font-size:1.1rem;font-weight:700;color:var(--blue);margin-bottom:.7rem;display:flex;align-items:center;gap:.5rem}
+    .ws-section-title.green{color:var(--green)}
+    .ws-section-title.red{color:var(--red)}
+    .objective-box{background:var(--blue-pale);border:1.5px solid var(--blue-light);border-radius:var(--radius-md);padding:1rem 1.2rem;font-size:.93rem;line-height:1.75;color:var(--ink-soft)}
+    .objective-box.green-box{background:var(--green-pale);border-color:var(--green-light)}
+    .objective-box.red-box{background:var(--red-pale);border-color:var(--red-light)}
+    .sdg-box{background:#e8f5ec;border:2px solid #2d9c4e;border-radius:var(--radius-md);padding:1rem 1.2rem;display:flex;gap:1rem;align-items:flex-start}
+    .sdg-logo{width:56px;height:56px;background:#2d9c4e;border-radius:var(--radius-sm);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;color:white;text-align:center}
+    .sdg-logo .sdg-num{font-size:1.4rem;font-weight:900;line-height:1}
+    .sdg-logo .sdg-lbl{font-size:.38rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px;line-height:1.2}
+    .sdg-text h4{font-size:.93rem;font-weight:700;color:#1a6e33;margin-bottom:.3rem}
+    .sdg-text p{font-size:.88rem;color:#2d5a38;line-height:1.6;margin:0}
+    .safety-box{background:#fff8e1;border:2px solid var(--yellow);border-radius:var(--radius-md);padding:.8rem 1.1rem;display:flex;gap:.8rem;align-items:flex-start;margin-bottom:1rem}
+    .safety-icon{font-size:1.4rem;flex-shrink:0}
+    .safety-text{font-size:.88rem;line-height:1.6;color:var(--ink-soft)}
+    .safety-text strong{color:var(--yellow)}
+    .materials-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.5rem}
+    .material-item{display:flex;align-items:center;gap:.6rem;padding:.5rem .8rem;background:var(--paper);border:1.5px solid var(--paper-lines);border-radius:var(--radius-sm);font-size:.88rem;color:var(--ink-soft)}
+    .material-item .mat-icon{font-size:1.1rem;flex-shrink:0}
+    /* INQUIRY procedure */
+    .inquiry-intro{background:var(--blue-pale);border:1.5px solid var(--blue-light);border-radius:var(--radius-md);padding:.8rem 1.1rem;font-size:.88rem;color:var(--blue);margin-bottom:1rem;font-style:italic}
+    .inquiry-intro.green-intro{background:var(--green-pale);border-color:var(--green-light);color:var(--green)}
+    .inquiry-intro.red-intro{background:var(--red-pale);border-color:var(--red-light);color:var(--red)}
+    .inquiry-step{margin-bottom:1.2rem;border:1.5px solid var(--paper-lines);border-radius:var(--radius-md);overflow:hidden}
+    .inquiry-question{display:flex;align-items:flex-start;gap:.8rem;padding:.8rem 1rem;background:var(--paper-dark);border-bottom:1.5px solid var(--paper-lines)}
+    .inquiry-q-num{width:28px;height:28px;border-radius:50%;background:var(--blue);color:white;display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:700;flex-shrink:0}
+    .inquiry-q-num.green-num{background:var(--green)}
+    .inquiry-q-num.red-num{background:var(--red)}
+    .inquiry-q-text{font-size:.93rem;font-weight:700;color:var(--ink);line-height:1.5}
+    .inquiry-answer{padding:.8rem 1rem}
+    .inquiry-answer-label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--ink-faint);margin-bottom:.3rem}
+    .ws-input{width:100%;padding:.6rem .9rem;font-family:var(--font-ui);font-size:.92rem;border:2px solid var(--paper-lines);border-radius:var(--radius-sm);background:var(--paper);color:var(--ink);outline:none;transition:border-color .2s;resize:vertical;box-sizing:border-box}
+    .ws-input:focus{border-color:var(--blue);background:white}
+    .ws-input.green-focus:focus{border-color:var(--green)}
+    .ws-input.red-focus:focus{border-color:var(--red)}
+    textarea.ws-input{min-height:70px}
+    .ws-field{margin-bottom:1rem}
+    .ws-field-label{font-size:.78rem;font-weight:700;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.7px;margin-bottom:.3rem}
+    .data-table-wrap{overflow-x:auto}
+    .data-table{width:100%;border-collapse:collapse;font-size:.88rem;min-width:400px}
+    .data-table th{background:var(--blue-pale);color:var(--blue);font-weight:700;padding:.55rem .8rem;border:2px solid var(--blue-light);text-align:left;font-size:.82rem}
+    .data-table th.green-th{background:var(--green-pale);color:var(--green);border-color:var(--green-light)}
+    .data-table th.red-th{background:var(--red-pale);color:var(--red);border-color:var(--red-light)}
+    .data-table td{border:1.5px solid var(--paper-lines);padding:.3rem .4rem}
+    .data-table td input{width:100%;border:none;outline:none;background:transparent;font-family:var(--font-ui);font-size:.88rem;color:var(--ink);padding:.2rem .4rem}
+    .data-table td input:focus{background:var(--paper);border-radius:3px}
+    .data-table .row-label{font-weight:600;color:var(--ink-soft);padding:.4rem .8rem;white-space:nowrap;background:var(--paper-dark);font-size:.85rem}
+    .odey-comment{display:flex;align-items:flex-end;gap:1rem;margin:1rem 0;padding:.8rem 1rem;background:var(--yellow-pale);border:1.5px dashed var(--yellow);border-radius:var(--radius-md)}
+    .odey-comment img{width:44px;height:44px;object-fit:contain;flex-shrink:0;animation:wobble 4s ease-in-out infinite}
+    .odey-comment span{font-family:var(--font-hand);font-size:.93rem;color:var(--ink-soft);font-style:italic}
+    .ws-action-bar{padding:1rem 2rem;background:var(--paper-dark);border-top:2px dashed var(--paper-lines);display:flex;gap:.8rem;align-items:center;flex-wrap:wrap}
+    .ws-action-bar p{font-family:var(--font-hand);font-size:.85rem;color:var(--ink-faint);flex:1}
+    .ws-print-btn{padding:.5rem 1.2rem;border-radius:var(--radius-sm);border:2px solid var(--blue);background:var(--blue-pale);color:var(--blue);font-family:var(--font-ui);font-size:.9rem;font-weight:700;cursor:pointer;transition:all .15s}
+    .ws-print-btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-sm)}
+    .ws-clear-btn{padding:.5rem 1.2rem;border-radius:var(--radius-sm);border:2px solid var(--paper-lines);background:var(--paper);color:var(--ink-faint);font-family:var(--font-ui);font-size:.9rem;cursor:pointer;transition:all .15s}
+    .ws-clear-btn:hover{border-color:var(--red);color:var(--red)}
+    .apple-visual{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap;margin:1rem 0}
+    .apple-card{text-align:center;padding:.8rem 1rem;border:2px solid var(--paper-lines);border-radius:var(--radius-md);background:var(--paper);min-width:90px}
+    .apple-emoji{font-size:2rem;display:block;margin-bottom:.3rem}
+    .apple-label{font-size:.82rem;font-weight:700;color:var(--ink)}
+    .apple-conc{font-size:.75rem;color:var(--ink-faint)}
+    @media(max-width:650px){.exp-panel{margin:0 .5rem}.ws-section{padding:1rem}.ws-header{padding:1rem}.materials-grid{grid-template-columns:1fr 1fr}.ws-action-bar{padding:.8rem 1rem}}
+    @media print{.navbar,.exp-hero,.exp-tabs,.ws-action-bar,.odey-comment{display:none!important}.exp-panel{display:block!important;border:none;box-shadow:none}}
+  </style>
+</head>
+<body>
+<nav class="navbar">
+  <a href="index.html" class="nav-logo">Learning with <span>Odey</span></a>
+  <button class="nav-toggle" id="navToggle"><span></span><span></span><span></span></button>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="materials.html">Materials</a></li>
+    <li><a href="quiz.html">Quiz</a></li>
+    <li><a href="minigames.html">Mini Games</a></li>
+    <li><a href="experiment.html" class="active">Experiment</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
+</nav>
+<div class="page-content">
+<div class="exp-page">
+
+  <div class="exp-hero">
+    <h1>🔬 Experiment</h1>
+    <p>Inquiry-based science worksheets — observe, question, discover!</p>
+    <div><span class="sdg-badge">🌿 Aligned with SDG 3 — Good Health and Well-Being</span></div>
+    <div class="exp-tabs">
+      <button class="exp-tab active-blue"  id="tab0" onclick="switchExp(0)">🍎 Exp. 1: Apple Preservation</button>
+      <button class="exp-tab"              id="tab1" onclick="switchExp(1)">🧶 Exp. 2: Food Colorant Detection</button>
+      <button class="exp-tab"              id="tab2" onclick="switchExp(2)">☕ Exp. 3: Caffeine &amp; Heart Rate</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       EXPERIMENT 1: APPLE PRESERVATION
+  ══════════════════════════════ -->
+  <div class="exp-panel blue-panel show" id="exp0">
+    <div class="ws-progress">
+      <span class="ws-progress-label">Worksheet completion:</span>
+      <div class="ws-progress-bar"><div class="ws-progress-fill" id="prog0" style="width:0%"></div></div>
+      <span class="ws-progress-pct" id="progPct0">0%</span>
+    </div>
+    <div class="ws-header">
+      <div class="ws-header-top">
+        <span class="exp-number blue">Experiment 1</span>
+        <div class="ws-title">How Does the Concentration of Vitamin C Affect Apple Browning?</div>
+      </div>
+      <div class="ws-sdg-note">🌿 SDG 3 — Good Health &amp; Well-Being: Food Preservation &amp; Safety</div>
+    </div>
+
+    <div class="ws-section">
+      <div class="ws-section-title">🎯 Objective</div>
+      <div class="objective-box">
+        To investigate the effect of different concentrations of citric acid (Vitamin C) as a natural
+        food preservative on the browning rate of apple slices, and to relate findings to safe food
+        preservation practices supporting SDG 3.
+      </div>
+    </div>
+
+    <div class="ws-section">
+      <div class="ws-section-title">🌍 SDG 3 Connection</div>
+      <div class="sdg-box">
+        <div class="sdg-logo"><div class="sdg-num">3</div><div class="sdg-lbl">Good Health &amp; Well‑Being</div></div>
+        <div class="sdg-text">
+          <h4>Why does this connect to SDG 3?</h4>
+          <p>Food spoilage causes millions of cases of foodborne illness annually. Understanding safe,
+          natural preservatives like Vitamin C (citric acid) helps reduce reliance on dangerous banned
+          preservatives (formalin, borax), directly supporting SDG 3 Target 3.9:
+          <em>"Reduce illnesses from hazardous chemicals."</em></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="ws-section">
+      <div class="ws-section-title">📖 Background</div>
+      <p style="font-size:.92rem;line-height:1.75;color:var(--ink-soft);margin-bottom:.8rem">
+        Apple browning is caused by <strong>enzymatic oxidation</strong> — when apple flesh is exposed to air,
+        an enzyme called polyphenol oxidase (PPO) reacts with oxygen, producing brown pigments (melanins).
+        Citric acid (Vitamin C / ascorbic acid) acts as an antioxidant that inhibits this reaction,
+        slowing browning significantly.
+      </p>
+      <p style="font-size:.92rem;line-height:1.75;color:var(--ink-soft);margin-bottom:.8rem">
+        Your teacher has prepared <strong>4 apple samples (A, B, C, D)</strong>, each treated with
+        a different concentration of citric acid and stored for <strong>2 weeks</strong>.
+        The concentrations are unknown to you — your job is to figure them out!
+      </p>
+      <div class="apple-visual">
+        <div class="apple-card"><span class="apple-emoji">🍎</span><div class="apple-label">Sample A</div><div class="apple-conc">? % citric acid</div></div>
+        <div class="apple-card"><span class="apple-emoji">🍎</span><div class="apple-label">Sample B</div><div class="apple-conc">? % citric acid</div></div>
+        <div class="apple-card"><span class="apple-emoji">🍎</span><div class="apple-label">Sample C</div><div class="apple-conc">? % citric acid</div></div>
+        <div class="apple-card"><span class="apple-emoji">🍎</span><div class="apple-label">Sample D</div><div class="apple-conc">? % citric acid</div></div>
+      </div>
+      <div class="odey-comment">
+        <img src="assets/odey.png" alt="Odey">
+        <span>"Your teacher did the waiting — zwei Wochen! Now YOUR job is to be the scientist. Observe carefully and predict which sample has the highest Vitamin C, Freund! 🔍"</span>
+      </div>
+    </div>
+
+    <div class="ws-section">
+      <div class="ws-section-title">🧪 Tools &amp; Materials</div>
+      <div class="materials-grid">
+        <div class="material-item"><span class="mat-icon">🍎</span>Preserved apple samples (different Vitamin C concentrations)</div>
+        <div class="material-item"><span class="mat-icon">📋</span>Observation sheet (this worksheet)</div>
+        <div class="material-item"><span class="mat-icon">🖊️</span>Pen</div>
+        <div class="material-item"><span class="mat-icon">🧻</span>Clean tissue</div>
+        <div class="material-item"><span class="mat-icon">💧</span>Drinking water (for taste neutralization)</div>
+      </div>
+    </div>
+
+    <!-- HYPOTHESIS -->
+    <div class="ws-section">
+      <div class="ws-section-title">💭 Hypothesis</div>
+      <div class="inquiry-intro">
+        Before starting your observations, write your prediction below. Think about what you already know
+        about Vitamin C and food preservation — which sample do you think will look the freshest?
+      </div>
+      <div class="ws-field">
+        <div class="ws-field-label">Based on your prior knowledge, predict: which sample (A, B, C, or D) has the highest Vitamin C concentration? What do you expect each sample to look like after 2 weeks?</div>
+        <textarea class="ws-input" style="min-height:80px" placeholder="I predict that Sample ___ has the highest Vitamin C concentration because...&#10;I expect Sample A to look... Sample B to look... Sample C to look... Sample D to look..." data-ws="0"></textarea>
+      </div>
+    </div>
+
+    <!-- INQUIRY PROCEDURE -->
+    <div class="ws-section">
+      <div class="ws-section-title">🔍 Inquiry Procedure</div>
+      <div class="inquiry-intro">
+        💡 This is an <strong>inquiry-based experiment</strong>. Answer each guiding question —
+        your answers describe what you actually did and observed at each step.
+      </div>
+
+      <div class="inquiry-step">
+        <div class="inquiry-question"><div class="inquiry-q-num">1</div><div class="inquiry-q-text">What should you do before starting the activity?</div></div>
+        <div class="inquiry-answer"><div class="inquiry-answer-label">✍️ My Answer</div><textarea class="ws-input" placeholder="Before starting, I should..." data-ws="0"></textarea></div>
+      </div>
+
+      <div class="inquiry-step">
+        <div class="inquiry-question"><div class="inquiry-q-num">2</div><div class="inquiry-q-text">What should you do with the four apple samples provided?</div></div>
+        <div class="inquiry-answer"><div class="inquiry-answer-label">✍️ My Answer</div><textarea class="ws-input" placeholder="With the four apple samples, I should..." data-ws="0"></textarea></div>
+      </div>
+
+      <div class="inquiry-step">
+        <div class="inquiry-question"><div class="inquiry-q-num">3</div><div class="inquiry-q-text">What should you observe on each apple, and what should you record about its color?</div></div>
+        <div class="inquiry-answer"><div class="inquiry-answer-label">✍️ My Answer</div><textarea class="ws-input" placeholder="I should observe... and record the color as..." data-ws="0"></textarea></div>
+      </div>
+
+      <div class="inquiry-step">
+        <div class="inquiry-question"><div class="inquiry-q-num">4</div><div class="inquiry-q-text">What should you do to identify the aroma of each apple, and what needs to be recorded?</div></div>
+        <div class="inquiry-answer"><div class="inquiry-answer-label">✍️ My Answer</div><textarea class="ws-input" placeholder="To identify the aroma, I should... and record it as..." data-ws="0"></textarea></div>
+      </div>
+
+      <div class="inquiry-step">
+        <div class="inquiry-question"><div class="inquiry-q-num">5</div><div class="inquiry-q-text">How can you determine the texture of each apple, and what should you do after that?</div></div>
+        <div class="inquiry-answer"><div class="inquiry-answer-label">✍️ My Answer</div><textarea class="ws-input" placeholder="To determine texture, I can... After that, I should..." data-ws="0"></textarea></div>
+      </div>
+
+      <div class="inquiry-step">
+        <div class="inquiry-question"><div class="inquiry-q-num">6</div><div class="inquiry-q-text">What must be ensured before tasting the apple?</div></div>
+        <div class="inquiry-answer"><div class="inquiry-answer-label">✍️ My Answer</div><textarea class="ws-input" placeholder="Before tasting, I must ensure that..." data-ws="0"></textarea></div>
+      </div>
+
+      <div class="inquiry-step">
+        <div class="inquiry-question"><div class="inquiry-q-num">7</div><div class="inquiry-q-text">If the apple is safe to taste, what should you do and what needs to be recorded?</div></div>
+        <div class="inquiry-answer"><div class="inquiry-answer-label">✍️ My Answer</div><textarea class="ws-input" placeholder="If the apple is safe, I should taste it and record the taste as..." data-ws="0"></textarea></div>
+      </div>
+
+      <div class="inquiry-step">
+        <div class="inquiry-question"><div class="inquiry-q-num">8</div><div class="inquiry-q-text">After completing all observations, what should you do with the results from the four apples?</div></div>
+        <div class="inquiry-answer"><div class="inquiry-answer-label">✍️ My Answer</div><textarea class="ws-input" placeholder="After completing all observations, I should..." data-ws="0"></textarea></div>
+      </div>
+
+      <div class="inquiry-step">
+        <div class="inquiry-question"><div class="inquiry-q-num">9</div><div class="inquiry-q-text">After comparing them, what should you determine about the four apples?</div></div>
+        <div class="inquiry-answer"><div class="inquiry-answer-label">✍️ My Answer</div><textarea class="ws-input" placeholder="After comparing, I should determine..." data-ws="0"></textarea></div>
+      </div>
+
+      <div class="inquiry-step">
+        <div class="inquiry-question"><div class="inquiry-q-num">10</div><div class="inquiry-q-text">After determining the level of change, what should you do regarding the Vitamin C concentration and how should you record your results?</div></div>
+        <div class="inquiry-answer"><div class="inquiry-answer-label">✍️ My Answer</div><textarea class="ws-input" placeholder="After determining the level of change, I should predict the Vitamin C concentration by... and record it in the table as..." data-ws="0"></textarea></div>
+      </div>
+    </div>
+
+    <!-- RESULT TABLE -->
+    <div class="ws-section">
+      <div class="ws-section-title">📊 Observation Result Table</div>
+      <div class="ws-field" style="margin-bottom:.5rem"><div class="ws-field-label">Student Name</div><input class="ws-input" type="text" placeholder="Your name..." data-ws="0"></div>
+      <div class="ws-field" style="margin-bottom:.8rem"><div class="ws-field-label">Date</div><input class="ws-input" type="date" data-ws="0"></div>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th rowspan="2" style="vertical-align:middle">Sample</th>
+              <th>Color</th>
+              <th>Aroma</th>
+              <th>Texture</th>
+              <th>Taste</th>
+              <th>Predicted Vitamin C (%)</th>
+            </tr>
+            <tr>
+              <th style="font-weight:400;font-size:.75rem;color:var(--ink-faint)">Fresh / Slightly Brown / Brown</th>
+              <th style="font-weight:400;font-size:.75rem;color:var(--ink-faint)">Normal / Slightly Sour / Unpleasant</th>
+              <th style="font-weight:400;font-size:.75rem;color:var(--ink-faint)">Firm / Slightly Soft / Soft</th>
+              <th style="font-weight:400;font-size:.75rem;color:var(--ink-faint)">Normal / Sour / Different</th>
+              <th style="font-weight:400;font-size:.75rem;color:var(--ink-faint)">0% / 1% / 2% / 3%</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="row-label">A</td>
+              <td><input type="text" placeholder="e.g. Fresh" data-ws="0"></td>
+              <td><input type="text" placeholder="e.g. Normal" data-ws="0"></td>
+              <td><input type="text" placeholder="e.g. Firm" data-ws="0"></td>
+              <td><input type="text" placeholder="e.g. Normal" data-ws="0"></td>
+              <td><input type="text" placeholder="e.g. 3%" data-ws="0"></td>
+            </tr>
+            <tr>
+              <td class="row-label">B</td>
+              <td><input type="text" placeholder="e.g. Slightly Brown" data-ws="0"></td>
+              <td><input type="text" placeholder="e.g. Slightly Sour" data-ws="0"></td>
+              <td><input type="text" placeholder="e.g. Slightly Soft" data-ws="0"></td>
+              <td><input type="text" placeholder="e.g. Sour" data-ws="0"></td>
+              <td><input type="text" placeholder="e.g. 2%" data-ws="0"></td>
+            </tr>
+            <tr>
+              <td class="row-label">C</td>
+              <td><input type="text" placeholder="e.g. Brown" data-ws="0"></td>
+              <td><input type="text" placeholder="e.g. Unpleasant" data-ws="0"></td>
+              <td><input type="text" placeholder="e.g. Soft" data-ws="0"></td>
+              <td><input type="text" placeholder="e.g. Different" data-ws="0"></td>
+              <td><input type="text" placeholder="e.g. 1%" data-ws="0"></td>
+            </tr>
+            <tr>
+              <td class="row-label">D</td>
+              <td><input type="text" placeholder="e.g. Brown" data-ws="0"></td>
+              <td><input type="text" placeholder="e.g. Unpleasant" data-ws="0"></td>
+              <td><input type="text" placeholder="e.g. Soft" data-ws="0"></td>
+              <td><input type="text" placeholder="e.g. Different" data-ws="0"></td>
+              <td><input type="text" placeholder="e.g. 0%" data-ws="0"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DISCUSSION -->
+    <div class="ws-section">
+      <div class="ws-section-title">🔍 Discussion</div>
+      <div class="ws-field">
+        <div class="ws-field-label">1. What differences did you observe among the four apple samples in terms of color, aroma, texture, and taste?</div>
+        <textarea class="ws-input" placeholder="Among the four samples, I observed that..." data-ws="0"></textarea>
+      </div>
+      <div class="ws-field">
+        <div class="ws-field-label">2. Which apple sample showed the least change and which showed the most change? What evidence from your observations supports your answer?</div>
+        <textarea class="ws-input" placeholder="The sample with the least change was ___ because... The sample with the most change was ___ because..." data-ws="0"></textarea>
+      </div>
+      <div class="ws-field">
+        <div class="ws-field-label">3. How do you think the concentration of Vitamin C affected the condition of the apples after two weeks?</div>
+        <textarea class="ws-input" placeholder="I think higher Vitamin C concentration caused... because..." data-ws="0"></textarea>
+      </div>
+      <div class="ws-field">
+        <div class="ws-field-label">4. Why can Vitamin C help slow down the browning process in apples?</div>
+        <textarea class="ws-input" placeholder="Vitamin C can slow browning because it acts as... which means..." data-ws="0"></textarea>
+      </div>
+    </div>
+
+    <div class="ws-section">
+      <div class="ws-section-title">📝 Conclusion</div>
+      <div class="ws-field">
+        <div class="ws-field-label">Write your conclusion — was your hypothesis supported? What did you learn?</div>
+        <textarea class="ws-input" style="min-height:90px" placeholder="Based on this experiment, I conclude that... My hypothesis was supported/not supported because... This relates to food safety because..." data-ws="0"></textarea>
+      </div>
+    </div>
+
+    <div class="ws-action-bar">
+      <p>💾 Answers are saved in this session. Print or screenshot to keep a record.</p>
+      <button class="ws-print-btn" onclick="window.print()">🖨️ Print</button>
+      <button class="ws-clear-btn" onclick="clearWS(0)">🗑️ Clear</button>
+    </div>
+  </div>
+
+    <!-- ══════════════════════════════
+       EXPERIMENT 2: FOOD COLORANT
+  ══════════════════════════════ -->
+  <div class="exp-panel green-panel" id="exp1">
+    <div class="ws-progress">
+      <span class="ws-progress-label">Worksheet completion:</span>
+      <div class="ws-progress-bar"><div class="ws-progress-fill green-fill" id="prog1" style="width:0%"></div></div>
+      <span class="ws-progress-pct green-pct" id="progPct1">0%</span>
+    </div>
+    <div class="ws-header">
+      <div class="ws-header-top">
+        <span class="exp-number green">Experiment 2</span>
+        <div class="ws-title">Are the Colors in Our Food Natural or Artificial? The Wool Thread Test</div>
+      </div>
+      <div class="ws-sdg-note">🌿 SDG 3 — Good Health &amp; Well-Being: Food Safety Awareness</div>
+    </div>
+
+    <div class="ws-section">
+      <div class="ws-section-title green">🎯 Objective</div>
+      <div class="objective-box green-box">To identify whether food samples contain artificial (synthetic) or natural colorants using the wool thread absorption method, and to relate findings to food safety and SDG 3.</div>
+    </div>
+
+    <div class="ws-section">
+      <div class="ws-section-title">🌍 SDG 3 Connection</div>
+      <div class="sdg-box">
+        <div class="sdg-logo"><div class="sdg-num">3</div><div class="sdg-lbl">Good Health &amp; Well‑Being</div></div>
+        <div class="sdg-text">
+          <h4>Why does this connect to SDG 3?</h4>
+          <p>Banned colorants like Rhodamine B have been linked to carcinogenicity and allergic reactions.
+          By learning to detect artificial colorants, we build food safety literacy that directly supports
+          SDG 3 Target 3.9: <em>"Reduce deaths and illnesses from hazardous chemicals and pollution."</em></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="ws-section">
+      <div class="ws-section-title">⚠️ Safety &amp; Materials</div>
+      <div class="safety-box">
+        <span class="safety-icon">⚠️</span>
+        <div class="safety-text"><strong>Safety:</strong> Do not consume samples after testing. Ask adult supervision when using the stove. Wash hands before and after.</div>
+      </div>
+      <div class="materials-grid">
+        <div class="material-item"><span class="mat-icon">🧶</span>White wool thread (10 cm pieces)</div>
+        <div class="material-item"><span class="mat-icon">🥤</span>3–5 food/drink samples</div>
+        <div class="material-item"><span class="mat-icon">🧴</span>White vinegar (5% acetic acid)</div>
+        <div class="material-item"><span class="mat-icon">🔥</span>Stove or portable heater</div>
+        <div class="material-item"><span class="mat-icon">🫙</span>Small heat-safe cups</div>
+        <div class="material-item"><span class="mat-icon">🥄</span>Tongs or spoon</div>
+        <div class="material-item"><span class="mat-icon">⏱️</span>Timer (10 minutes)</div>
+        <div class="material-item"><span class="mat-icon">🧼</span>Soap and water for rinsing</div>
+      </div>
+    </div>
+
+    <div class="ws-section">
+      <div class="ws-section-title green">🔍 Inquiry Procedure</div>
+      <div class="inquiry-intro green-intro">💡 Answer each guiding question — your answers ARE the procedure. Observe, think, and investigate!</div>
+
+      <div class="inquiry-step">
+        <div class="inquiry-question"><div class="inquiry-q-num green-num">1</div><div class="inquiry-q-text">Look at your food samples before starting. Which samples do you think contain artificial colorants, and which contain natural ones? What visual clues are you using to make this prediction?</div></div>
+        <div class="inquiry-answer"><div class="inquiry-answer-label">✍️ Initial Prediction</div><textarea class="ws-input green-focus" placeholder="I think sample ___ contains artificial color because... I think sample ___ is natural because..." data-ws="1"></textarea></div>
+      </div>
+
+      <div class="inquiry-step">
+        <div class="inquiry-question"><div class="inquiry-q-num green-num">2</div><div class="inquiry-q-text">You will add vinegar to each sample before boiling. Why do you think the vinegar is needed? What role does acidity play in this test? Make a prediction before you proceed.</div></div>
+        <div class="inquiry-answer"><div class="inquiry-answer-label">✍️ My Reasoning</div><textarea class="ws-input green-focus" placeholder="I think vinegar is needed because... Acidity probably..." data-ws="1"></textarea></div>
+      </div>
+
+      <div class="inquiry-step">
+        <div class="inquiry-question"><div class="inquiry-q-num green-num">3</div><div class="inquiry-q-text">Now carry out the test: pour ~100 mL of each sample into a cup, add 1 tsp vinegar, submerge one wool thread, and boil for 10 minutes. After boiling, remove and rinse the thread with soap and water for 30 seconds. What do you observe about each thread immediately after boiling? After rinsing?</div></div>
+        <div class="inquiry-answer"><div class="inquiry-answer-label">✍️ My Observations (before and after rinsing)</div><textarea class="ws-input green-focus" placeholder="Before rinsing: thread from sample ___ is... After rinsing: thread from sample ___ is..." data-ws="1"></textarea></div>
+      </div>
+
+      <div class="inquiry-step">
+        <div class="inquiry-question"><div class="inquiry-q-num green-num">4</div><div class="inquiry-q-text">Based on your results, which samples do you now classify as artificial vs natural colorant? How confident are you in this classification? Does this match your original prediction?</div></div>
+        <div class="inquiry-answer"><div class="inquiry-answer-label">✍️ My Classification &amp; Confidence</div><textarea class="ws-input green-focus" placeholder="Artificial: ... Natural: ... My confidence is high/medium/low because... My prediction was correct/incorrect because..." data-ws="1"></textarea></div>
+      </div>
+    </div>
+
+    <div class="ws-section">
+      <div class="ws-section-title green">📊 Data Table</div>
+      <div class="ws-field" style="margin-bottom:.5rem"><div class="ws-field-label">Student Name</div><input class="ws-input green-focus" type="text" placeholder="Your name..." data-ws="1"></div>
+      <div class="ws-field" style="margin-bottom:.8rem"><div class="ws-field-label">Date</div><input class="ws-input green-focus" type="date" data-ws="1"></div>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead><tr><th class="green-th">Sample</th><th class="green-th">Food/Drink Name</th><th class="green-th">Wool Color After Boiling</th><th class="green-th">Wool Color After Rinsing</th><th class="green-th">Classification</th></tr></thead>
+          <tbody id="colorTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="ws-section">
+      <div class="ws-section-title green">🔍 Discussion Questions</div>
+      <div class="ws-field"><div class="ws-field-label">1. Which samples showed strong color retention after rinsing? What does this tell us?</div><textarea class="ws-input green-focus" placeholder="Samples that retained color were... This indicates they contain..." data-ws="1"></textarea></div>
+      <div class="ws-field"><div class="ws-field-label">2. Explain why synthetic colorants bind more strongly to wool than natural ones.</div><textarea class="ws-input green-focus" placeholder="Synthetic colorants bind more strongly because..." data-ws="1"></textarea></div>
+      <div class="ws-field"><div class="ws-field-label">3. If a food sample's wool thread turned bright pink/red and stayed that color after rinsing, what might this suggest about the colorant used? What health concern would this raise?</div><textarea class="ws-input green-focus" placeholder="If the thread stays bright pink/red, it might suggest... Health concerns include..." data-ws="1"></textarea></div>
+      <div class="ws-field"><div class="ws-field-label">4. How does this experiment support SDG 3 Goal of Good Health and Well-Being?</div><textarea class="ws-input green-focus" placeholder="This experiment supports SDG 3 because..." data-ws="1"></textarea></div>
+    </div>
+
+    <div class="ws-section">
+      <div class="ws-section-title green">📝 Conclusion</div>
+      <div class="ws-field"><div class="ws-field-label">Write your conclusion based on your data and hypothesis</div><textarea class="ws-input green-focus" style="min-height:90px" placeholder="Based on this experiment, I conclude that... My hypothesis was supported/not supported because..." data-ws="1"></textarea></div>
+    </div>
+
+    <div class="ws-section">
+      <div class="ws-section-title">💡 Personal Reflection</div>
+      <div class="ws-field"><div class="ws-field-label">What will you do differently when choosing food and drinks after this experiment?</div><textarea class="ws-input green-focus" placeholder="After this experiment, I will now pay attention to..." data-ws="1"></textarea></div>
+      <div class="odey-comment">
+        <img src="assets/odey.png" alt="Odey">
+        <span>"Sehr gut! You are now officially a food safety detective! Knowing what's in your food is one of the most important life skills, Freund. Wunderbar! 🕵️‍♂️"</span>
+      </div>
+    </div>
+
+    <div class="ws-action-bar">
+      <p>💾 Answers saved in this browser session.</p>
+      <button class="ws-print-btn" onclick="window.print()">🖨️ Print</button>
+      <button class="ws-clear-btn" onclick="clearWS(1)">🗑️ Clear</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       EXPERIMENT 3: CAFFEINE
+  ══════════════════════════════ -->
+  <div class="exp-panel red-panel" id="exp2">
+    <div class="ws-progress">
+      <span class="ws-progress-label">Worksheet completion:</span>
+      <div class="ws-progress-bar"><div class="ws-progress-fill red-fill" id="prog2" style="width:0%"></div></div>
+      <span class="ws-progress-pct red-pct" id="progPct2">0%</span>
+    </div>
+    <div class="ws-header">
+      <div class="ws-header-top">
+        <span class="exp-number red">Experiment 3</span>
+        <div class="ws-title">Does Caffeine Change Your Heart Rate? An Inquiry into Addictive Substances</div>
+      </div>
+      <div class="ws-sdg-note">🌿 SDG 3 — Good Health &amp; Well-Being: Addictive Substance Awareness</div>
+    </div>
+
+    <div class="ws-section">
+      <div class="ws-section-title red">🎯 Objective</div>
+      <div class="objective-box red-box">To investigate the short-term physiological effect of caffeine on heart rate, and to relate findings to SDG 3 through awareness of how addictive substances affect human health.</div>
+    </div>
+
+    <div class="ws-section">
+      <div class="ws-section-title">🌍 SDG 3 Connection</div>
+      <div class="sdg-box">
+        <div class="sdg-logo"><div class="sdg-num">3</div><div class="sdg-lbl">Good Health &amp; Well‑Being</div></div>
+        <div class="sdg-text">
+          <h4>Why does this connect to SDG 3?</h4>
+          <p>Caffeine is the world's most consumed psychoactive substance. While legal, excess caffeine
+          causes dependence, anxiety, and cardiovascular effects. This experiment supports SDG 3 Target 3.5:
+          <em>"Strengthen prevention and treatment of substance abuse"</em> — even mild substances deserve awareness.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="ws-section">
+      <div class="ws-section-title">⚠️ Safety &amp; Materials</div>
+      <div class="safety-box">
+        <span class="safety-icon">⚠️</span>
+        <div class="safety-text"><strong>Important:</strong> Do not participate if you have a heart condition or caffeine sensitivity. Students under 13 should observe a consenting adult volunteer. Use only 1 standard serving (150 mL coffee or tea).</div>
+      </div>
+      <div class="materials-grid">
+        <div class="material-item"><span class="mat-icon">☕</span>1 cup coffee or tea (~150 mL)</div>
+        <div class="material-item"><span class="mat-icon">⏱️</span>Timer/stopwatch</div>
+        <div class="material-item"><span class="mat-icon">🫀</span>Wrist pulse (radial artery)</div>
+        <div class="material-item"><span class="mat-icon">💺</span>Chair — stay seated throughout</div>
+        <div class="material-item"><span class="mat-icon">👥</span>1–3 volunteer subjects</div>
+        <div class="material-item"><span class="mat-icon">📋</span>This worksheet</div>
+      </div>
+    </div>
+
+    <div class="ws-section">
+      <div class="ws-section-title red">🔍 Inquiry Procedure</div>
+      <div class="inquiry-intro red-intro">💡 Answer each guiding question to guide your investigation. Your thinking IS the experiment!</div>
+
+      <div class="inquiry-step">
+        <div class="inquiry-question"><div class="inquiry-q-num red-num">1</div><div class="inquiry-q-text">Before consuming any caffeine — what do you already know about how caffeine affects the body? What is your hypothesis: will heart rate increase, decrease, or stay the same after consuming caffeine? Why?</div></div>
+        <div class="inquiry-answer"><div class="inquiry-answer-label">✍️ Prior Knowledge &amp; Hypothesis</div><textarea class="ws-input red-focus" placeholder="From what I already know, caffeine... My hypothesis is that heart rate will... because..." data-ws="2"></textarea></div>
+      </div>
+
+      <div class="inquiry-step">
+        <div class="inquiry-question"><div class="inquiry-q-num red-num">2</div><div class="inquiry-q-text">Measure the resting heart rate (baseline). Sit quietly for 5 minutes, then count your pulse for 30 seconds and multiply by 2. What is your baseline BPM? Why is it important to rest before measuring?</div></div>
+        <div class="inquiry-answer"><div class="inquiry-answer-label">✍️ Baseline Measurement &amp; Reasoning</div><textarea class="ws-input red-focus" placeholder="My baseline heart rate is ___ BPM. Resting before measuring is important because..." data-ws="2"></textarea></div>
+      </div>
+
+      <div class="inquiry-step">
+        <div class="inquiry-question"><div class="inquiry-q-num red-num">3</div><div class="inquiry-q-text">Consume one standard serving of the caffeinated beverage. Record the type and estimated caffeine content. At 15, 30, and 60 minutes after consumption, measure your heart rate again. What pattern do you observe in the data?</div></div>
+        <div class="inquiry-answer"><div class="inquiry-answer-label">✍️ Observations &amp; Patterns</div><textarea class="ws-input red-focus" placeholder="Beverage used: ___ (approx ___ mg caffeine). &#10;At 15 min: ___ BPM, At 30 min: ___ BPM, At 60 min: ___ BPM. &#10;Pattern I observe: ..." data-ws="2"></textarea></div>
+      </div>
+
+      <div class="inquiry-step">
+        <div class="inquiry-question"><div class="inquiry-q-num red-num">4</div><div class="inquiry-q-text">If you were designing this experiment more rigorously, what variables would you need to control? What are the limitations of this simple classroom version of the experiment?</div></div>
+        <div class="inquiry-answer"><div class="inquiry-answer-label">✍️ Variables &amp; Limitations</div><textarea class="ws-input red-focus" placeholder="Variables I would control: ... Limitations of this experiment: ..." data-ws="2"></textarea></div>
+      </div>
+    </div>
+
+    <div class="ws-section">
+      <div class="ws-section-title red">📊 Heart Rate Data Table (BPM)</div>
+      <div class="ws-field" style="margin-bottom:.5rem"><div class="ws-field-label">Student Name</div><input class="ws-input red-focus" type="text" placeholder="Your name..." data-ws="2"></div>
+      <div class="ws-field" style="margin-bottom:.5rem"><div class="ws-field-label">Date</div><input class="ws-input red-focus" type="date" data-ws="2"></div>
+      <div class="ws-field" style="margin-bottom:.8rem"><div class="ws-field-label">Beverage &amp; Caffeine Content</div><input class="ws-input red-focus" type="text" placeholder="e.g. Black coffee, ~95 mg caffeine" data-ws="2"></div>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead><tr>
+            <th class="red-th">Time</th>
+            <th class="red-th">Subject 1 (BPM)</th><th class="red-th">Δ BPM</th>
+            <th class="red-th">Subject 2 (BPM)</th><th class="red-th">Δ BPM</th>
+            <th class="red-th">Subject 3 (BPM)</th><th class="red-th">Δ BPM</th>
+            <th class="red-th">Average</th>
+          </tr></thead>
+          <tbody>
+            <tr><td class="row-label">Baseline</td><td><input type="number" placeholder="—" id="b1"></td><td style="background:var(--paper-dark);text-align:center;font-weight:700;font-size:.85rem">—</td><td><input type="number" placeholder="—" id="b2"></td><td style="background:var(--paper-dark);text-align:center;font-weight:700;font-size:.85rem">—</td><td><input type="number" placeholder="—" id="b3"></td><td style="background:var(--paper-dark);text-align:center;font-weight:700;font-size:.85rem">—</td><td><input id="bavg" readonly style="background:var(--red-pale);font-weight:700;text-align:center;border:none;width:100%;font-family:var(--font-ui);font-size:.88rem"></td></tr>
+            <tr><td class="row-label">+15 min</td><td><input type="number" placeholder="—" id="m151"></td><td><input id="d151" readonly style="background:var(--paper-dark);text-align:center;border:none;width:100%;font-family:var(--font-ui);font-size:.88rem;font-weight:700"></td><td><input type="number" placeholder="—" id="m152"></td><td><input id="d152" readonly style="background:var(--paper-dark);text-align:center;border:none;width:100%;font-family:var(--font-ui);font-size:.88rem;font-weight:700"></td><td><input type="number" placeholder="—" id="m153"></td><td><input id="d153" readonly style="background:var(--paper-dark);text-align:center;border:none;width:100%;font-family:var(--font-ui);font-size:.88rem;font-weight:700"></td><td><input id="avg15" readonly style="background:var(--red-pale);font-weight:700;text-align:center;border:none;width:100%;font-family:var(--font-ui);font-size:.88rem"></td></tr>
+            <tr><td class="row-label">+30 min</td><td><input type="number" placeholder="—" id="m301"></td><td><input id="d301" readonly style="background:var(--paper-dark);text-align:center;border:none;width:100%;font-family:var(--font-ui);font-size:.88rem;font-weight:700"></td><td><input type="number" placeholder="—" id="m302"></td><td><input id="d302" readonly style="background:var(--paper-dark);text-align:center;border:none;width:100%;font-family:var(--font-ui);font-size:.88rem;font-weight:700"></td><td><input type="number" placeholder="—" id="m303"></td><td><input id="d303" readonly style="background:var(--paper-dark);text-align:center;border:none;width:100%;font-family:var(--font-ui);font-size:.88rem;font-weight:700"></td><td><input id="avg30" readonly style="background:var(--red-pale);font-weight:700;text-align:center;border:none;width:100%;font-family:var(--font-ui);font-size:.88rem"></td></tr>
+            <tr><td class="row-label">+60 min</td><td><input type="number" placeholder="—" id="m601"></td><td><input id="d601" readonly style="background:var(--paper-dark);text-align:center;border:none;width:100%;font-family:var(--font-ui);font-size:.88rem;font-weight:700"></td><td><input type="number" placeholder="—" id="m602"></td><td><input id="d602" readonly style="background:var(--paper-dark);text-align:center;border:none;width:100%;font-family:var(--font-ui);font-size:.88rem;font-weight:700"></td><td><input type="number" placeholder="—" id="m603"></td><td><input id="d603" readonly style="background:var(--paper-dark);text-align:center;border:none;width:100%;font-family:var(--font-ui);font-size:.88rem;font-weight:700"></td><td><input id="avg60" readonly style="background:var(--red-pale);font-weight:700;text-align:center;border:none;width:100%;font-family:var(--font-ui);font-size:.88rem"></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size:.78rem;color:var(--ink-faint);margin-top:.5rem">💡 Δ BPM and Average columns calculate automatically.</p>
+    </div>
+
+    <div class="ws-section">
+      <div class="ws-section-title red">🔍 Discussion Questions</div>
+      <div class="ws-field"><div class="ws-field-label">1. At which time point was the heart rate change the greatest? Was this consistent across subjects?</div><textarea class="ws-input red-focus" placeholder="The greatest change was at... This was/was not consistent because..." data-ws="2"></textarea></div>
+      <div class="ws-field"><div class="ws-field-label">2. Caffeine blocks adenosine receptors in the brain. How does this explain the heart rate changes you observed?</div><textarea class="ws-input red-focus" placeholder="By blocking adenosine receptors, caffeine causes... which results in..." data-ws="2"></textarea></div>
+      <div class="ws-field"><div class="ws-field-label">3. Caffeine is classified as an addictive substance. Based on your findings, what are the potential health risks of consuming large amounts of caffeine daily?</div><textarea class="ws-input red-focus" placeholder="Excessive daily caffeine could cause..." data-ws="2"></textarea></div>
+      <div class="ws-field"><div class="ws-field-label">4. How does this experiment help you understand SDG 3 Target 3.5 (strengthening prevention of substance abuse)?</div><textarea class="ws-input red-focus" placeholder="Understanding caffeine's effects helps achieve SDG 3.5 because..." data-ws="2"></textarea></div>
+    </div>
+
+    <div class="ws-section">
+      <div class="ws-section-title red">📝 Conclusion</div>
+      <div class="ws-field"><div class="ws-field-label">Write your conclusion based on your data and hypothesis</div><textarea class="ws-input red-focus" style="min-height:90px" placeholder="Based on this experiment, I conclude that caffeine... My hypothesis was supported/not supported because... This relates to health because..." data-ws="2"></textarea></div>
+    </div>
+
+    <div class="ws-section">
+      <div class="ws-section-title">💡 Personal Reflection</div>
+      <div class="ws-field"><div class="ws-field-label">What will you do differently regarding caffeine and other addictive substances after this experiment?</div><textarea class="ws-input red-focus" placeholder="After this experiment, I will..." data-ws="2"></textarea></div>
+      <div class="odey-comment">
+        <img src="assets/odey.png" alt="Odey">
+        <span>"You just measured real science inside a human body! Das ist fantastisch, Freund! Even legal substances like caffeine deserve respect. Moderation ist der Schlüssel — moderation is the key! 🔑"</span>
+      </div>
+    </div>
+
+    <div class="ws-action-bar">
+      <p>💾 Answers saved in this browser session.</p>
+      <button class="ws-print-btn" onclick="window.print()">🖨️ Print</button>
+      <button class="ws-clear-btn" onclick="clearWS(2)">🗑️ Clear</button>
+    </div>
+  </div>
+
+</div></div>
+<footer class="site-footer">
+  <p>© 2026 Fauzan Ahmad · <a href="/cdn-cgi/l/email-protection#583e392d223936393035393c182d2831763d3c2d"><span class="__cf_email__" data-cfemail="3d5b5c48475c535c55505c597d484d5413585948">[email&#160;protected]</span></a></p>
+</footer>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+document.getElementById('navToggle').addEventListener('click',()=>{document.getElementById('navLinks').classList.toggle('open')});
+
+function switchExp(idx){
+  document.querySelectorAll('.exp-panel').forEach((p,i)=>p.classList.toggle('show',i===idx));
+  const colors=['blue','green','red'];
+  ['tab0','tab1','tab2'].forEach((id,i)=>{
+    document.getElementById(id).className='exp-tab'+(i===idx?' active-'+colors[i]:'');
+  });
+}
+
+function buildColorTable(){
+  const tb=document.getElementById('colorTableBody');
+  tb.innerHTML='';
+  for(let i=1;i<=5;i++){
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td class="row-label">Sample ${i}</td><td><input type="text" placeholder="e.g. Strawberry syrup" data-ws="1"></td><td><input type="text" placeholder="After boiling..." data-ws="1"></td><td><input type="text" placeholder="After rinsing..." data-ws="1"></td><td><input type="text" placeholder="Artificial / Natural" data-ws="1"></td>`;
+    tb.appendChild(tr);
+  }
+}
+
+function setupHR(){
+  const times=['15','30','60'];
+  function calc(){
+    const b=[parseFloat(document.getElementById('b1').value)||0,parseFloat(document.getElementById('b2').value)||0,parseFloat(document.getElementById('b3').value)||0];
+    const bv=b.filter(v=>v>0);
+    document.getElementById('bavg').value=bv.length?Math.round(bv.reduce((a,c)=>a+c,0)/bv.length):'';
+    times.forEach(t=>{
+      const vals=[parseFloat(document.getElementById('m'+t+'1').value)||0,parseFloat(document.getElementById('m'+t+'2').value)||0,parseFloat(document.getElementById('m'+t+'3').value)||0];
+      [1,2,3].forEach((s,i)=>{
+        const d=document.getElementById('d'+t+s);
+        if(vals[i]&&b[i]){const diff=vals[i]-b[i];d.value=(diff>=0?'+':'')+diff;d.style.color=diff>0?'var(--red)':diff<0?'var(--green)':'var(--ink)';}else d.value='';
+      });
+      const vv=vals.filter(v=>v>0);
+      document.getElementById('avg'+t).value=vv.length?Math.round(vv.reduce((a,c)=>a+c,0)/vv.length):'';
+    });
+  }
+  ['b1','b2','b3','m151','m152','m153','m301','m302','m303','m601','m602','m603'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.addEventListener('input',calc);
+  });
+}
+
+function setupProgress(){
+  [0,1,2].forEach(i=>{
+    function update(){
+      const inputs=document.querySelectorAll(`[data-ws="${i}"]`);
+      const filled=[...inputs].filter(el=>el.value&&el.value.trim()).length;
+      const pct=inputs.length?Math.round(filled/inputs.length*100):0;
+      document.getElementById('prog'+i).style.width=pct+'%';
+      document.getElementById('progPct'+i).textContent=pct+'%';
+    }
+    document.querySelectorAll(`[data-ws="${i}"]`).forEach(el=>el.addEventListener('input',update));
+  });
+}
+
+function clearWS(i){
+  if(!confirm('Clear all answers in this worksheet?')) return;
+  document.querySelectorAll(`[data-ws="${i}"]`).forEach(el=>el.value='');
+  if(i===1){document.querySelectorAll('#colorTableBody input').forEach(el=>el.value='');}
+  if(i===2){['b1','b2','b3','m151','m152','m153','m301','m302','m303','m601','m602','m603','bavg','d151','d152','d153','d301','d302','d303','d601','d602','d603','avg15','avg30','avg60'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}
+  document.getElementById('prog'+i).style.width='0%';
+  document.getElementById('progPct'+i).textContent='0%';
+}
+
+window.addEventListener('load',()=>{buildColorTable();setupHR();setupProgress();});
+</script>
+</body>
+</html>
