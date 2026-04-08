@@ -422,6 +422,180 @@
       .topic-panel { padding: 1.2rem; }
       .main-tab-btn { font-size: 1rem; padding: 0.6rem 1.2rem; }
     }
+
+    /* ── Card Info Button ── */
+    .flip-front { position: relative; }
+    .card-info-btn {
+      position: absolute;
+      bottom: 5px; right: 5px;
+      background: rgba(255,255,255,0.9);
+      border: 1.5px solid var(--paper-lines);
+      border-radius: 50%;
+      width: 24px; height: 24px;
+      font-size: 0.72rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0; line-height: 1;
+      transition: all 0.15s;
+      z-index: 10;
+      box-shadow: var(--shadow-sm);
+    }
+    .card-info-btn:hover { background: white; transform: scale(1.2); border-color: var(--blue); }
+
+    /* ── Modal Overlay ── */
+    .card-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(44,36,22,0.5);
+      z-index: 3000;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      backdrop-filter: blur(3px);
+    }
+    .card-modal-overlay.open { display: flex; animation: fadeInUp 0.2s ease; }
+
+    .card-modal {
+      background: var(--paper);
+      border: 3px solid var(--paper-lines);
+      border-radius: var(--radius-lg);
+      box-shadow: 8px 12px 0px rgba(44,36,22,0.18);
+      max-width: 400px; width: 100%;
+      position: relative;
+      animation: popIn 0.28s cubic-bezier(0.34,1.56,0.64,1) forwards;
+      overflow: hidden;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .card-modal-stripe {
+      height: 7px; width: 100%;
+      background: var(--blue);
+    }
+    .card-modal-stripe.green  { background: var(--green); }
+    .card-modal-stripe.yellow { background: var(--yellow); }
+    .card-modal-stripe.red    { background: var(--red); }
+    .card-modal-stripe.purple { background: var(--purple); }
+
+    .card-modal-close {
+      position: absolute;
+      top: 0.75rem; right: 1rem;
+      background: none; border: none;
+      font-family: var(--font-hand);
+      font-size: 1.3rem; cursor: pointer;
+      color: var(--ink-faint);
+      line-height: 1;
+      transition: color 0.15s;
+      z-index: 5;
+    }
+    .card-modal-close:hover { color: var(--red); }
+
+    .card-modal-body { padding: 1.2rem 1.5rem 1.5rem; }
+
+    .card-modal-photo-wrap {
+      width: 100%; height: 170px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: var(--paper-dark);
+      border: 2px solid var(--paper-lines);
+      margin-bottom: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .card-modal-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .card-modal-photo-fallback { font-size: 4.5rem; display: none; }
+    .card-modal-photo-credit {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(44,36,22,0.45);
+      color: rgba(255,255,255,0.8);
+      font-family: var(--font-ui);
+      font-size: 0.62rem;
+      padding: 0.2rem 0.6rem;
+      text-align: right;
+    }
+    .card-modal-photo-credit a { color: rgba(255,255,255,0.75); }
+
+    .banned-badge {
+      display: none;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--red-pale);
+      border: 2px solid var(--red);
+      border-radius: 99px;
+      padding: 0.2rem 0.9rem;
+      font-family: var(--font-hand);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--red);
+      margin-bottom: 0.6rem;
+    }
+    .banned-badge.show { display: inline-flex; }
+
+    .card-modal-name {
+      font-family: var(--font-hand);
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--blue);
+      margin-bottom: 0.1rem;
+      line-height: 1.2;
+    }
+    .card-modal-name.red    { color: var(--red); }
+    .card-modal-name.green  { color: var(--green); }
+    .card-modal-name.yellow { color: var(--yellow); }
+    .card-modal-name.purple { color: var(--purple); }
+
+    .card-modal-type {
+      font-family: var(--font-hand);
+      font-size: 0.83rem;
+      color: var(--ink-faint);
+      margin-bottom: 0.85rem;
+      font-style: italic;
+    }
+
+    .card-modal-section {
+      display: flex;
+      gap: 0.6rem; align-items: flex-start;
+      margin-bottom: 0.65rem;
+      padding: 0.65rem 0.9rem;
+      border-radius: var(--radius-md);
+      background: var(--paper-dark);
+      border: 1.5px solid var(--paper-lines);
+    }
+    .card-modal-section-icon { font-size: 1.05rem; flex-shrink: 0; margin-top: 0.05rem; }
+    .card-modal-section-content 
+    .card-modal-section-label {
+      font-family: var(--font-hand);
+      font-size: 0.72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      color: var(--ink-faint); margin-bottom: 0.15rem;
+    }
+    .card-modal-section-text {
+      font-family: var(--font-ui);
+      font-size: 0.86rem; line-height: 1.6; color: var(--ink-soft);
+    }
+
+    .card-modal-funfact {
+      background: var(--yellow-pale);
+      border: 1.5px dashed var(--yellow);
+      border-radius: var(--radius-md);
+      padding: 0.65rem 0.9rem;
+      display: flex; gap: 0.5rem; align-items: flex-start;
+    }
+    .card-modal-funfact-icon { font-size: 1rem; flex-shrink: 0; margin-top: 0.1rem; }
+    .card-modal-funfact-text {
+      font-family: var(--font-hand);
+      font-size: 0.93rem; color: var(--ink-soft);
+      font-style: italic; line-height: 1.55;
+    }
+
+    @media (max-width: 480px) {
+      .card-modal { max-width: 100%; }
+      .card-modal-photo-wrap { height: 140px; }
+      .card-modal-body { padding: 1rem 1.1rem 1.2rem; }
+    }
+
   </style>
 </head>
 <body>
@@ -539,39 +713,39 @@
             because they are toxic and carcinogenic.
           </p>
           <div class="examples-label">🃏 Examples — click a card to flip!</div>
-          <p class="flip-hint">Tap any card to reveal its use in food</p>
+          <p class="flip-hint">Flip to reveal · tap ℹ️ for photo &amp; details</p>
           <div class="flip-grid">
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Pandan Leaves" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front"><div class="card-emoji">🍃</div><div class="card-name">Pandan Leaves</div></div>
                 <div class="flip-back"><div class="back-label">Use For</div><div class="back-text">Natural green color in jellies, cakes, and drinks</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Curcumin" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front"><div class="card-emoji">🌿</div><div class="card-name">Curcumin</div></div>
                 <div class="flip-back"><div class="back-label">Use For</div><div class="back-text">Yellow/orange color from turmeric used in rice dishes & snacks</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Beta-Carotene" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front"><div class="card-emoji">🥕</div><div class="card-name">Beta-Carotene</div></div>
                 <div class="flip-back"><div class="back-label">Use For</div><div class="back-text">Orange-yellow color in margarine, cheese, and fruit drinks</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Carmoisine (Red 3)" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front green-card"><div class="card-emoji">🔴</div><div class="card-name">Carmoisine (Red 3)</div></div>
                 <div class="flip-back"><div class="back-label">Use For</div><div class="back-text">Synthetic red color in syrup, candy, and beverages</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Tartrazine" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front yellow-card"><div class="card-emoji">🟡</div><div class="card-name">Tartrazine</div></div>
                 <div class="flip-back"><div class="back-label">Use For</div><div class="back-text">Synthetic yellow color in noodles, chips, and cereal</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Rhodamine B" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front red-card"><div class="card-emoji">☠️</div><div class="card-name">Rhodamine B</div></div>
                 <div class="flip-back"><div class="back-label">⛔ BANNED</div><div class="back-text">Toxic textile dye illegally used in food can causes cancer</div></div>
@@ -609,39 +783,39 @@
             <span class="odey-comment-text">"Do you know that Saccharin is 300× sweeter than sugar? wait, THREE HUNDRED TIMES? That is wild~"</span>
           </div>
           <div class="examples-label">🃏 Examples — click a card to flip!</div>
-          <p class="flip-hint">Tap any card to reveal its use in food</p>
+          <p class="flip-hint">Flip to reveal · tap ℹ️ for photo &amp; details</p>
           <div class="flip-grid">
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Sucrose" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front yellow-card"><div class="card-emoji">🍚</div><div class="card-name">Sucrose</div></div>
                 <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Common table sugar — baked goods, beverages, candy</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Fructose" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front yellow-card"><div class="card-emoji">🌽</div><div class="card-name">Fructose</div></div>
                 <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Fruit-derived sugar used in fruit juices and jams</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Saccharin" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front"><div class="card-emoji">⚗️</div><div class="card-name">Saccharin</div></div>
                 <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Artificial sweetener, 300× sweeter than sugar — diet drinks</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Aspartame" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front"><div class="card-emoji">🥤</div><div class="card-name">Aspartame</div></div>
                 <div class="flip-back"><div class="back-label">Use</div><div class="back-text">200× sweeter than sugar — sugar-free gum and soft drinks</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Stevia" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front green-card"><div class="card-emoji">🍃</div><div class="card-name">Stevia</div></div>
                 <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Natural zero-calorie sweetener from stevia plant — health drinks</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Sorbitol" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front yellow-card"><div class="card-emoji">🧁</div><div class="card-name">Sorbitol</div></div>
                 <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Sugar alcohol — diabetic-friendly foods and chewing gum</div></div>
@@ -667,39 +841,39 @@
             in food as they are hazardous to human health.
           </p>
           <div class="examples-label">🃏 Examples — click a card to flip!</div>
-          <p class="flip-hint">Tap any card to reveal its use in food</p>
+          <p class="flip-hint">Flip to reveal · tap ℹ️ for photo &amp; details</p>
           <div class="flip-grid">
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Salt (NaCl)" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front green-card"><div class="card-emoji">🧂</div><div class="card-name">Salt (NaCl)</div></div>
                 <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Natural preservative — salted fish, pickles, cured meats</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Citric Acid" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front green-card"><div class="card-emoji">🍋</div><div class="card-name">Citric Acid</div></div>
                 <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Prevents oxidation and microbial growth — canned fruits, juices</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Sodium Benzoate" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front"><div class="card-emoji">🔬</div><div class="card-name">Sodium Benzoate</div></div>
                 <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Inhibits mold/yeast — soft drinks, ketchup, salad dressings</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Sorbic Acid" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front"><div class="card-emoji">🧈</div><div class="card-name">Sorbic Acid</div></div>
                 <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Prevents mold — cheese, baked goods, dried fruits</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Formalin" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front red-card"><div class="card-emoji">☠️</div><div class="card-name">Formalin</div></div>
                 <div class="flip-back"><div class="back-label">⛔ BANNED</div><div class="back-text">Industrial disinfectant — illegally used in tofu/noodles. Carcinogenic!</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Borax" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front red-card"><div class="card-emoji">☠️</div><div class="card-name">Borax</div></div>
                 <div class="flip-back"><div class="back-label">⛔ BANNED</div><div class="back-text">Industrial cleaner — illegally added to meatballs. Toxic!</div></div>
@@ -729,21 +903,21 @@
             <span class="odey-comment-text">"MSG has a bad reputation... but it literally occurs naturally in tomatoes, parmesan, and soy sauce. Science defending MSG? Ja, absolut! 🍅"</span>
           </div>
           <div class="examples-label">🃏 Examples — click a card to flip!</div>
-          <p class="flip-hint">Tap any card to reveal its use in food</p>
+          <p class="flip-hint">Flip to reveal · tap ℹ️ for photo &amp; details</p>
           <div class="flip-grid">
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="MSG" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front"><div class="card-emoji">🧂</div><div class="card-name">MSG</div></div>
                 <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Enhances savory/umami taste — instant noodles, chips, soups</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Disodium Inosinate" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front"><div class="card-emoji">⚗️</div><div class="card-name">Disodium Inosinate</div></div>
                 <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Synergizes with MSG to boost umami — processed snacks</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Herbs &amp; Spices" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front green-card"><div class="card-emoji">🌿</div><div class="card-name">Herbs &amp; Spices</div></div>
                 <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Natural flavorings — pepper, garlic, ginger, coriander</div></div>
@@ -768,27 +942,27 @@
             pineapple), and isoamyl acetate (artificial banana).
           </p>
           <div class="examples-label">🃏 Examples — click a card to flip!</div>
-          <p class="flip-hint">Tap any card to reveal its use in food</p>
+          <p class="flip-hint">Flip to reveal · tap ℹ️ for photo &amp; details</p>
           <div class="flip-grid">
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Vanillin" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front purple-card"><div class="card-emoji">🍦</div><div class="card-name">Vanillin</div></div>
                 <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Artificial vanilla aroma — ice cream, cakes, biscuits</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Ethyl Butyrate" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front purple-card"><div class="card-emoji">🍍</div><div class="card-name">Ethyl Butyrate</div></div>
                 <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Artificial pineapple/fruit aroma — sweets, beverages</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Isoamyl Acetate" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front purple-card"><div class="card-emoji">🍌</div><div class="card-name">Isoamyl Acetate</div></div>
                 <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Artificial banana aroma — candy, flavored milk</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Ethyl Acetate" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front purple-card"><div class="card-emoji">🍓</div><div class="card-name">Ethyl Acetate</div></div>
                 <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Fruity aroma — strawberry/cherry flavored products</div></div>
@@ -813,27 +987,27 @@
             or plant starches.
           </p>
           <div class="examples-label">🃏 Examples — click a card to flip!</div>
-          <p class="flip-hint">Tap any card to reveal its use in food</p>
+          <p class="flip-hint">Flip to reveal · tap ℹ️ for photo &amp; details</p>
           <div class="flip-grid">
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Agar-Agar" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front green-card"><div class="card-emoji">🌊</div><div class="card-name">Agar-Agar</div></div>
                 <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Seaweed-based gelling agent — jelly, pudding, ice cream</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Carrageenan" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front green-card"><div class="card-emoji">🟤</div><div class="card-name">Carrageenan</div></div>
                 <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Red seaweed extract — dairy products, sauces, infant formula</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Modified Starch" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front yellow-card"><div class="card-emoji">🌾</div><div class="card-name">Modified Starch</div></div>
                 <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Thickens soups, gravies, and canned foods</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Gelatin" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front"><div class="card-emoji">🍮</div><div class="card-name">Gelatin</div></div>
                 <div class="flip-back"><div class="back-label">Use</div><div class="back-text">Animal-based gelling agent — gummies, marshmallows, panna cotta</div></div>
@@ -920,27 +1094,27 @@
           </table>
           <hr class="section-divider">
           <div class="examples-label">🃏 Narcotic Examples — flip to see effects</div>
-          <p class="flip-hint">Tap any card to reveal medical effects</p>
+          <p class="flip-hint">Flip to reveal · tap ℹ️ for photo &amp; details</p>
           <div class="flip-grid">
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Morphine" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front red-card"><div class="card-emoji">🌺</div><div class="card-name">Morphine</div></div>
                 <div class="flip-back"><div class="back-label">Effect</div><div class="back-text">Strong painkiller; misuse causes respiratory depression, overdose death</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Heroin" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front red-card"><div class="card-emoji">💉</div><div class="card-name">Heroin</div></div>
                 <div class="flip-back"><div class="back-label">Effect</div><div class="back-text">Euphoria followed by severe withdrawal; HIV risk from needles</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Cannabis" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front red-card"><div class="card-emoji">🌿</div><div class="card-name">Cannabis</div></div>
                 <div class="flip-back"><div class="back-label">Effect</div><div class="back-text">Altered perception, memory impairment, lung damage when smoked</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Cocaine" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front red-card"><div class="card-emoji">🥄</div><div class="card-name">Cocaine</div></div>
                 <div class="flip-back"><div class="back-label">Effect</div><div class="back-text">Intense stimulation; heart attack risk; severe psychological dependence</div></div>
@@ -966,25 +1140,25 @@
             (I–IV) under Indonesian law.
           </p>
           <div class="flip-grid">
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Methamphetamine (Shabu)" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front red-card"><div class="card-emoji">⚡</div><div class="card-name">Methamphetamine (Shabu)</div></div>
                 <div class="flip-back"><div class="back-label">Effect</div><div class="back-text">Extreme stimulant; paranoia, heart failure, brain damage</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Ecstasy (MDMA)" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front red-card"><div class="card-emoji">💊</div><div class="card-name">Ecstasy (MDMA)</div></div>
                 <div class="flip-back"><div class="back-label">Effect</div><div class="back-text">Euphoria, hyperthermia, dehydration; damages serotonin system</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="LSD" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front red-card"><div class="card-emoji">😵</div><div class="card-name">LSD</div></div>
                 <div class="flip-back"><div class="back-label">Effect</div><div class="back-text">Powerful hallucinogen; triggers psychosis, flashbacks</div></div>
               </div>
             </div>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card" data-card="Benzodiazepines" onclick="handleCardClick(event, this)">>
               <div class="flip-inner">
                 <div class="flip-front red-card"><div class="card-emoji">💤</div><div class="card-name">Benzodiazepines</div></div>
                 <div class="flip-back"><div class="back-label">Effect</div><div class="back-text">Depressants (sedatives); used medically but misuse causes amnesia, dependence</div></div>
@@ -1072,6 +1246,128 @@
   </footer>
 
   <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+
+    /* ════════════════════════════════════════════
+       CARD DATA — photos from Wikimedia Commons
+    ════════════════════════════════════════════ */
+    const CARD_DATA = {
+      "Pandan Leaves":        { type:"Natural Colorant", color:"green", emoji:"🍃", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Pandanus_amaryllifolius.jpg/320px-Pandanus_amaryllifolius.jpg", use:"Gives a natural green colour to cakes, jelly, and drinks — super common in Southeast Asian cooking!", funfact:"Pandan is often called the 'vanilla of Asia' — it adds both colour AND a sweet grassy aroma. Wunderbar! 🌿", banned:false },
+      "Curcumin":             { type:"Natural Colorant — from Turmeric", color:"yellow", emoji:"🌿", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Curcuma_longa_roots.jpg/320px-Curcuma_longa_roots.jpg", use:"Produces a yellow-orange colour in rice dishes, curry, and snacks. Also widely used in traditional medicine.", funfact:"Curcumin is studied for anti-inflammatory properties. Your yellow rice is basically health food. Ja! 💛", banned:false },
+      "Beta-Carotene":        { type:"Natural Colorant — from Carrots & Plants", color:"yellow", emoji:"🥕", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Carrots_-_NCI_Visuals_Online.jpg/320px-Carrots_-_NCI_Visuals_Online.jpg", use:"Adds orange-yellow colour to margarine, cheese, fruit drinks, and butter.", funfact:"Your body converts beta-carotene into Vitamin A! That orange cheese is secretly nutritious. Science is delicious~ 🧀", banned:false },
+      "Carmoisine (Red 3)":   { type:"Synthetic Colorant — Permitted with ADI", color:"blue", emoji:"🔴", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Food_coloring.jpg/320px-Food_coloring.jpg", use:"Produces a vivid red colour in syrup, candy, and beverages. Safe within BPOM's daily limit.", funfact:"Carmoisine's bright red comes from an azo dye structure — a chemical bond that's great at absorbing light. Chemistry making your drinks pretty! 🎨", banned:false },
+      "Tartrazine":           { type:"Synthetic Colorant — Permitted with ADI", color:"yellow", emoji:"🟡", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Food_coloring.jpg/320px-Food_coloring.jpg", use:"Gives a yellow colour to noodles, chips, cereal, and soft drinks. One of the most widely used food dyes.", funfact:"Tartrazine is E102 in Europe. Some people are sensitive to it — which is exactly why food labels exist! Always read them, Freund. 👀", banned:false },
+      "Rhodamine B":          { type:"Industrial Dye — BANNED in Food", color:"red", emoji:"☠️", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Rhodamine_B.jpg/320px-Rhodamine_B.jpg", use:"Zero safe use in food. A textile dye sometimes illegally used to colour street food.", funfact:"Rhodamine B glows bright pink under UV light — which is exactly how food inspectors detect it. Science catching the bad guys! 🔦", banned:true },
+      "Sucrose":              { type:"Natural Nutritive Sweetener", color:"yellow", emoji:"🍚", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Sugar_2xmacro.jpg/320px-Sugar_2xmacro.jpg", use:"The classic table sugar in baked goods, beverages, candy — basically everything sweet.", funfact:"Sucrose is a disaccharide: one glucose + one fructose molecule holding hands. A very sweet chemistry couple! 💑", banned:false },
+      "Fructose":             { type:"Natural Nutritive Sweetener — from Fruit", color:"yellow", emoji:"🌽", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Pineapple-Fruit-Pieces.jpg/320px-Pineapple-Fruit-Pieces.jpg", use:"Found naturally in fruits; also used in fruit juices, jams, and processed foods as high-fructose corn syrup.", funfact:"Fructose is sweeter than sucrose but absorbed differently — your liver processes it directly. Your liver is really working hard for that sweetness! 🍊", banned:false },
+      "Saccharin":            { type:"Artificial Non-Nutritive Sweetener", color:"blue", emoji:"⚗️", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Saccharin2.svg/320px-Saccharin2.svg.png", use:"Used in diet drinks, sugar-free products, and medications. About 300× sweeter than regular sugar!", funfact:"Saccharin was discovered by accident in 1879 when a scientist forgot to wash his hands before lunch. Delicious mistake! 🧪", banned:false },
+      "Aspartame":            { type:"Artificial Non-Nutritive Sweetener", color:"blue", emoji:"🥤", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Diet_Coke_can.jpg/320px-Diet_Coke_can.jpg", use:"In diet sodas, sugar-free gum, and 'light' products. About 200× sweeter than sugar.", funfact:"Aspartame contains phenylalanine — people with PKU must avoid it. That's why diet drinks carry a warning label! 🏷️", banned:false },
+      "Stevia":               { type:"Natural Non-Nutritive Sweetener", color:"green", emoji:"🍃", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Stevia_rebaudiana.jpg/320px-Stevia_rebaudiana.jpg", use:"Used in health drinks and diabetic-friendly foods. Zero calories!", funfact:"Stevia leaves are 200–300× sweeter than sugar with zero calories. The plant literally evolved to be everyone's favourite sweetener. 🌿", banned:false },
+      "Sorbitol":             { type:"Sugar Alcohol Sweetener", color:"yellow", emoji:"🧁", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Diet_Coke_can.jpg/320px-Diet_Coke_can.jpg", use:"In diabetic-friendly foods, chewing gum, and toothpaste. Also keeps food moist!", funfact:"Sorbitol occurs naturally in apples and pears. Too many pears can cause... digestive adventures. Moderation, Freund! 😅", banned:false },
+      "Salt (NaCl)":          { type:"Natural Preservative", color:"green", emoji:"🧂", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Salt_shaker_on_white_background.jpg/320px-Salt_shaker_on_white_background.jpg", use:"Preserves salted fish, pickles, and cured meats by drawing moisture away from microbes.", funfact:"The word 'salary' comes from the Latin word for salt — soldiers were paid in salt! You are literally worth your salt. 💰", banned:false },
+      "Citric Acid":          { type:"Natural Preservative & Antioxidant", color:"green", emoji:"🍋", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Citric_acid_crystals.jpg/320px-Citric_acid_crystals.jpg", use:"Prevents oxidation and microbial growth in canned fruits, juices, jams, and soft drinks.", funfact:"Commercially, citric acid is made by fermenting sugar with a type of mould. Mould doing good things for your juice! 🍋", banned:false },
+      "Sodium Benzoate":      { type:"Synthetic Preservative", color:"blue", emoji:"🔬", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Sodium_benzoate.jpg/320px-Sodium_benzoate.jpg", use:"Inhibits mould and yeast in soft drinks, ketchup, salad dressings, and pickles.", funfact:"Sodium benzoate + Vitamin C can form benzene (a carcinogen). This is why manufacturers carefully reformulate drinks. Chemistry matters! ⚗️", banned:false },
+      "Sorbic Acid":          { type:"Synthetic Preservative", color:"blue", emoji:"🧈", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Sorbic_acid.png/320px-Sorbic_acid.png", use:"Prevents mould and yeast in cheese, baked goods, dried fruits, and wine.", funfact:"Sorbic acid was first isolated from unripe rowan berries in 1859. Nature had the answer long before we did! 🍇", banned:false },
+      "Formalin":             { type:"Industrial Chemical — BANNED in Food", color:"red", emoji:"☠️", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Formaldehyde-2D.svg/320px-Formaldehyde-2D.svg.png", use:"No safe food use. Illegally used to extend shelf life of tofu, noodles, and fish.", funfact:"Formalin is used to preserve biology lab specimens — the same liquid that keeps frogs for dissection. If it's in your tofu, that's a problem. 🏃", banned:true },
+      "Borax":                { type:"Industrial Chemical — BANNED in Food", color:"red", emoji:"☠️", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Borax_crystals.jpg/320px-Borax_crystals.jpg", use:"No safe food use. Illegally added to meatballs and bakso to improve texture.", funfact:"Borax is commonly found in cleaning products and ant killer. If it kills ants, it's not going in your meatballs! 🐜", banned:true },
+      "MSG":                  { type:"Flavoring — Monosodium Glutamate", color:"blue", emoji:"🧂", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/MSGpowder.jpg/320px-MSGpowder.jpg", use:"Enhances the umami (savory) taste in instant noodles, chips, soups, and snacks.", funfact:"MSG was discovered in 1908 by Japanese chemist Kikunae Ikeda from seaweed broth. Umami is now recognised as the 5th basic taste. Wunderbar! 🍜", banned:false },
+      "Disodium Inosinate":   { type:"Flavor Enhancer — Synergizes with MSG", color:"blue", emoji:"⚗️", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/MSGpowder.jpg/320px-MSGpowder.jpg", use:"Works with MSG to multiply the umami flavour in processed snacks and seasoning packets.", funfact:"Disodium inosinate alone has almost no flavour — but paired with MSG, the umami effect multiplies dramatically. The ultimate power duo! ⚡", banned:false },
+      "Herbs & Spices":       { type:"Natural Flavoring", color:"green", emoji:"🌿", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Herbs_spices_selective_focus.jpg/320px-Herbs_spices_selective_focus.jpg", use:"Natural flavourings including pepper, garlic, ginger, and coriander used across all world cuisines.", funfact:"Black pepper was once so valuable it was used as currency and funded entire trade expeditions. Your rendang is made of historical treasures! 🌶️", banned:false },
+      "Vanillin":             { type:"Artificial Aroma — Vanilla Flavour", color:"purple", emoji:"🍦", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Vanillin2.svg/320px-Vanillin2.svg.png", use:"Mimics vanilla aroma in ice cream, cakes, biscuits, and chocolate products.", funfact:"Real vanilla is one of the most expensive spices in the world. Vanillin gives the same aroma at a fraction of the price. Science saving your dessert budget! 🍰", banned:false },
+      "Ethyl Butyrate":       { type:"Artificial Aroma — Pineapple Flavour", color:"purple", emoji:"🍍", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Pineapple-Fruit-Pieces.jpg/320px-Pineapple-Fruit-Pieces.jpg", use:"Creates an artificial pineapple or fruity aroma in sweets and beverages.", funfact:"A single molecule of ethyl butyrate is responsible for that tropical pineapple scent. One molecule, infinite summer vibes! 🌴", banned:false },
+      "Isoamyl Acetate":      { type:"Artificial Aroma — Banana Flavour", color:"purple", emoji:"🍌", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Kluai-Hom-Thong.jpg/320px-Banana-Kluai-Hom-Thong.jpg", use:"Creates an artificial banana aroma in candy, flavoured milk, and confectionery.", funfact:"Banana candy doesn't taste like real bananas because it's based on the Gros Michel variety — a banana almost wiped out in the 1950s. A ghost banana flavour! 👻", banned:false },
+      "Ethyl Acetate":        { type:"Artificial Aroma — Fruity Flavour", color:"purple", emoji:"🍓", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Strawberries.jpg/320px-Strawberries.jpg", use:"Provides a fruity strawberry/cherry aroma in flavoured confectionery and products.", funfact:"Ethyl acetate is also the main solvent in nail polish remover! Same molecule, very different uses. Chemistry is wild. 💅", banned:false },
+      "Agar-Agar":            { type:"Natural Thickener — from Seaweed", color:"green", emoji:"🌊", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Agar_plate_with_colonies.jpg/320px-Agar_plate_with_colonies.jpg", use:"Seaweed-based gelling agent in jelly, pudding, ice cream, and vegetarian gelatin products.", funfact:"Agar is also used in science labs to grow bacteria cultures! The same stuff in your pudding grows microbes in labs. Odey finds this hilarious. 🧫", banned:false },
+      "Carrageenan":          { type:"Natural Thickener — from Red Seaweed", color:"green", emoji:"🟤", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Red_algae.jpg/320px-Red_algae.jpg", use:"From red seaweed; used in dairy products, infant formula, sauces, and processed meats.", funfact:"Carrageenan has been used in Irish cooking for centuries as 'Irish moss.' Your modern dairy drink has ancient seaweed in it! 🇮🇪", banned:false },
+      "Modified Starch":      { type:"Semi-Synthetic Thickener", color:"yellow", emoji:"🌾", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Cornstarch_mixed_with_water.jpg/320px-Cornstarch_mixed_with_water.jpg", use:"Thickens soups, gravies, canned foods, and sauces. More stable than regular starch under heat.", funfact:"Modified starch mixed with water becomes a non-Newtonian fluid — liquid when still, solid when hit. The secret ingredient of slime! 🌀", banned:false },
+      "Gelatin":              { type:"Animal-Based Thickener", color:"blue", emoji:"🍮", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Gummy_bears.jpg/320px-Gummy_bears.jpg", use:"Animal-derived gelling agent in gummies, marshmallows, panna cotta, and capsule medicines.", funfact:"Gelatin is made from boiled animal bones and skin — so gummy bears are not vegetarian. A fun fact that changes everything! 🐻", banned:false },
+      "Morphine":             { type:"Narcotic — Schedule II", color:"red", emoji:"🌺", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Morphine_sulphate.jpg/320px-Morphine_sulphate.jpg", use:"Medical: powerful painkiller for severe pain. Misuse causes respiratory depression and overdose death.", funfact:"Morphine is derived from the opium poppy. Even short-term medical misuse creates strong physical dependence — strict supervision exists for a reason. 🏥", banned:false },
+      "Heroin":               { type:"Narcotic — Schedule I (Fully Prohibited)", color:"red", emoji:"💉", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Diacetylmorphine.svg/320px-Diacetylmorphine.svg.png", use:"No medical use. Highly addictive — causes intense euphoria followed by severe withdrawal and health destruction.", funfact:"Heroin was originally marketed by Bayer in 1898 as a 'non-addictive' cough medicine. Possibly the worst product claim in history. 😨", banned:true },
+      "Cannabis":             { type:"Narcotic — Schedule I in Indonesia", color:"red", emoji:"🌿", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Cannabis_sativa_plant_%284%29.jpg/320px-Cannabis_sativa_plant_%284%29.jpg", use:"Illegal in Indonesia. Causes altered perception, memory impairment, and lung damage when smoked.", funfact:"Cannabis is one of the oldest cultivated plants on Earth. Yet today its legal status varies massively by country — science and policy often disagree. 🌏", banned:true },
+      "Cocaine":              { type:"Narcotic — Schedule I (Fully Prohibited)", color:"red", emoji:"🥄", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Kokain.jpg/320px-Kokain.jpg", use:"No legal use. Intense stimulation and euphoria — with extremely high risk of heart attack and dependence.", funfact:"Cocaine was once an ingredient in the original Coca-Cola (1886). Removed in 1903. That really changes how you think about 'the real thing'! 🥤", banned:true },
+      "Methamphetamine (Shabu)": { type:"Psychotropic Stimulant — Schedule I", color:"red", emoji:"⚡", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Crystal_meth.jpg/320px-Crystal_meth.jpg", use:"Illegal. Extreme stimulant causing paranoia, cardiovascular failure, and severe brain damage.", funfact:"Methamphetamine was used by soldiers in WWII to stay awake — with devastating long-term consequences. Staying awake is not worth this. 😔", banned:true },
+      "Ecstasy (MDMA)":      { type:"Psychotropic — Schedule I", color:"red", emoji:"💊", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/MDMA_crystal.jpg/320px-MDMA_crystal.jpg", use:"Illegal. Causes euphoria and dangerous overheating. Permanently damages the brain's serotonin system.", funfact:"MDMA was originally patented in 1914 as a potential appetite suppressant — never marketed. It resurfaced decades later with very different uses. 📜", banned:true },
+      "LSD":                  { type:"Psychotropic Hallucinogen — Schedule I", color:"red", emoji:"😵", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/LSD_Structural_Formula.svg/320px-LSD_Structural_Formula.svg.png", use:"Illegal. Powerful hallucinogen that distorts perception and can trigger lasting psychosis and flashbacks.", funfact:"LSD was discovered accidentally in 1943 when chemist Albert Hofmann absorbed it through his fingertips. His bicycle ride home became history's first documented 'trip.' 🚲", banned:true },
+      "Benzodiazepines":      { type:"Psychotropic Depressant — Schedule IV", color:"red", emoji:"💤", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Diazepam_2mg_5mg_10mg_tablets.jpg/320px-Diazepam_2mg_5mg_10mg_tablets.jpg", use:"Prescribed medically for anxiety and sleep. Misuse causes amnesia, sedation, and physical dependence.", funfact:"Benzodiazepines like Valium were the world's most prescribed drugs in the 1970s — creating a massive wave of dependence. Always follow your doctor's dosage! 💊", banned:false }
+    };
+
+    /* ── Handle card click: flip OR open modal ── */
+    function handleCardClick(e, card) {
+      // If the info button was clicked, don't flip
+      if (e.target.closest('.card-info-btn')) return;
+      card.classList.toggle('flipped');
+    }
+
+    /* ── Open modal ── */
+    function openCardModal(cardName) {
+      const d = CARD_DATA[cardName];
+      if (!d) return;
+
+      document.getElementById('modalStripe').className = 'card-modal-stripe ' + (d.color || '');
+
+      const photo = document.getElementById('modalPhoto');
+      const fallback = document.getElementById('modalPhotoFallback');
+      fallback.textContent = d.emoji;
+      fallback.style.display = 'none';
+      photo.style.display = 'block';
+      photo.onerror = function() {
+        this.style.display = 'none';
+        fallback.style.display = 'block';
+      };
+      photo.src = d.photo;
+      photo.alt = cardName;
+
+      document.getElementById('modalCredit').innerHTML = '© Wikimedia Commons';
+
+      const badge = document.getElementById('modalBannedBadge');
+      badge.className = d.banned ? 'banned-badge show' : 'banned-badge';
+
+      const nameEl = document.getElementById('modalName');
+      nameEl.textContent = cardName;
+      nameEl.className = 'card-modal-name ' + (d.color || '');
+      document.getElementById('modalType').textContent = d.type;
+
+      document.getElementById('modalUseLabel').textContent = d.banned ? 'Why It\'s Dangerous' : 'Found In / Used For';
+      document.getElementById('modalUseIcon').textContent = d.banned ? '🚫' : '📌';
+      document.getElementById('modalUse').textContent = d.use;
+      document.getElementById('modalFunfact').textContent = d.funfact;
+
+      document.getElementById('cardModalOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeCardModalBtn() {
+      document.getElementById('cardModalOverlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      /* Close on overlay click */
+      document.getElementById('cardModalOverlay').addEventListener('click', function(e) {
+        if (e.target === this) closeCardModalBtn();
+      });
+
+      /* Close button */
+      document.getElementById('modalCloseBtn').addEventListener('click', closeCardModalBtn);
+
+      /* Close on Escape */
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCardModalBtn(); });
+
+      /* Inject info button into every flip-front */
+      document.querySelectorAll('.flip-card[data-card]').forEach(card => {
+        const front = card.querySelector('.flip-front');
+        if (!front) return;
+        const btn = document.createElement('button');
+        btn.className = 'card-info-btn';
+        btn.title = 'More info & photo';
+        btn.textContent = 'ℹ️';
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          openCardModal(card.dataset.card);
+        });
+        front.appendChild(btn);
+      });
+    });
+
     /* ── Nav toggle ── */
     document.getElementById('navToggle').addEventListener('click', () => {
       document.getElementById('navLinks').classList.toggle('open');
@@ -1115,7 +1411,36 @@
     }
   </script>
 
+
+  <!-- ── Card Detail Modal ── -->
+  <div class="card-modal-overlay" id="cardModalOverlay">
+    <div class="card-modal" id="cardModal">
+      <div class="card-modal-stripe" id="modalStripe"></div>
+      <button class="card-modal-close" id="modalCloseBtn">✕</button>
+      <div class="card-modal-body">
+        <div class="card-modal-photo-wrap">
+          <img class="card-modal-photo" id="modalPhoto" src="" alt="">
+          <div class="card-modal-photo-fallback" id="modalPhotoFallback"></div>
+          <div class="card-modal-photo-credit" id="modalCredit"></div>
+        </div>
+        <div class="banned-badge" id="modalBannedBadge">⛔ BANNED / PROHIBITED</div>
+        <div class="card-modal-name" id="modalName"></div>
+        <div class="card-modal-type" id="modalType"></div>
+        <div class="card-modal-section">
+          <div class="card-modal-section-icon" id="modalUseIcon">📌</div>
+          <div class="card-modal-section-content">
+            <div class="card-modal-section-label" id="modalUseLabel">Found In / Used For</div>
+            <div class="card-modal-section-text" id="modalUse"></div>
+          </div>
+        </div>
+        <div class="card-modal-funfact">
+          <div class="card-modal-funfact-icon">⚡</div>
+          <div class="card-modal-funfact-text" id="modalFunfact"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </body>
 
 </html>
-
