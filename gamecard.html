@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toxin Duel — Learning with Odey</title>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--paper:#f5f0e8;--paper-dark:#ede7d9;--paper-lines:#d6cfc0;--ink:#2c2416;--ink-soft:#5a5040;--ink-faint:#9a8e7a;--blue:#4a6fa5;--blue-pale:#c8d9ed;--blue-light:#7a9cc4;--green:#4a7c59;--green-pale:#c4dbc9;--green-light:#7aaa8a;--red:#a0453a;--red-pale:#e8c4c0;--red-light:#c47a72;--yellow:#b8922a;--yellow-pale:#f0dfa0;--yellow-light:#d4b060;--purple:#6b5b8a;--purple-pale:#d0c4e0;--font-hand:'Caveat',cursive;--font-ui:'Nunito',sans-serif;--radius-sm:6px;--radius-md:12px;--radius-lg:20px;--shadow-sm:2px 3px 0 rgba(44,36,22,.15);--shadow-md:4px 6px 0 rgba(44,36,22,.15);--shadow-lg:6px 10px 0 rgba(44,36,22,.12)}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font-ui);background:var(--paper);color:var(--ink);min-height:100vh;overflow-x:hidden}
+
+    .topbar{background:var(--paper-dark);border-bottom:2px solid var(--paper-lines);padding:.7rem 1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+    .topbar-logo{font-family:var(--font-hand);font-size:1.3rem;font-weight:700;color:var(--purple);text-decoration:none}
+    .topbar-game{font-family:var(--font-hand);font-size:1.2rem;font-weight:700;color:var(--ink)}
+    .topbar-room{font-size:.8rem;color:var(--ink-faint);margin-left:auto}
+    .topbar-code{font-family:var(--font-hand);font-size:1rem;font-weight:700;color:var(--purple);letter-spacing:2px}
+
+    .game-layout{display:grid;grid-template-columns:1fr 280px;gap:1rem;padding:1rem;max-width:1100px;margin:0 auto}
+    @media(max-width:800px){.game-layout{grid-template-columns:1fr}}
+
+    /* ARENA */
+    .arena{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);padding:1.2rem;box-shadow:var(--shadow-md)}
+    .arena-title{font-family:var(--font-hand);font-size:1.3rem;color:var(--purple);margin-bottom:1rem;display:flex;align-items:center;gap:.6rem}
+
+    /* PLAYER ZONES */
+    .player-zones{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.8rem;margin-bottom:1.2rem}
+    .player-zone{border:2.5px solid var(--paper-lines);border-radius:var(--radius-md);padding:.7rem;background:var(--paper);transition:all .2s;position:relative}
+    .player-zone.my-zone{border-color:var(--purple);background:var(--purple-pale)}
+    .player-zone.current-turn{border-color:var(--yellow);box-shadow:0 0 0 3px var(--yellow-pale)}
+    .player-zone.shielded{border-color:var(--blue)}
+    .pz-name{font-family:var(--font-hand);font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:.3rem;display:flex;align-items:center;gap:.4rem}
+    .pz-pts{font-family:var(--font-hand);font-size:1.3rem;font-weight:700;color:var(--purple)}
+    .pz-shield{position:absolute;top:.4rem;right:.5rem;font-size:1rem}
+    .pz-skip{position:absolute;bottom:.4rem;right:.5rem;font-size:.7rem;font-weight:700;background:var(--red-pale);color:var(--red);border-radius:99px;padding:.1rem .4rem}
+    .pz-hp{display:flex;gap:2px;margin-top:.3rem}
+    .hp-pip{width:10px;height:10px;border-radius:2px;background:var(--green);border:1px solid var(--green-light);transition:background .3s}
+    .hp-pip.lost{background:var(--paper-lines)}
+
+    /* CARD HAND */
+    .hand-label{font-family:var(--font-hand);font-size:.95rem;color:var(--ink-faint);margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem}
+    .card-hand{display:flex;gap:.6rem;flex-wrap:wrap;min-height:90px;padding:.4rem;background:var(--paper-dark);border-radius:var(--radius-md);border:2px dashed var(--paper-lines);margin-bottom:1rem}
+    .hand-card{width:80px;height:110px;border-radius:var(--radius-md);border:2.5px solid;background:white;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.4rem;text-align:center;cursor:pointer;transition:all .25s;position:relative;flex-shrink:0}
+    .hand-card:hover:not(.disabled){transform:translateY(-8px);box-shadow:var(--shadow-md)}
+    .hand-card.selected{transform:translateY(-12px);box-shadow:var(--shadow-lg)}
+    .hand-card.disabled{opacity:.5;cursor:default}
+    .hc-icon{font-size:1.3rem;margin-bottom:.2rem}
+    .hc-name{font-family:var(--font-hand);font-size:.72rem;font-weight:700;line-height:1.2;color:var(--ink)}
+    .hc-effect{font-size:.6rem;color:var(--ink-faint);margin-top:.2rem;line-height:1.3}
+    .hc-type-badge{position:absolute;top:2px;left:2px;font-size:.5rem;font-weight:700;text-transform:uppercase;padding:.1rem .3rem;border-radius:99px}
+    .hand-card.type-attack  {border-color:var(--red);   background:var(--red-pale)}
+    .hand-card.type-attack  .hc-type-badge{background:var(--red);color:white}
+    .hand-card.type-defense {border-color:var(--blue);  background:var(--blue-pale)}
+    .hand-card.type-defense .hc-type-badge{background:var(--blue);color:white}
+    .hand-card.type-boost   {border-color:var(--green); background:var(--green-pale)}
+    .hand-card.type-boost   .hc-type-badge{background:var(--green);color:white}
+    .hand-card.type-special {border-color:var(--purple);background:var(--purple-pale)}
+    .hand-card.type-special .hc-type-badge{background:var(--purple);color:white}
+
+    /* PLAY AREA */
+    .play-area{background:var(--paper-dark);border:2px dashed var(--paper-lines);border-radius:var(--radius-md);padding:1rem;margin-bottom:.8rem;min-height:80px;display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap}
+    .play-area-label{font-family:var(--font-hand);font-size:.9rem;color:var(--ink-faint);text-align:center}
+    .played-card{width:70px;height:95px;border-radius:var(--radius-md);border:2.5px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.3rem;text-align:center;animation:cardPlay .3s ease}
+    @keyframes cardPlay{0%{transform:scale(0) rotate(-10deg)}100%{transform:scale(1) rotate(0deg)}}
+
+    /* ACTION BAR */
+    .action-bar{display:flex;gap:.6rem;flex-wrap:wrap}
+    .act-btn{padding:.6rem 1.2rem;border-radius:var(--radius-md);border:2px solid;font-family:var(--font-hand);font-size:1rem;font-weight:700;cursor:pointer;transition:all .15s}
+    .act-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:var(--shadow-sm)}
+    .act-btn:disabled{opacity:.4;cursor:default;transform:none}
+    .act-btn.play  {background:var(--purple-pale);color:var(--purple);border-color:var(--purple)}
+    .act-btn.draw  {background:var(--blue-pale);  color:var(--blue);  border-color:var(--blue)}
+    .act-btn.pass  {background:var(--paper);      color:var(--ink-faint);border-color:var(--paper-lines)}
+
+    /* SIDEBAR */
+    .sidebar{display:flex;flex-direction:column;gap:.8rem}
+    .card-s{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);padding:1rem;box-shadow:var(--shadow-sm)}
+    .card-s-title{font-family:var(--font-hand);font-size:1.1rem;color:var(--ink-soft);margin-bottom:.6rem}
+    .turn-card{background:white;border:2.5px solid var(--purple);border-radius:var(--radius-lg);padding:1rem;box-shadow:var(--shadow-sm)}
+    .turn-label{font-family:var(--font-hand);font-size:.9rem;color:var(--ink-faint)}
+    .turn-name{font-family:var(--font-hand);font-size:1.4rem;font-weight:700;color:var(--purple);margin:.3rem 0 .5rem}
+    .deck-info{font-family:var(--font-hand);font-size:.85rem;color:var(--ink-faint)}
+
+    /* SCORE */
+    .score-row{display:flex;align-items:center;gap:.5rem;padding:.35rem .4rem;border-radius:var(--radius-sm);margin-bottom:.25rem}
+    .score-row.me{background:var(--purple-pale);border:1.5px solid var(--purple-pale)}
+    .score-row.active{background:var(--yellow-pale);border:1.5px solid var(--yellow-light)}
+    .sr-avatar{font-size:.9rem}
+    .sr-name{font-family:var(--font-hand);font-size:.9rem;font-weight:700;flex:1}
+    .sr-pts{font-family:var(--font-hand);font-size:.9rem;color:var(--purple);font-weight:700}
+
+    /* LOG */
+    .log-scroll{max-height:130px;overflow-y:auto}
+    .log-item{font-family:var(--font-hand);font-size:.82rem;color:var(--ink-soft);padding:.1rem 0;border-bottom:1px dashed var(--paper-lines)}
+    .log-item.atk{color:var(--red)}
+    .log-item.def{color:var(--blue)}
+    .log-item.pts{color:var(--green)}
+
+    /* QUESTION */
+    .q-overlay{display:none;position:fixed;inset:0;background:rgba(44,36,22,.6);z-index:5000;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(6px)}
+    .q-overlay.open{display:flex;animation:fadeIn .25s ease}
+    .q-box{background:var(--paper);border:3px solid var(--purple);border-radius:var(--radius-lg);max-width:530px;width:100%;box-shadow:var(--shadow-lg);overflow:hidden;max-height:92vh;overflow-y:auto}
+    .q-header{padding:1rem 1.5rem;background:var(--purple-pale);border-bottom:2px dashed var(--purple-pale);display:flex;align-items:center;gap:.8rem;flex-wrap:wrap}
+    .q-card-preview{display:flex;align-items:center;gap:.6rem}
+    .q-card-icon{font-size:1.4rem}
+    .q-card-name{font-family:var(--font-hand);font-size:1.1rem;font-weight:700;color:var(--purple)}
+    .q-card-desc{font-size:.8rem;color:var(--ink-faint);margin-top:.1rem}
+    .q-timer{margin-left:auto;font-family:var(--font-hand);font-size:1.4rem;font-weight:700;color:var(--red)}
+    .q-timer.urgent{animation:pulse .5s ease-in-out infinite}
+    .q-body{padding:1.5rem}
+    .q-reward-box{background:var(--purple-pale);border:1.5px solid var(--purple);border-radius:var(--radius-md);padding:.6rem 1rem;margin-bottom:1rem;font-family:var(--font-hand);font-size:.92rem;color:var(--purple)}
+    .q-text{font-family:var(--font-hand);font-size:1.3rem;line-height:1.5;color:var(--ink);margin-bottom:1.1rem}
+    .q-opts{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+    .q-opt{padding:.7rem 1rem;border-radius:var(--radius-md);border:2px solid var(--paper-lines);background:white;color:var(--ink);font-family:var(--font-hand);font-size:1.05rem;cursor:pointer;text-align:left;transition:all .15s;display:flex;align-items:center;gap:.6rem}
+    .q-opt:hover:not(:disabled){border-color:var(--purple);background:var(--purple-pale);color:var(--purple)}
+    .q-opt:disabled{cursor:default}
+    .q-opt.correct{background:var(--green-pale);border-color:var(--green);color:var(--green)}
+    .q-opt.wrong{background:var(--red-pale);border-color:var(--red);color:var(--red)}
+    .q-opt-letter{width:24px;height:24px;border-radius:50%;background:var(--paper-dark);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0}
+    .q-result{padding:.8rem 1rem;border-radius:var(--radius-md);margin-bottom:.8rem;display:none;font-family:var(--font-hand);font-size:1rem;line-height:1.5}
+    .q-result.show{display:block}
+    .q-result.correct{background:var(--green-pale);border:2px solid var(--green);color:var(--green)}
+    .q-result.wrong{background:var(--red-pale);border:2px solid var(--red);color:var(--red)}
+    .q-cont{width:100%;padding:.65rem;border-radius:var(--radius-md);border:none;background:var(--purple);color:white;font-family:var(--font-hand);font-size:1.1rem;font-weight:700;cursor:pointer}
+    .q-spectate{font-family:var(--font-hand);font-size:.95rem;color:var(--ink-faint);text-align:center;padding:.5rem;font-style:italic}
+
+    /* TARGET PICKER */
+    .target-overlay{display:none;position:fixed;inset:0;background:rgba(44,36,22,.5);z-index:4500;align-items:center;justify-content:center;padding:1rem}
+    .target-overlay.open{display:flex;animation:fadeIn .2s ease}
+    .target-box{background:var(--paper);border:3px solid var(--red);border-radius:var(--radius-lg);max-width:380px;width:100%;padding:1.5rem;box-shadow:var(--shadow-lg)}
+    .target-title{font-family:var(--font-hand);font-size:1.3rem;font-weight:700;color:var(--red);margin-bottom:1rem}
+    .target-list{display:flex;flex-direction:column;gap:.5rem}
+    .target-btn{padding:.6rem 1rem;border-radius:var(--radius-md);border:2px solid var(--paper-lines);background:white;font-family:var(--font-hand);font-size:1.05rem;cursor:pointer;text-align:left;display:flex;align-items:center;gap:.6rem;transition:all .15s}
+    .target-btn:hover{border-color:var(--red);background:var(--red-pale);color:var(--red)}
+    .target-cancel{width:100%;margin-top:.7rem;padding:.5rem;border-radius:var(--radius-sm);border:2px solid var(--paper-lines);background:var(--paper);color:var(--ink-faint);font-family:var(--font-hand);font-size:1rem;cursor:pointer}
+
+    /* WIN */
+    .win-overlay{display:none;position:fixed;inset:0;background:rgba(44,36,22,.75);z-index:6000;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+    .win-overlay.open{display:flex;animation:fadeIn .3s ease}
+    .win-box{background:var(--paper);border:4px solid var(--purple);border-radius:var(--radius-lg);max-width:430px;width:90%;padding:2rem;text-align:center;box-shadow:var(--shadow-lg);animation:popIn .4s ease}
+    @keyframes popIn{0%{transform:scale(.8);opacity:0}70%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+    .win-emoji{font-size:3.5rem;margin-bottom:.5rem}
+    .win-title{font-family:var(--font-hand);font-size:2rem;font-weight:700;color:var(--purple);margin-bottom:.3rem}
+    .win-sub{font-family:var(--font-hand);font-size:1rem;color:var(--ink-soft);margin-bottom:1.2rem}
+    .win-rows{text-align:left;margin-bottom:1.5rem}
+    .win-row{display:flex;align-items:center;gap:.6rem;padding:.35rem .5rem;border-radius:var(--radius-sm);margin-bottom:.3rem}
+    .win-row.first{background:var(--purple-pale);border:1.5px solid var(--purple)}
+    .win-back{padding:.7rem 2rem;border-radius:var(--radius-md);border:none;background:var(--purple);color:white;font-family:var(--font-hand);font-size:1.1rem;font-weight:700;cursor:pointer}
+
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--ink);color:white;font-family:var(--font-hand);font-size:1.1rem;padding:.7rem 1.5rem;border-radius:99px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none}
+    .toast.show{opacity:1}
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="minigames.html" class="topbar-logo">🃏 Toxin Duel</a>
+  <span class="topbar-game">Card Battle Mode</span>
+  <span class="topbar-room">Room: <span class="topbar-code" id="topbarCode">------</span></span>
+</div>
+
+<div class="game-layout">
+  <!-- ARENA -->
+  <div class="arena">
+    <div class="arena-title">🃏 Battle Arena — Answer to earn cards, play cards to dominate!</div>
+
+    <!-- PLAYER ZONES -->
+    <div class="player-zones" id="playerZones"></div>
+
+    <!-- MY HAND -->
+    <div class="hand-label">🤚 Your Hand <span id="handCount" style="color:var(--ink-faint)">(0 cards)</span></div>
+    <div class="card-hand" id="cardHand"></div>
+
+    <!-- SELECTED CARD INFO -->
+    <div id="selectedCardInfo" style="display:none;padding:.5rem .8rem;background:var(--purple-pale);border:1.5px solid var(--purple);border-radius:var(--radius-md);margin-bottom:.7rem;font-family:var(--font-hand);font-size:.95rem;color:var(--purple)"></div>
+
+    <!-- PLAY AREA -->
+    <div class="play-area" id="playArea">
+      <div class="play-area-label">Cards played this turn will appear here</div>
+    </div>
+
+    <!-- ACTION BAR -->
+    <div class="action-bar">
+      <button class="act-btn draw"  id="drawBtn"  onclick="drawCard()"   disabled>🃏 Draw Card (Answer Q)</button>
+      <button class="act-btn play"  id="playBtn"  onclick="playSelected()"disabled>▶️ Play Selected</button>
+      <button class="act-btn pass"  id="passBtn"  onclick="passTurn()"   disabled>⏭ End Turn</button>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="turn-card">
+      <div class="turn-label">Current Turn</div>
+      <div class="turn-name" id="turnName">Loading…</div>
+      <div class="deck-info" id="deckInfo">🃏 Deck: — cards remaining</div>
+    </div>
+
+    <div class="card-s">
+      <div class="card-s-title">🏆 Scores</div>
+      <div id="scoreRows"></div>
+    </div>
+
+    <div class="card-s" style="background:var(--paper-dark)">
+      <div class="card-s-title">🃏 Card Types</div>
+      <div style="font-size:.75rem;color:var(--ink-soft);line-height:1.8">
+        <span style="color:var(--red)">⚔️ Attack</span> — steal points from target<br>
+        <span style="color:var(--blue)">🛡 Defense</span> — shield next attack<br>
+        <span style="color:var(--green)">⚡ Boost</span> — gain bonus points<br>
+        <span style="color:var(--purple)">✨ Special</span> — unique effects<br>
+        <em>Answer correctly to draw!</em>
+      </div>
+    </div>
+
+    <div class="card-s">
+      <div class="card-s-title">📜 Log</div>
+      <div class="log-scroll" id="gameLog"></div>
+    </div>
+  </div>
+</div>
+
+<!-- QUESTION MODAL -->
+<div class="q-overlay" id="qOverlay">
+  <div class="q-box">
+    <div class="q-header">
+      <div class="q-card-preview">
+        <span class="q-card-icon" id="qCardIcon">🃏</span>
+        <div>
+          <div class="q-card-name" id="qCardName">Mystery Card</div>
+          <div class="q-card-desc" id="qCardDesc">Answer correctly to earn this card!</div>
+        </div>
+      </div>
+      <span class="q-timer" id="qTimer">30</span>
+    </div>
+    <div class="q-body">
+      <div class="q-reward-box" id="qReward">🎯 Answer correctly to draw this card!</div>
+      <div class="q-text" id="qText"></div>
+      <div class="q-opts" id="qOpts"></div>
+      <div class="q-result" id="qResult"></div>
+      <button class="q-cont" id="qCont" onclick="continueAfterQ()" style="display:none">Continue →</button>
+      <div class="q-spectate" id="qSpectate" style="display:none">👀 <span id="qActiveName"></span> is drawing a card…</div>
+    </div>
+  </div>
+</div>
+
+<!-- TARGET PICKER -->
+<div class="target-overlay" id="targetOverlay">
+  <div class="target-box">
+    <div class="target-title">⚔️ Choose Target</div>
+    <div class="target-list" id="targetList"></div>
+    <button class="target-cancel" onclick="closeTarget()">Cancel</button>
+  </div>
+</div>
+
+<!-- WIN SCREEN -->
+<div class="win-overlay" id="winOverlay">
+  <div class="win-box">
+    <div class="win-emoji">🃏</div>
+    <div class="win-title" id="winTitle">Toxin Duel!</div>
+    <div class="win-sub" id="winSub"></div>
+    <div class="win-rows" id="winRows"></div>
+    <button class="win-back" onclick="window.location.href='minigames.html'">← Back to Games</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, onValue, update, off, get }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey:"AIzaSyCgHnNvbz9eLw-986ZjAiqKQD9PwnY0Pho",authDomain:"learningwithiodey.firebaseapp.com",
+    databaseURL:"https://learningwithiodey-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId:"learningwithiodey",storageBucket:"learningwithiodey.firebasestorage.app",
+    messagingSenderId:"286187814406",appId:"1:286187814406:web:2b3362562086fdc3538d87"
+  };
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
+
+  const params = new URLSearchParams(location.search);
+  const ROOM   = params.get('room') || sessionStorage.getItem('odey_room');
+  const MY_PID = params.get('pid')  || sessionStorage.getItem('odey_pid');
+  document.getElementById('topbarCode').textContent = ROOM || '------';
+
+  /* ══════════════════════════════════
+     CARD DEFINITIONS
+  ══════════════════════════════════ */
+  const CARD_POOL = [
+    // ATTACK
+    { id:'rhodamine_strike',  type:'attack',  icon:'☠️', name:'Rhodamine Strike',  effect:'steal_pts', value:10, desc:'Steal 10 pts from target' },
+    { id:'formalin_dose',     type:'attack',  icon:'💀', name:'Formalin Dose',     effect:'steal_pts', value:15, desc:'Steal 15 pts from target' },
+    { id:'borax_trap',        type:'attack',  icon:'🪤', name:'Borax Trap',        effect:'skip_turn', value:0,  desc:'Target skips next turn' },
+    { id:'metanil_poison',    type:'attack',  icon:'🟡', name:'Metanil Poison',    effect:'steal_pts', value:8,  desc:'Steal 8 pts from target' },
+    { id:'heroin_sabotage',   type:'attack',  icon:'💉', name:'Heroin Sabotage',   effect:'discard',   value:1,  desc:'Target discards 1 card' },
+    { id:'cocaine_rush',      type:'attack',  icon:'⚡', name:'Cocaine Rush',      effect:'steal_pts', value:12, desc:'Steal 12 pts from target' },
+    // DEFENSE
+    { id:'citric_shield',     type:'defense', icon:'🍋', name:'Citric Shield',     effect:'shield',    value:1,  desc:'Block the next attack against you' },
+    { id:'bpom_clearance',    type:'defense', icon:'✅', name:'BPOM Clearance',    effect:'shield',    value:2,  desc:'Block next 2 attacks against you' },
+    { id:'vitamin_c_armor',   type:'defense', icon:'💊', name:'Vitamin C Armor',   effect:'shield',    value:1,  desc:'Block next attack + heal 5 pts' },
+    { id:'agar_barrier',      type:'defense', icon:'🌊', name:'Agar Barrier',      effect:'shield',    value:1,  desc:'Block next attack against you' },
+    // BOOST
+    { id:'msg_power',         type:'boost',   icon:'🧂', name:'MSG Power',         effect:'gain_pts',  value:15, desc:'Gain 15 points' },
+    { id:'stevia_rush',       type:'boost',   icon:'🍃', name:'Stevia Rush',       effect:'gain_pts',  value:10, desc:'Gain 10 points' },
+    { id:'beta_carotene',     type:'boost',   icon:'🥕', name:'Beta-Carotene',     effect:'gain_pts',  value:8,  desc:'Gain 8 points' },
+    { id:'agar_fuel',         type:'boost',   icon:'🍮', name:'Agar Fuel',         effect:'gain_pts',  value:12, desc:'Gain 12 points' },
+    { id:'caffeine_spike',    type:'boost',   icon:'☕', name:'Caffeine Spike',    effect:'draw_extra',value:1,  desc:'Draw 1 extra card this turn' },
+    // SPECIAL
+    { id:'sdg3_protocol',     type:'special', icon:'🌿', name:'SDG 3 Protocol',    effect:'gain_pts',  value:25, desc:'Gain 25 points — protect public health!' },
+    { id:'bpom_raid',         type:'special', icon:'🔬', name:'BPOM Raid',         effect:'steal_all', value:5,  desc:'Steal 5 pts from ALL other players' },
+    { id:'recall_order',      type:'special', icon:'📋', name:'Recall Order',      effect:'skip_all',  value:0,  desc:'All other players skip next turn' },
+    { id:'pandan_revival',    type:'special', icon:'🍃', name:'Pandan Revival',    effect:'gain_pts',  value:20, desc:'Gain 20 points — natural is best!' },
+    { id:'schedule1_bust',    type:'special', icon:'🚨', name:'Schedule I Bust',   effect:'steal_pts', value:20, desc:'Steal 20 pts from highest-scoring player' },
+  ];
+
+  /* QUESTIONS FOR DRAWING CARDS */
+  const DRAW_QUESTIONS = [
+    { q:"Which substance is a Schedule I narcotic with no medical use?", opts:["Codeine","Heroin","Morphine","Caffeine"], ans:1, exp:"Heroin (diacetylmorphine) is Schedule I — highest addiction risk, zero legal medical application." },
+    { q:"What is the Acceptable Daily Intake (ADI) concept based on?", opts:["Maximum dose ever tested","No-Observed-Adverse-Effect Level divided by 100","The dose that kills 50% of lab animals","Consumer preference surveys"], ans:1, exp:"ADI = NOAEL ÷ 100 (safety factor). This means you'd need 100× the ADI daily to approach any risk." },
+    { q:"Vanillin is the synthetic version of which natural compound?", opts:["Cinnamic acid","4-hydroxy-3-methoxybenzaldehyde (vanilla bean extract)","Eugenol","Limonene"], ans:1, exp:"Vanillin (4-hydroxy-3-methoxybenzaldehyde) is the primary aroma compound in vanilla beans, now synthesized industrially." },
+    { q:"Which BPOM regulation governs food colorant use in Indonesia?", opts:["It's unregulated","Peraturan BPOM No. 37 Tahun 2013","Ministry of Health Decree 1987","WHO Codex only"], ans:1, exp:"BPOM Regulation No. 37/2013 governs permitted colorants, banned substances, and ADI limits in Indonesian food products." },
+    { q:"Fructose and glucose combine to form which disaccharide?", opts:["Lactose","Maltose","Sucrose","Trehalose"], ans:2, exp:"Sucrose = glucose + fructose, joined by an α,β-1,2-glycosidic bond. Hydrolysis by invertase or sucrase splits them." },
+    { q:"Why does benzoic acid inhibit microbial growth in acidic food?", opts:["It raises pH above 7","It disrupts microbial cell membrane and inhibits glycolysis at low pH","It removes oxygen","It kills fungi by dehydration"], ans:1, exp:"In acidic conditions, sodium benzoate converts to benzoic acid which penetrates microbial cells, disrupting the proton gradient needed for metabolism." },
+    { q:"LSD was accidentally discovered in what year?", opts:["1898","1929","1943","1967"], ans:2, exp:"Albert Hofmann first synthesized LSD-25 in 1938 and accidentally absorbed it through his skin on April 16, 1943." },
+    { q:"The 'wool thread test' distinguishes natural vs synthetic colorants because:", opts:["Natural colorants are more colorful","Synthetic colorants bind to wool protein fibers and resist washing due to their molecular structure","Natural colorants are water-soluble only","The test detects toxicity directly"], ans:1, exp:"Synthetic (especially azo) dyes form strong ionic and covalent bonds with protein fibers. Natural colorants have weaker interactions and wash off easily." },
+    { q:"Methamphetamine was used by which groups during WWII?", opts:["Doctors only","Prisoners","Both Allied and Axis soldiers to combat fatigue","Civilians for weight loss"], ans:2, exp:"Both sides used amphetamines (Pervitin for Germany, Benzedrine for Allies). The result was widespread addiction and long-term neurological damage among veterans." },
+    { q:"Which property of agar-agar makes it the base of microbiological culture media?", opts:["It's nutritious for bacteria","It gels at 35°C and melts at 85°C without bacterial degradation","It kills contaminating fungi","It contains specific growth factors"], ans:1, exp:"Agar's gelling temperature (35°C) is above body temperature, allowing solid media that bacteria grow ON but can't break down — unlike gelatin which bacteria digest." },
+    { q:"Aspartame is approximately how many times sweeter than sucrose?", opts:["30×","100×","200×","500×"], ans:2, exp:"Aspartame is ~200× sweeter than sucrose by weight, allowing very small amounts to achieve equivalent sweetness with negligible calories." },
+    { q:"Which SDG 3 target specifically addresses substance abuse prevention?", opts:["Target 3.1","Target 3.4","Target 3.5","Target 3.9"], ans:2, exp:"SDG 3 Target 3.5: Strengthen the prevention and treatment of substance abuse, including narcotic drug abuse and harmful use of alcohol." },
+    { q:"Carrageenan is extracted from which biological source?", opts:["Brown algae","Red seaweed (Rhodophyta)","Land plants only","Bacterial fermentation"], ans:1, exp:"Carrageenan is a sulfated polysaccharide extracted from red seaweeds — used for centuries in Ireland as 'Irish moss' before industrial extraction." },
+    { q:"MDMA's mechanism of neurotoxicity involves:", opts:["Blocking dopamine synthesis","Oxidative stress destroying serotonin transporter (SERT) proteins","Inhibiting acetylcholinesterase","Blocking GABA-A receptors"], ans:1, exp:"MDMA causes massive serotonin release then oxidative damage to SERT proteins. Regular use permanently reduces serotonergic capacity, causing chronic depression." },
+    { q:"Isoamyl acetate is an ester formed from:", opts:["Ethanol + acetic acid","Isoamyl alcohol + acetic acid","Methanol + butyric acid","Propanol + formic acid"], ans:1, exp:"Isoamyl acetate is the condensation product of isoamyl alcohol (3-methylbutan-1-ol) and acetic acid — the characteristic banana ester." },
+  ];
+
+  /* STATE */
+  let selectedCardIdx = null;
+  let myHand = [];
+  let qTimer = null;
+  let qTimeLeft = 30;
+  let waitingForAnswer = false;
+  let pendingCardDraw = null;
+  let roomPlayers = {};
+  const MAX_TURNS = 20;
+
+  /* RENDER PLAYER ZONES */
+  function renderPlayerZones(players, currentTurn, shields, skipNext) {
+    const zones = document.getElementById('playerZones');
+    zones.innerHTML = '';
+    Object.entries(players).forEach(([pid, p]) => {
+      const isMe = pid === MY_PID;
+      const isTurn = pid === currentTurn;
+      const hasShield = (shields?.[pid] || 0) > 0;
+      const isSkipped = skipNext?.[pid];
+      const div = document.createElement('div');
+      div.className = 'player-zone' + (isMe?' my-zone':'') + (isTurn?' current-turn':'') + (hasShield?' shielded':'');
+      div.id = 'pz-' + pid;
+      div.innerHTML = `
+        ${hasShield ? '<span class="pz-shield">🛡</span>' : ''}
+        ${isSkipped ? '<span class="pz-skip">SKIP</span>' : ''}
+        <div class="pz-name">${p.avatar||'👤'} ${p.name}${isMe?' (you)':''}</div>
+        <div class="pz-pts">${p.score||0} pts</div>
+        <div class="pz-hp" id="hp-${pid}"></div>`;
+      zones.appendChild(div);
+
+      // HP pips (based on score, 0–60 range)
+      const hpEl = document.getElementById('hp-' + pid);
+      const maxHp = 6;
+      const filledHp = Math.min(maxHp, Math.ceil(((p.score||0) / 60) * maxHp));
+      for (let i = 0; i < maxHp; i++) {
+        const pip = document.createElement('div');
+        pip.className = 'hp-pip' + (i >= filledHp ? ' lost' : '');
+        hpEl.appendChild(pip);
+      }
+    });
+  }
+
+  /* RENDER MY HAND */
+  function renderHand(hand) {
+    myHand = hand || [];
+    const el = document.getElementById('cardHand');
+    el.innerHTML = '';
+    document.getElementById('handCount').textContent = `(${myHand.length} cards)`;
+    myHand.forEach((cardId, idx) => {
+      const card = CARD_POOL.find(c => c.id === cardId);
+      if (!card) return;
+      const div = document.createElement('div');
+      div.className = `hand-card type-${card.type}` + (idx === selectedCardIdx ? ' selected' : '');
+      div.innerHTML = `
+        <span class="hc-type-badge">${card.type}</span>
+        <span class="hc-icon">${card.icon}</span>
+        <span class="hc-name">${card.name}</span>
+        <span class="hc-effect">${card.desc}</span>`;
+      div.onclick = () => selectCard(idx);
+      el.appendChild(div);
+    });
+  }
+
+  function selectCard(idx) {
+    if (selectedCardIdx === idx) {
+      selectedCardIdx = null;
+      document.getElementById('selectedCardInfo').style.display = 'none';
+    } else {
+      selectedCardIdx = idx;
+      const card = CARD_POOL.find(c => c.id === myHand[idx]);
+      if (card) {
+        const info = document.getElementById('selectedCardInfo');
+        info.style.display = 'block';
+        info.textContent = `${card.icon} ${card.name} — ${card.desc}`;
+      }
+    }
+    renderHandHighlight();
+    document.getElementById('playBtn').disabled = selectedCardIdx === null;
+  }
+
+  function renderHandHighlight() {
+    document.querySelectorAll('.hand-card').forEach((el, i) => {
+      el.classList.toggle('selected', i === selectedCardIdx);
+    });
+  }
+
+  /* PLAY CARD */
+  window.playSelected = function() {
+    if (selectedCardIdx === null || selectedCardIdx >= myHand.length) return;
+    const card = CARD_POOL.find(c => c.id === myHand[selectedCardIdx]);
+    if (!card) return;
+    if (card.type === 'attack' || card.effect === 'steal_all' || card.effect === 'skip_all' || card.effect === 'schedule1_bust') {
+      openTargetPicker(card);
+    } else {
+      executeCard(card, null);
+    }
+  };
+
+  function openTargetPicker(card) {
+    const list = document.getElementById('targetList');
+    list.innerHTML = '';
+    const isMultiTarget = card.effect === 'steal_all' || card.effect === 'skip_all';
+    if (isMultiTarget) {
+      const btn = document.createElement('button');
+      btn.className = 'target-btn';
+      btn.innerHTML = '🌍 All Other Players';
+      btn.onclick = () => { closeTarget(); executeCard(card, 'all'); };
+      list.appendChild(btn);
+    } else {
+      Object.entries(roomPlayers).forEach(([pid, p]) => {
+        if (pid === MY_PID) return;
+        const btn = document.createElement('button');
+        btn.className = 'target-btn';
+        btn.innerHTML = `${p.avatar||'👤'} ${p.name} — ${p.score||0} pts`;
+        btn.onclick = () => { closeTarget(); executeCard(card, pid); };
+        list.appendChild(btn);
+      });
+    }
+    document.getElementById('targetOverlay').classList.add('open');
+  }
+
+  window.closeTarget = function() {
+    document.getElementById('targetOverlay').classList.remove('open');
+  };
+
+  async function executeCard(card, targetPid) {
+    const snap = await get(ref(db, 'rooms/' + ROOM));
+    const room = snap.val();
+    const gs = room.gameState || {};
+    const players = gs.players || room.players || {};
+    const shields = gs.shields || {};
+    const updates = {};
+
+    // Remove card from hand
+    const newHand = [...(gs.hands?.[MY_PID] || [])];
+    newHand.splice(selectedCardIdx, 1);
+    updates[`rooms/${ROOM}/gameState/hands/${MY_PID}`] = newHand;
+    selectedCardIdx = null;
+    document.getElementById('selectedCardInfo').style.display = 'none';
+
+    const myScore = players[MY_PID]?.score || 0;
+
+    switch (card.effect) {
+      case 'gain_pts':
+        updates[`rooms/${ROOM}/gameState/players/${MY_PID}/score`] = myScore + card.value;
+        addLog(`${players[MY_PID]?.name} played ${card.name} — gained ${card.value} pts!`, 'pts');
+        break;
+
+      case 'steal_pts':
+        if (targetPid && targetPid !== 'all') {
+          const targetScore = players[targetPid]?.score || 0;
+          if ((shields[targetPid] || 0) > 0) {
+            const newShield = (shields[targetPid] || 0) - 1;
+            updates[`rooms/${ROOM}/gameState/shields/${targetPid}`] = newShield;
+            addLog(`${players[MY_PID]?.name} attacked ${players[targetPid]?.name} — BLOCKED by shield!`, 'def');
+          } else {
+            const stolen = Math.min(card.value, targetScore);
+            updates[`rooms/${ROOM}/gameState/players/${MY_PID}/score`]   = myScore + stolen;
+            updates[`rooms/${ROOM}/gameState/players/${targetPid}/score`] = targetScore - stolen;
+            addLog(`${players[MY_PID]?.name} stole ${stolen} pts from ${players[targetPid]?.name}!`, 'atk');
+          }
+        }
+        break;
+
+      case 'steal_all':
+        let totalStolen = 0;
+        Object.entries(players).forEach(([pid, p]) => {
+          if (pid === MY_PID) return;
+          const s = Math.min(card.value, p.score || 0);
+          if ((shields[pid] || 0) > 0) {
+            updates[`rooms/${ROOM}/gameState/shields/${pid}`] = (shields[pid]||0) - 1;
+          } else {
+            updates[`rooms/${ROOM}/gameState/players/${pid}/score`] = (p.score||0) - s;
+            totalStolen += s;
+          }
+        });
+        updates[`rooms/${ROOM}/gameState/players/${MY_PID}/score`] = myScore + totalStolen;
+        addLog(`${players[MY_PID]?.name} used BPOM Raid — stole from everyone!`, 'atk');
+        break;
+
+      case 'schedule1_bust': {
+        // Steal from highest-scoring player
+        let highPid = null, highScore = -1;
+        Object.entries(players).forEach(([pid, p]) => {
+          if (pid !== MY_PID && (p.score||0) > highScore) { highPid = pid; highScore = p.score||0; }
+        });
+        if (highPid) {
+          if ((shields[highPid]||0) > 0) {
+            updates[`rooms/${ROOM}/gameState/shields/${highPid}`] = (shields[highPid]||0) - 1;
+            addLog(`${players[MY_PID]?.name} targeted ${players[highPid]?.name} — BLOCKED!`, 'def');
+          } else {
+            const stolen = Math.min(card.value, highScore);
+            updates[`rooms/${ROOM}/gameState/players/${MY_PID}/score`]   = myScore + stolen;
+            updates[`rooms/${ROOM}/gameState/players/${highPid}/score`]  = highScore - stolen;
+            addLog(`${players[MY_PID]?.name} busted ${players[highPid]?.name} — stole ${stolen} pts!`, 'atk');
+          }
+        }
+        break;
+      }
+
+      case 'shield':
+        updates[`rooms/${ROOM}/gameState/shields/${MY_PID}`] = (shields[MY_PID]||0) + card.value;
+        if (card.id === 'vitamin_c_armor') {
+          updates[`rooms/${ROOM}/gameState/players/${MY_PID}/score`] = myScore + 5;
+        }
+        addLog(`${players[MY_PID]?.name} activated ${card.name}!`, 'def');
+        break;
+
+      case 'skip_turn':
+        if (targetPid) {
+          updates[`rooms/${ROOM}/gameState/skipNext/${targetPid}`] = true;
+          addLog(`${players[MY_PID]?.name} forced ${players[targetPid]?.name} to skip next turn!`, 'atk');
+        }
+        break;
+
+      case 'skip_all':
+        Object.keys(players).forEach(pid => {
+          if (pid !== MY_PID) updates[`rooms/${ROOM}/gameState/skipNext/${pid}`] = true;
+        });
+        addLog(`${players[MY_PID]?.name} used Recall Order — everyone else skips!`, 'atk');
+        break;
+
+      case 'draw_extra':
+        pendingCardDraw = true;
+        break;
+
+      case 'discard':
+        if (targetPid && gs.hands?.[targetPid]?.length > 0) {
+          const tHand = [...gs.hands[targetPid]];
+          tHand.pop();
+          updates[`rooms/${ROOM}/gameState/hands/${targetPid}`] = tHand;
+          addLog(`${players[MY_PID]?.name} forced ${players[targetPid]?.name} to discard!`, 'atk');
+        }
+        break;
+    }
+
+    // Show played card in arena
+    showPlayedCard(card);
+    await update(ref(db), updates);
+    document.getElementById('playBtn').disabled = true;
+  }
+
+  function showPlayedCard(card) {
+    const area = document.getElementById('playArea');
+    area.innerHTML = '';
+    const div = document.createElement('div');
+    div.className = 'played-card type-' + card.type;
+    div.style.borderColor = card.type === 'attack' ? 'var(--red)' : card.type === 'defense' ? 'var(--blue)' : card.type === 'boost' ? 'var(--green)' : 'var(--purple)';
+    div.innerHTML = `<span style="font-size:1.5rem">${card.icon}</span><span style="font-family:var(--font-hand);font-size:.75rem;font-weight:700">${card.name}</span>`;
+    area.appendChild(div);
+  }
+
+  /* DRAW CARD (triggers question) */
+  window.drawCard = async function() {
+    const snap = await get(ref(db, 'rooms/' + ROOM));
+    const gs = snap.val()?.gameState || {};
+    if (gs.currentTurn !== MY_PID) { showToast('Not your turn!'); return; }
+    if (gs.currentQuestion) return;
+    const hand = gs.hands?.[MY_PID] || [];
+    if (hand.length >= 5) { showToast('Hand full! Play a card first.'); return; }
+
+    // Pick random card from pool
+    const randomCard = CARD_POOL[Math.floor(Math.random() * CARD_POOL.length)];
+    const qi = Math.floor(Math.random() * DRAW_QUESTIONS.length);
+    await update(ref(db), {
+      [`rooms/${ROOM}/gameState/currentQuestion`]: { askedTo: MY_PID, qIdx: qi, rewardCard: randomCard.id }
+    });
+  };
+
+  function showQuestion(qData, isMyTurn) {
+    const q = DRAW_QUESTIONS[qData.qIdx];
+    if (!q) return;
+    const card = CARD_POOL.find(c => c.id === qData.rewardCard);
+
+    document.getElementById('qCardIcon').textContent = card?.icon || '🃏';
+    document.getElementById('qCardName').textContent = card?.name || 'Card';
+    document.getElementById('qCardDesc').textContent = card?.desc || '';
+    document.getElementById('qReward').textContent = `🎯 Answer correctly → earn: ${card?.icon} ${card?.name} (${card?.desc})`;
+    document.getElementById('qText').textContent = q.q;
+
+    const optsEl = document.getElementById('qOpts');
+    optsEl.innerHTML = '';
+    const letters = ['A','B','C','D'];
+    q.opts.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'q-opt';
+      btn.innerHTML = `<span class="q-opt-letter">${letters[i]}</span>${opt}`;
+      btn.disabled = !isMyTurn;
+      btn.onclick = () => answerQ(i, q, qData);
+      optsEl.appendChild(btn);
+    });
+
+    document.getElementById('qResult').className = 'q-result';
+    document.getElementById('qCont').style.display = 'none';
+    document.getElementById('qSpectate').style.display = isMyTurn ? 'none' : 'block';
+    document.getElementById('qOverlay').classList.add('open');
+
+    if (isMyTurn) {
+      qTimeLeft = 30; document.getElementById('qTimer').textContent = 30;
+      document.getElementById('qTimer').classList.remove('urgent');
+      clearInterval(qTimer);
+      qTimer = setInterval(() => {
+        qTimeLeft--;
+        const el = document.getElementById('qTimer');
+        el.textContent = qTimeLeft;
+        if (qTimeLeft <= 10) el.classList.add('urgent');
+        if (qTimeLeft <= 0) { clearInterval(qTimer); answerQ(-1, q, qData, true); }
+      }, 1000);
+    }
+  }
+
+  async function answerQ(chosen, q, qData, timeout = false) {
+    if (waitingForAnswer) return;
+    waitingForAnswer = true;
+    clearInterval(qTimer);
+    const correct = chosen === q.ans;
+
+    document.querySelectorAll('.q-opt').forEach((b, i) => {
+      b.disabled = true;
+      if (i === q.ans) b.classList.add('correct');
+      else if (i === chosen) b.classList.add('wrong');
+    });
+
+    const res = document.getElementById('qResult');
+    res.className = 'q-result show ' + (correct ? 'correct' : 'wrong');
+
+    if (correct) {
+      const card = CARD_POOL.find(c => c.id === qData.rewardCard);
+      res.textContent = `✅ Correct! You earned: ${card?.icon} ${card?.name}! ` + q.exp;
+      const snap = await get(ref(db, 'rooms/' + ROOM + '/gameState/hands/' + MY_PID));
+      const hand = snap.val() || [];
+      hand.push(qData.rewardCard);
+      await update(ref(db), {
+        [`rooms/${ROOM}/gameState/hands/${MY_PID}`]: hand,
+        [`rooms/${ROOM}/gameState/players/${MY_PID}/score`]:
+          ((await get(ref(db, 'rooms/' + ROOM + '/gameState/players/' + MY_PID + '/score'))).val() || 0) + 5
+      });
+      addLog(`${(await get(ref(db, 'rooms/'+ROOM+'/gameState/players/'+MY_PID+'/name'))).val() || 'Player'} drew ${card?.name}!`, 'pts');
+    } else {
+      res.textContent = `${timeout ? '⏰ Time up!' : '❌ Wrong!'} No card drawn. ` + q.exp;
+    }
+    document.getElementById('qCont').style.display = 'block';
+  }
+
+  window.continueAfterQ = async function() {
+    waitingForAnswer = false;
+    document.getElementById('qOverlay').classList.remove('open');
+    document.getElementById('qTimer').classList.remove('urgent');
+    await update(ref(db), { [`rooms/${ROOM}/gameState/currentQuestion`]: null });
+  };
+
+  window.passTurn = async function() {
+    const snap = await get(ref(db, 'rooms/' + ROOM));
+    const room = snap.val();
+    const gs = room.gameState || {};
+    const players = gs.players || room.players || {};
+    const order = Object.keys(players).sort((a,b) => (players[a].joinedAt||0) - (players[b].joinedAt||0));
+    const curr = order.indexOf(gs.currentTurn || order[0]);
+    const next = (curr + 1) % order.length;
+    const newTurn = (gs.turnCount || 0) + 1;
+
+    const skipNext = gs.skipNext || {};
+    let actualNext = order[next];
+    if (skipNext[actualNext]) {
+      await update(ref(db), { [`rooms/${ROOM}/gameState/skipNext/${actualNext}`]: false });
+      actualNext = order[(next + 1) % order.length];
+    }
+
+    await update(ref(db), {
+      [`rooms/${ROOM}/gameState/currentTurn`]: actualNext,
+      [`rooms/${ROOM}/gameState/currentQuestion`]: null,
+      [`rooms/${ROOM}/gameState/turnCount`]: newTurn
+    });
+
+    // Clear play area
+    document.getElementById('playArea').innerHTML = '<div class="play-area-label">Cards played this turn will appear here</div>';
+    selectedCardIdx = null;
+  };
+
+  /* RENDER SCORES */
+  function renderScores(players, currentTurn) {
+    const rows = document.getElementById('scoreRows');
+    const arr = Object.entries(players).sort((a,b) => (b[1].score||0) - (a[1].score||0));
+    rows.innerHTML = '';
+    arr.forEach(([pid, p]) => {
+      const div = document.createElement('div');
+      div.className = 'score-row' + (pid === MY_PID ? ' me' : '') + (pid === currentTurn ? ' active' : '');
+      div.innerHTML = `<span class="sr-avatar">${p.avatar||'👤'}</span><span class="sr-name">${p.name}${pid===MY_PID?' (you)':''}</span><span class="sr-pts">${p.score||0}</span>`;
+      rows.appendChild(div);
+    });
+  }
+
+  function addLog(msg, cls = '') {
+    const log = document.getElementById('gameLog');
+    const item = document.createElement('div');
+    item.className = 'log-item ' + cls;
+    item.textContent = msg;
+    log.insertBefore(item, log.firstChild);
+  }
+
+  /* FIREBASE LISTENER */
+  onValue(ref(db, 'rooms/' + ROOM), snap => {
+    if (!snap.exists()) { window.location.href = 'minigames.html'; return; }
+    const room = snap.val();
+    const gs = room.gameState || {};
+    const players = gs.players || room.players || {};
+    roomPlayers = players;
+    const currentTurn = gs.currentTurn;
+    const isMyTurn = currentTurn === MY_PID;
+    const shields = gs.shields || {};
+    const skipNext = gs.skipNext || {};
+    const turnCount = gs.turnCount || 0;
+
+    document.getElementById('turnName').textContent =
+      currentTurn ? (players[currentTurn]?.name || '…') + (isMyTurn ? ' (You!)' : '') : 'Loading…';
+    document.getElementById('deckInfo').textContent = `🃏 Turn ${turnCount} / ${MAX_TURNS}`;
+
+    renderPlayerZones(players, currentTurn, shields, skipNext);
+    renderScores(players, currentTurn);
+
+    // My hand
+    const hand = gs.hands?.[MY_PID] || [];
+    renderHand(hand);
+
+    document.getElementById('drawBtn').disabled = !isMyTurn || !!gs.currentQuestion || hand.length >= 5;
+    document.getElementById('passBtn').disabled = !isMyTurn || !!gs.currentQuestion;
+    document.getElementById('playBtn').disabled = selectedCardIdx === null || !isMyTurn;
+
+    // Question
+    if (gs.currentQuestion && !document.getElementById('qOverlay').classList.contains('open')) {
+      const isAnswering = gs.currentQuestion.askedTo === MY_PID;
+      if (!isAnswering) document.getElementById('qActiveName').textContent = players[gs.currentQuestion.askedTo]?.name || '…';
+      showQuestion(gs.currentQuestion, isAnswering);
+    }
+
+    // End game: max turns reached
+    if (turnCount >= MAX_TURNS && !document.getElementById('winOverlay').classList.contains('open')) {
+      off(ref(db, 'rooms/' + ROOM));
+      showWin(players);
+    }
+  });
+
+  function showWin(players) {
+    const arr = Object.entries(players).sort((a,b) => (b[1].score||0) - (a[1].score||0));
+    const winner = arr[0];
+    document.getElementById('winTitle').textContent = (winner?.[1]?.name || '?') + ' Wins! 🃏';
+    document.getElementById('winSub').textContent = `After ${MAX_TURNS} turns — final standings:`;
+    const rows = document.getElementById('winRows');
+    rows.innerHTML = '';
+    arr.forEach(([pid, p], i) => {
+      const div = document.createElement('div');
+      div.className = 'win-row' + (i === 0 ? ' first' : '');
+      div.innerHTML = `<span>${i===0?'🥇':i===1?'🥈':'🥉'}</span><span style="font-family:var(--font-hand);flex:1">${p.name}${pid===MY_PID?' (you)':''}</span><span style="font-family:var(--font-hand);color:var(--purple);font-weight:700">${p.score||0} pts</span>`;
+      rows.appendChild(div);
+    });
+    document.getElementById('winOverlay').classList.add('open');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  if (!ROOM || !MY_PID) { showToast('No room — redirecting…'); setTimeout(() => window.location.href = 'minigames.html', 2000); }
+</script>
+</body>
+</html>

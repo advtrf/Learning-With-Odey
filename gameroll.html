@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BioTrail — Learning with Odey</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --paper:#f5f0e8;--paper-dark:#ede7d9;--paper-lines:#d6cfc0;
+      --ink:#2c2416;--ink-soft:#5a5040;--ink-faint:#9a8e7a;
+      --blue:#4a6fa5;--blue-pale:#c8d9ed;--blue-light:#7a9cc4;
+      --green:#4a7c59;--green-pale:#c4dbc9;--green-light:#7aaa8a;
+      --red:#a0453a;--red-pale:#e8c4c0;--red-light:#c47a72;
+      --yellow:#b8922a;--yellow-pale:#f0dfa0;--yellow-light:#d4b060;
+      --purple:#6b5b8a;--purple-pale:#d0c4e0;
+      --font-hand:'Caveat',cursive;--font-ui:'Nunito',sans-serif;
+      --radius-sm:6px;--radius-md:12px;--radius-lg:20px;
+      --shadow-sm:2px 3px 0 rgba(44,36,22,.15);
+      --shadow-md:4px 6px 0 rgba(44,36,22,.15);
+      --shadow-lg:6px 10px 0 rgba(44,36,22,.12);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font-ui);background:var(--paper);color:var(--ink);min-height:100vh;overflow-x:hidden}
+
+    /* ── TOP BAR ── */
+    .topbar{background:var(--paper-dark);border-bottom:2px solid var(--paper-lines);padding:.7rem 1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+    .topbar-logo{font-family:var(--font-hand);font-size:1.3rem;font-weight:700;color:var(--blue);text-decoration:none}
+    .topbar-logo span{color:var(--green)}
+    .topbar-game{font-family:var(--font-hand);font-size:1.2rem;font-weight:700;color:var(--ink);margin-left:.5rem}
+    .topbar-room{font-size:.8rem;color:var(--ink-faint);margin-left:auto}
+    .topbar-code{font-family:var(--font-hand);font-size:1rem;font-weight:700;color:var(--blue);letter-spacing:2px}
+
+    /* ── LAYOUT ── */
+    .game-layout{display:grid;grid-template-columns:1fr 280px;gap:1rem;padding:1rem;max-width:1200px;margin:0 auto;align-items:start}
+    @media(max-width:800px){.game-layout{grid-template-columns:1fr}}
+
+    /* ── BOARD ── */
+    .board-wrap{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);padding:1rem;box-shadow:var(--shadow-md);overflow:hidden}
+    .board-title{font-family:var(--font-hand);font-size:1.3rem;color:var(--ink-soft);margin-bottom:.8rem;display:flex;align-items:center;gap:.5rem}
+    .board-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:3px}
+    .board-cell{aspect-ratio:1;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;border:2px solid;position:relative;cursor:default;transition:transform .2s}
+    .board-cell.type-start  {background:#c8d9ed;border-color:var(--blue);color:var(--blue)}
+    .board-cell.type-finish {background:#c4dbc9;border-color:var(--green);color:var(--green)}
+    .board-cell.type-trivia {background:white;border-color:var(--blue-light);color:var(--blue)}
+    .board-cell.type-scenario{background:var(--yellow-pale);border-color:var(--yellow-light);color:var(--yellow)}
+    .board-cell.type-trap   {background:var(--red-pale);border-color:var(--red-light);color:var(--red)}
+    .board-cell.type-bonus  {background:var(--green-pale);border-color:var(--green-light);color:var(--green)}
+    .board-cell.type-skip   {background:var(--purple-pale);border-color:var(--purple);color:var(--purple)}
+    .board-cell.type-blank  {background:var(--paper);border-color:var(--paper-lines);color:var(--ink-faint)}
+    .board-cell.active{transform:scale(1.1);z-index:2;box-shadow:var(--shadow-sm)}
+    .cell-icon{font-size:.9rem;line-height:1}
+    .cell-num{position:absolute;top:1px;left:2px;font-size:.45rem;opacity:.5}
+    .player-token{position:absolute;width:14px;height:14px;border-radius:50%;border:1.5px solid white;font-size:.55rem;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);animation:pop .3s ease}
+    @keyframes pop{0%{transform:scale(0)}100%{transform:scale(1)}}
+
+    /* ── SIDEBAR ── */
+    .sidebar{display:flex;flex-direction:column;gap:.8rem}
+
+    /* SCOREBOARD */
+    .score-card{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);padding:1rem;box-shadow:var(--shadow-sm)}
+    .score-title{font-family:var(--font-hand);font-size:1.1rem;color:var(--ink-soft);margin-bottom:.7rem}
+    .score-row{display:flex;align-items:center;gap:.6rem;padding:.4rem .5rem;border-radius:var(--radius-sm);margin-bottom:.3rem;transition:background .2s}
+    .score-row.my-turn{background:var(--yellow-pale);border:1.5px solid var(--yellow-light)}
+    .score-row.current-turn{background:var(--blue-pale);border:1.5px solid var(--blue-light)}
+    .score-avatar{font-size:1rem;flex-shrink:0}
+    .score-name{font-family:var(--font-hand);font-size:1rem;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .score-pts{font-family:var(--font-hand);font-size:1rem;font-weight:700;color:var(--blue);white-space:nowrap}
+    .score-pos{font-size:.7rem;color:var(--ink-faint);margin-left:.2rem}
+
+    /* TURN INFO */
+    .turn-card{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);padding:1rem;box-shadow:var(--shadow-sm)}
+    .turn-title{font-family:var(--font-hand);font-size:1rem;color:var(--ink-faint);margin-bottom:.5rem}
+    .turn-name{font-family:var(--font-hand);font-size:1.4rem;font-weight:700;color:var(--ink);margin-bottom:.6rem}
+    .dice-area{display:flex;align-items:center;gap:.8rem}
+    .dice{font-size:3rem;cursor:pointer;transition:transform .15s;user-select:none}
+    .dice:hover{transform:rotate(-10deg) scale(1.1)}
+    .dice.rolling{animation:rollDice .5s ease}
+    @keyframes rollDice{0%,100%{transform:rotate(0)}25%{transform:rotate(-15deg) scale(1.2)}75%{transform:rotate(15deg) scale(1.2)}}
+    .dice-result{font-family:var(--font-hand);font-size:1.2rem;color:var(--ink-soft)}
+    .roll-btn{width:100%;padding:.65rem;border-radius:var(--radius-md);border:none;background:var(--blue);color:white;font-family:var(--font-hand);font-size:1.2rem;font-weight:700;cursor:pointer;transition:all .2s;margin-top:.5rem}
+    .roll-btn:hover:not(:disabled){filter:brightness(1.1);transform:translateY(-2px);box-shadow:var(--shadow-sm)}
+    .roll-btn:disabled{opacity:.4;cursor:default;transform:none}
+
+    /* LEGEND */
+    .legend-card{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);padding:1rem;box-shadow:var(--shadow-sm)}
+    .legend-title{font-family:var(--font-hand);font-size:1rem;color:var(--ink-faint);margin-bottom:.6rem}
+    .legend-item{display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem;font-size:.78rem;color:var(--ink-soft)}
+    .legend-dot{width:14px;height:14px;border-radius:3px;border:1.5px solid;flex-shrink:0}
+
+    /* ── QUESTION MODAL ── */
+    .q-overlay{display:none;position:fixed;inset:0;background:rgba(44,36,22,.55);z-index:5000;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(5px)}
+    .q-overlay.open{display:flex;animation:fadeIn .25s ease}
+    .q-box{background:var(--paper);border:3px solid var(--paper-lines);border-radius:var(--radius-lg);max-width:520px;width:100%;box-shadow:var(--shadow-lg);overflow:hidden;max-height:90vh;overflow-y:auto}
+    .q-header{padding:1rem 1.5rem;border-bottom:2px dashed var(--paper-lines);display:flex;align-items:center;gap:.8rem}
+    .q-type-badge{padding:.25rem .8rem;border-radius:99px;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+    .q-type-badge.trivia  {background:var(--blue-pale);  color:var(--blue);  border:1.5px solid var(--blue-light)}
+    .q-type-badge.scenario{background:var(--yellow-pale); color:var(--yellow);border:1.5px solid var(--yellow-light)}
+    .q-timer{margin-left:auto;font-family:var(--font-hand);font-size:1.3rem;font-weight:700;color:var(--red);min-width:40px;text-align:right}
+    .q-timer.urgent{animation:pulse 0.5s ease-in-out infinite}
+    .q-body{padding:1.5rem}
+    .q-text{font-family:var(--font-hand);font-size:1.35rem;line-height:1.5;color:var(--ink);margin-bottom:1.2rem}
+    .q-options{display:flex;flex-direction:column;gap:.55rem;margin-bottom:1rem}
+    .q-opt{padding:.75rem 1rem;border-radius:var(--radius-md);border:2px solid var(--paper-lines);background:white;color:var(--ink);font-family:var(--font-hand);font-size:1.1rem;cursor:pointer;text-align:left;transition:all .15s;display:flex;align-items:center;gap:.7rem}
+    .q-opt:hover:not(:disabled){border-color:var(--blue);background:var(--blue-pale);color:var(--blue)}
+    .q-opt:disabled{cursor:default}
+    .q-opt.correct{background:var(--green-pale);border-color:var(--green);color:var(--green)}
+    .q-opt.wrong  {background:var(--red-pale);  border-color:var(--red);  color:var(--red)}
+    .q-opt-letter{width:26px;height:26px;border-radius:50%;background:var(--paper-dark);border:1.5px solid var(--paper-lines);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;flex-shrink:0}
+    .q-feedback{padding:.8rem 1rem;border-radius:var(--radius-md);margin-bottom:.8rem;display:none}
+    .q-feedback.show{display:block;animation:fadeIn .2s ease}
+    .q-feedback.correct{background:var(--green-pale);border:2px solid var(--green);color:var(--green)}
+    .q-feedback.wrong  {background:var(--red-pale);  border:2px solid var(--red);  color:var(--red)}
+    .q-feedback-text{font-family:var(--font-hand);font-size:1.05rem;line-height:1.5}
+    .q-continue-btn{width:100%;padding:.7rem;border-radius:var(--radius-md);border:none;background:var(--blue);color:white;font-family:var(--font-hand);font-size:1.15rem;font-weight:700;cursor:pointer;transition:all .2s}
+    .q-continue-btn:hover{filter:brightness(1.1)}
+    .q-spectate-msg{font-family:var(--font-hand);font-size:1rem;color:var(--ink-faint);text-align:center;padding:.5rem;font-style:italic}
+
+    /* CELL EFFECT POPUP */
+    .cell-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:white;border:3px solid var(--paper-lines);border-radius:var(--radius-lg);padding:1.5rem 2.5rem;text-align:center;font-family:var(--font-hand);font-size:1.4rem;z-index:4500;box-shadow:var(--shadow-lg);transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+    .cell-popup.show{transform:translate(-50%,-50%) scale(1)}
+
+    /* WIN SCREEN */
+    .win-overlay{display:none;position:fixed;inset:0;background:rgba(44,36,22,.7);z-index:6000;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+    .win-overlay.open{display:flex;animation:fadeIn .3s ease}
+    .win-box{background:var(--paper);border:4px solid var(--yellow);border-radius:var(--radius-lg);max-width:440px;width:90%;padding:2rem;text-align:center;box-shadow:var(--shadow-lg);animation:popIn .4s ease}
+    @keyframes popIn{0%{transform:scale(.8);opacity:0}70%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+    .win-emoji{font-size:4rem;margin-bottom:.5rem}
+    .win-title{font-family:var(--font-hand);font-size:2rem;font-weight:700;color:var(--yellow);margin-bottom:.3rem}
+    .win-sub{font-family:var(--font-hand);font-size:1.1rem;color:var(--ink-soft);margin-bottom:1.5rem}
+    .win-scores{text-align:left;margin-bottom:1.5rem}
+    .win-score-row{display:flex;align-items:center;gap:.6rem;padding:.4rem .6rem;border-radius:var(--radius-sm);margin-bottom:.3rem}
+    .win-score-row.first{background:var(--yellow-pale);border:1.5px solid var(--yellow-light)}
+    .win-back-btn{padding:.75rem 2rem;border-radius:var(--radius-md);border:none;background:var(--blue);color:white;font-family:var(--font-hand);font-size:1.2rem;font-weight:700;cursor:pointer;transition:all .2s}
+    .win-back-btn:hover{filter:brightness(1.1)}
+
+    /* LOG */
+    .log-card{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);padding:.8rem 1rem;box-shadow:var(--shadow-sm);max-height:150px;overflow-y:auto}
+    .log-title{font-family:var(--font-hand);font-size:.95rem;color:var(--ink-faint);margin-bottom:.5rem}
+    .log-entry{font-family:var(--font-hand);font-size:.9rem;color:var(--ink-soft);padding:.15rem 0;border-bottom:1px dashed var(--paper-lines)}
+    .log-entry:last-child{border-bottom:none}
+
+    /* SHARED */
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--ink);color:white;font-family:var(--font-hand);font-size:1.1rem;padding:.7rem 1.5rem;border-radius:99px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none}
+    .toast.show{opacity:1}
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="minigames.html" class="topbar-logo">Learning with <span>Odey</span></a>
+  <span class="topbar-game">🎲 BioTrail</span>
+  <span class="topbar-room">Room: <span class="topbar-code" id="topbarCode">------</span></span>
+</div>
+
+<div class="game-layout">
+
+  <!-- BOARD -->
+  <div class="board-wrap">
+    <div class="board-title">🗺️ BioTrail Board <span style="font-size:.85rem;color:var(--ink-faint);margin-left:.5rem">— 40 squares to the finish!</span></div>
+    <div class="board-grid" id="boardGrid"></div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <div class="turn-card">
+      <div class="turn-title">Current Turn</div>
+      <div class="turn-name" id="turnName">Loading…</div>
+      <div class="dice-area">
+        <div class="dice" id="diceEl">🎲</div>
+        <div class="dice-result" id="diceResult">—</div>
+      </div>
+      <button class="roll-btn" id="rollBtn" onclick="rollDice()" disabled>🎲 Roll Dice</button>
+    </div>
+
+    <div class="score-card">
+      <div class="score-title">📊 Scoreboard</div>
+      <div id="scoreRows"></div>
+    </div>
+
+    <div class="legend-card">
+      <div class="legend-title">Legend</div>
+      <div class="legend-item"><div class="legend-dot" style="background:white;border-color:var(--blue-light)"></div>Trivia Question</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--yellow-pale);border-color:var(--yellow-light)"></div>Scenario Challenge</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--green-pale);border-color:var(--green-light)"></div>Bonus Square (+5 pts)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--red-pale);border-color:var(--red-light)"></div>Trap (move back 2)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--purple-pale);border-color:var(--purple)"></div>Skip Turn</div>
+    </div>
+
+    <div class="log-card">
+      <div class="log-title">📜 Game Log</div>
+      <div id="gameLog"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- QUESTION MODAL -->
+<div class="q-overlay" id="qOverlay">
+  <div class="q-box">
+    <div class="q-header">
+      <span class="q-type-badge" id="qTypeBadge">Trivia</span>
+      <div id="qTimerWrap" style="margin-left:auto;display:flex;align-items:center;gap:.4rem">
+        <span style="font-size:.8rem;color:var(--ink-faint)">⏱</span>
+        <span class="q-timer" id="qTimer">30</span>
+      </div>
+    </div>
+    <div class="q-body">
+      <div class="q-text" id="qText">Loading question…</div>
+      <div class="q-options" id="qOptions"></div>
+      <div class="q-feedback" id="qFeedback"><div class="q-feedback-text" id="qFeedbackText"></div></div>
+      <button class="q-continue-btn" id="qContinueBtn" onclick="continueAfterQ()" style="display:none">Continue →</button>
+      <div class="q-spectate-msg" id="qSpectateMsg" style="display:none">👀 Spectating — <span id="qActivePlayer"></span> is answering…</div>
+    </div>
+  </div>
+</div>
+
+<!-- WIN SCREEN -->
+<div class="win-overlay" id="winOverlay">
+  <div class="win-box">
+    <div class="win-emoji">🏆</div>
+    <div class="win-title" id="winTitle">Game Over!</div>
+    <div class="win-sub" id="winSub"></div>
+    <div class="win-scores" id="winScores"></div>
+    <button class="win-back-btn" onclick="window.location.href='minigames.html'">← Back to Games</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, onValue, update, off }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCgHnNvbz9eLw-986ZjAiqKQD9PwnY0Pho",
+    authDomain: "learningwithiodey.firebaseapp.com",
+    databaseURL: "https://learningwithiodey-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "learningwithiodey",
+    storageBucket: "learningwithiodey.firebasestorage.app",
+    messagingSenderId: "286187814406",
+    appId: "1:286187814406:web:2b3362562086fdc3538d87"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
+
+  /* ── PARAMS ── */
+  const params = new URLSearchParams(location.search);
+  const ROOM   = params.get('room') || sessionStorage.getItem('odey_room');
+  const MY_PID = params.get('pid')  || sessionStorage.getItem('odey_pid');
+  const IS_HOST= (params.get('host') || sessionStorage.getItem('odey_host')) === '1';
+
+  document.getElementById('topbarCode').textContent = ROOM || '------';
+
+  /* ── BOARD DEFINITION ── */
+  const TOTAL = 40;
+  // Cell types distributed across 40 cells
+  const CELL_TYPES = (() => {
+    const types = [];
+    for (let i = 0; i < TOTAL; i++) {
+      if (i === 0)        { types.push('start');    continue; }
+      if (i === TOTAL-1)  { types.push('finish');   continue; }
+      const r = Math.random();
+      if (r < .40) types.push('trivia');
+      else if (r < .60) types.push('scenario');
+      else if (r < .70) types.push('bonus');
+      else if (r < .80) types.push('trap');
+      else if (r < .88) types.push('skip');
+      else types.push('blank');
+    }
+    return types;
+  })();
+
+  const CELL_ICONS = {
+    start:'🚀', finish:'🏁', trivia:'❓', scenario:'🧪', bonus:'⭐', trap:'💀', skip:'⏭️', blank:'⬜'
+  };
+
+  /* ── QUESTIONS DATABASE ── */
+  const QUESTIONS = {
+    trivia: [
+      { q:"What enzyme causes apple browning when exposed to air?", opts:["Polyphenol oxidase","Amylase","Lipase","Protease"], ans:0, exp:"Polyphenol oxidase (PPO) reacts with oxygen to produce melanin, causing browning." },
+      { q:"Rhodamine B is classified as...", opts:["A permitted colorant","A natural sweetener","A banned textile dye","A flavor enhancer"], ans:2, exp:"Rhodamine B is a toxic textile dye. Using it in food is illegal and carcinogenic." },
+      { q:"Which schedule of narcotics has NO medical use at all?", opts:["Schedule I","Schedule II","Schedule III","Schedule IV"], ans:0, exp:"Schedule I narcotics (e.g. heroin, cocaine) have the highest addiction risk and zero legal medical use." },
+      { q:"MSG is a flavor enhancer for which taste?", opts:["Sweet","Sour","Bitter","Umami"], ans:3, exp:"MSG enhances the umami (savory) taste — the 5th basic taste, discovered in 1908." },
+      { q:"Borax is illegally used in food to...", opts:["Add color","Improve texture","Add sweetness","Prevent oxidation"], ans:1, exp:"Borax gives meatballs/bakso an elastic texture but is toxic. It's banned from food." },
+      { q:"Saccharin is how many times sweeter than sugar?", opts:["30×","100×","300×","1000×"], ans:2, exp:"Saccharin is approximately 300× sweeter than sucrose." },
+      { q:"Which is a natural food thickener from seaweed?", opts:["Aspartame","Agar-agar","Vanillin","Tartrazine"], ans:1, exp:"Agar-agar is derived from red algae (seaweed) and used as a natural gelling/thickening agent." },
+      { q:"Caffeine's mechanism of action involves blocking which receptors?", opts:["Dopamine","Serotonin","Adenosine","GABA"], ans:2, exp:"Caffeine blocks adenosine receptors, preventing drowsiness and increasing neural activity." },
+      { q:"What chemical formula represents ethanol (alcohol)?", opts:["CH3OH","C2H5OH","C6H12O6","C8H10N4O2"], ans:1, exp:"Ethanol has the formula C₂H₅OH — one of the simplest alcohols." },
+      { q:"Formalin is the same as diluted...", opts:["Ethanol","Methanol","Formaldehyde","Acetic acid"], ans:2, exp:"Formalin is a 37% aqueous solution of formaldehyde — used to preserve specimens, not food!" },
+      { q:"Which additive gives margarine its yellow color?", opts:["Tartrazine","Beta-carotene","Curcumin","Carmoisine"], ans:1, exp:"Beta-carotene provides the natural yellow-orange color to margarine and is also a Vitamin A precursor." },
+      { q:"Sodium benzoate combined with Vitamin C can form which carcinogen?", opts:["Toluene","Benzene","Acetone","Ethylene"], ans:1, exp:"The reaction between sodium benzoate and ascorbic acid (Vit C) can produce benzene, a known carcinogen." },
+      { q:"In the wool thread test, which type of colorant stays on the thread after rinsing?", opts:["Natural colorants","Synthetic colorants","Both equally","Neither"], ans:1, exp:"Synthetic colorants bind more strongly to protein fibers (wool) due to their molecular structure and remain after rinsing." },
+      { q:"Metanil Yellow is banned because it is...", opts:["Too expensive","A carcinogenic azo dye","A heavy metal","A hallucinogen"], ans:1, exp:"Metanil Yellow is a toxic azo dye. It's carcinogenic and not approved for any food use." },
+      { q:"Which psychotropic substance causes hyperthermia and damages the serotonin system?", opts:["LSD","Benzodiazepines","MDMA (Ecstasy)","Codeine"], ans:2, exp:"MDMA causes dangerous body temperature rise (hyperthermia) and destroys serotonin receptors long-term." }
+    ],
+    scenario: [
+      { q:"A street vendor's snacks are bright fluorescent red that doesn't fade after weeks. What is the MOST LIKELY explanation?", opts:["Natural pandan extract","High-quality synthetic colorant within BPOM limits","Illegal Rhodamine B textile dye","The snack is very fresh"], ans:2, exp:"Legitimate food colorants fade. A non-fading fluorescent red strongly suggests Rhodamine B — a toxic banned dye." },
+      { q:"A classmate says 'MSG causes headaches — it's poison.' What is the most scientifically accurate response?", opts:["Agree — MSG is definitely dangerous","MSG is safe within normal dietary amounts; the 'MSG headache' claim lacks scientific consensus","MSG should be banned immediately","Only imported MSG is safe"], ans:1, exp:"Extensive research (FDA, WHO) finds MSG safe at normal intake. 'Chinese Restaurant Syndrome' was not scientifically confirmed." },
+      { q:"You find noodles that stay fresh for 3 weeks without refrigeration and feel unusually springy. What do you suspect?", opts:["Very good packaging","Natural citric acid preservation","Possible formalin or borax contamination","High-quality wheat flour"], ans:2, exp:"Unusually long shelf life at room temp + rubbery texture are classic signs of illegal formalin and borax use." },
+      { q:"A new 'energy drink' claims it contains 400mg caffeine per can. One can of coffee has ~95mg. What health risk should you consider?", opts:["None — more caffeine = more energy","Potential heart palpitations, anxiety, and cardiovascular risk","It's natural so it's safe","Only dangerous for older adults"], ans:1, exp:"400mg far exceeds the WHO safe daily limit (~300mg). High caffeine doses cause tachycardia, anxiety, and can trigger cardiac events." },
+      { q:"A food company replaces sugar with aspartame and labels it 'sugar-free.' A PKU patient wants to buy it. What is the critical issue?", opts:["Price difference","Aspartame contains phenylalanine — dangerous for PKU patients","Sugar-free products are always healthier","No issue at all"], ans:1, exp:"Aspartame breaks down into phenylalanine. People with Phenylketonuria (PKU) cannot metabolize this amino acid — potentially fatal." },
+      { q:"A friend offers you a pill at a party saying 'it's just a vitamin.' It makes others hyperactive and hot. You should...", opts:["Take it since vitamins are safe","Try a small amount first","Refuse and leave — this describes MDMA/ecstasy symptoms","Report to the host only"], ans:2, exp:"Hyperactivity + overheating are hallmark MDMA effects. Never accept unknown pills — this is a classic drug-at-party scenario." },
+      { q:"BPOM raids a factory using tartrazine at 10× the permitted dose. What is the correct action?", opts:["Continue selling — it's a permitted additive so any amount is fine","Recall all products and face criminal charges","Reduce the dose gradually","Request a higher ADI from WHO"], ans:1, exp:"Exceeding the Acceptable Daily Intake (ADI) makes even permitted additives dangerous. This violates food safety law." },
+      { q:"Someone says cannabis is 'natural' therefore harmless. What is wrong with this reasoning?", opts:["Nothing — natural always means safe","Many natural substances are toxic; naturalness ≠ safety","They are correct","Only synthetic drugs are harmful"], ans:1, exp:"'Natural' has no bearing on safety. Arsenic, botulinum toxin, and cyanide are all natural. Cannabis causes real neurological effects." }
+    ]
+  };
+
+  /* ── STATE ── */
+  let gameState = null;
+  let myPos = 0;
+  let qTimer = null;
+  let qTimeLeft = 30;
+  let waitingForAnswer = false;
+
+  /* ── BUILD BOARD ── */
+  function buildBoard() {
+    const grid = document.getElementById('boardGrid');
+    grid.innerHTML = '';
+    // Snake pattern: row 0 left→right, row 1 right→left, etc.
+    for (let row = 0; row < 4; row++) {
+      const cells = [];
+      for (let col = 0; col < 10; col++) {
+        const idx = row * 10 + col;
+        if (idx >= TOTAL) break;
+        cells.push(idx);
+      }
+      if (row % 2 === 1) cells.reverse();
+      cells.forEach(i => {
+        const t = CELL_TYPES[i];
+        const cell = document.createElement('div');
+        cell.className = 'board-cell type-' + t;
+        cell.id = 'cell-' + i;
+        cell.innerHTML = `<span class="cell-num">${i + 1}</span><span class="cell-icon">${CELL_ICONS[t]}</span>`;
+        grid.appendChild(cell);
+      });
+    }
+  }
+
+  /* ── RENDER TOKENS ── */
+  function renderTokens(players) {
+    // Clear old tokens
+    document.querySelectorAll('.player-token').forEach(t => t.remove());
+    const byPos = {};
+    Object.entries(players).forEach(([pid, p]) => {
+      const pos = p.position || 0;
+      if (!byPos[pos]) byPos[pos] = [];
+      byPos[pos].push({ pid, ...p });
+    });
+    Object.entries(byPos).forEach(([pos, arr]) => {
+      const cell = document.getElementById('cell-' + pos);
+      if (!cell) return;
+      arr.forEach((p, i) => {
+        const token = document.createElement('div');
+        token.className = 'player-token';
+        token.style.cssText = `background:${p.color || '#888'};bottom:${2 + i*16}px;right:${2 + (i%2)*16}px`;
+        token.textContent = p.avatar || '👤';
+        token.title = p.name;
+        cell.appendChild(token);
+      });
+    });
+  }
+
+  /* ── RENDER SCOREBOARD ── */
+  const PLAYER_COLORS = ['#4a6fa5','#a0453a','#4a7c59','#b8922a','#6b5b8a','#8a5b4a'];
+  function renderScores(players, currentTurn) {
+    const rows = document.getElementById('scoreRows');
+    const arr = Object.entries(players).sort((a,b) => (b[1].score||0) - (a[1].score||0));
+    rows.innerHTML = '';
+    arr.forEach(([pid, p], rank) => {
+      const div = document.createElement('div');
+      const isMe = pid === MY_PID;
+      const isTurn = pid === currentTurn;
+      div.className = 'score-row' + (isMe ? ' my-turn' : '') + (isTurn ? ' current-turn' : '');
+      div.innerHTML = `<span class="score-avatar">${p.avatar||'👤'}</span>
+        <span class="score-name">${p.name}${isMe?' (you)':''}</span>
+        <span class="score-pts">${p.score||0}pt</span>
+        <span class="score-pos">sq.${(p.position||0)+1}</span>`;
+      rows.appendChild(div);
+    });
+  }
+
+  /* ── LOG ── */
+  function addLog(msg) {
+    const log = document.getElementById('gameLog');
+    const entry = document.createElement('div');
+    entry.className = 'log-entry';
+    entry.textContent = msg;
+    log.insertBefore(entry, log.firstChild);
+  }
+
+  /* ── DICE ROLL ── */
+  window.rollDice = async function() {
+    if (!ROOM || !MY_PID) return;
+    document.getElementById('rollBtn').disabled = true;
+    const diceEl = document.getElementById('diceEl');
+    diceEl.classList.add('rolling');
+
+    const roll = Math.floor(Math.random() * 6) + 1;
+    const faces = ['🎲','⚀','⚁','⚂','⚃','⚄','⚅'];
+
+    await new Promise(r => setTimeout(r, 600));
+    diceEl.classList.remove('rolling');
+    diceEl.textContent = faces[roll];
+    document.getElementById('diceResult').textContent = 'Rolled ' + roll;
+
+    // Compute new position
+    const snap = await (await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js")).get(ref(db, 'rooms/' + ROOM));
+    const room = snap.val();
+    const players = room.gameState?.players || room.players || {};
+    const me = players[MY_PID];
+    const oldPos = me?.position || 0;
+    let newPos = Math.min(oldPos + roll, TOTAL - 1);
+    const cellType = CELL_TYPES[newPos];
+
+    addLog(`${me?.name} rolled ${roll} → square ${newPos + 1} (${cellType})`);
+
+    // Update position in Firebase
+    const updates = {};
+    updates[`rooms/${ROOM}/gameState/players/${MY_PID}/position`] = newPos;
+
+    if (cellType === 'trap') {
+      newPos = Math.max(0, newPos - 2);
+      updates[`rooms/${ROOM}/gameState/players/${MY_PID}/position`] = newPos;
+      showCellPopup('💀 TRAP! Move back 2 squares!', 'red');
+      addLog(`${me?.name} hit a trap — back to ${newPos + 1}`);
+      await update(ref(db), updates);
+      setTimeout(() => advanceTurn(room), 2000);
+    } else if (cellType === 'bonus') {
+      const newScore = (me?.score || 0) + 5;
+      updates[`rooms/${ROOM}/gameState/players/${MY_PID}/score`] = newScore;
+      showCellPopup('⭐ BONUS! +5 points!', 'green');
+      addLog(`${me?.name} got a bonus square!`);
+      await update(ref(db), updates);
+      setTimeout(() => advanceTurn(room), 2000);
+    } else if (cellType === 'skip') {
+      updates[`rooms/${ROOM}/gameState/players/${MY_PID}/skipNext`] = true;
+      showCellPopup('⏭️ Skip next turn!', 'purple');
+      await update(ref(db), updates);
+      setTimeout(() => advanceTurn(room), 2000);
+    } else if (cellType === 'finish') {
+      updates[`rooms/${ROOM}/gameState/players/${MY_PID}/position`] = TOTAL - 1;
+      await update(ref(db), updates);
+      endGame();
+    } else if (cellType === 'trivia' || cellType === 'scenario') {
+      await update(ref(db), updates);
+      // Trigger question for everyone
+      const pool = cellType === 'trivia' ? QUESTIONS.trivia : QUESTIONS.scenario;
+      const qi = Math.floor(Math.random() * pool.length);
+      await update(ref(db), {
+        [`rooms/${ROOM}/gameState/currentQuestion`]: { type: cellType, index: qi, askedTo: MY_PID, answeredAt: null }
+      });
+    } else {
+      await update(ref(db), updates);
+      setTimeout(() => advanceTurn(room), 800);
+    }
+  };
+
+  async function advanceTurn(room) {
+    const players = room.gameState?.players || room.players || {};
+    const order = Object.keys(players).sort((a,b) => (players[a].joinedAt||0) - (players[b].joinedAt||0));
+    const currIdx = order.indexOf(room.gameState?.currentTurn || order[0]);
+    let next = (currIdx + 1) % order.length;
+    // Skip players who have skipNext flag
+    if (players[order[next]]?.skipNext) {
+      await update(ref(db), {
+        [`rooms/${ROOM}/gameState/players/${order[next]}/skipNext`]: false
+      });
+      next = (next + 1) % order.length;
+    }
+    await update(ref(db), {
+      [`rooms/${ROOM}/gameState/currentTurn`]: order[next],
+      [`rooms/${ROOM}/gameState/currentQuestion`]: null
+    });
+  }
+
+  /* ── QUESTION ── */
+  function showQuestion(qData, isMyTurn) {
+    const pool = qData.type === 'trivia' ? QUESTIONS.trivia : QUESTIONS.scenario;
+    const q = pool[qData.index];
+    if (!q) return;
+
+    document.getElementById('qTypeBadge').textContent = qData.type === 'trivia' ? '❓ Trivia' : '🧪 Scenario';
+    document.getElementById('qTypeBadge').className   = 'q-type-badge ' + qData.type;
+    document.getElementById('qText').textContent = q.q;
+
+    const optsEl = document.getElementById('qOptions');
+    optsEl.innerHTML = '';
+    const letters = ['A','B','C','D'];
+    q.opts.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'q-opt';
+      btn.innerHTML = `<span class="q-opt-letter">${letters[i]}</span>${opt}`;
+      btn.disabled = !isMyTurn;
+      btn.onclick = () => answerQuestion(i, q, isMyTurn);
+      optsEl.appendChild(btn);
+    });
+
+    document.getElementById('qFeedback').className = 'q-feedback';
+    document.getElementById('qContinueBtn').style.display = 'none';
+    document.getElementById('qSpectateMsg').style.display = isMyTurn ? 'none' : 'block';
+    document.getElementById('qOverlay').classList.add('open');
+
+    if (isMyTurn) {
+      startQTimer(q, qData);
+    }
+  }
+
+  function startQTimer(q, qData) {
+    qTimeLeft = 30;
+    document.getElementById('qTimer').textContent = 30;
+    clearInterval(qTimer);
+    qTimer = setInterval(() => {
+      qTimeLeft--;
+      const el = document.getElementById('qTimer');
+      el.textContent = qTimeLeft;
+      if (qTimeLeft <= 10) el.classList.add('urgent');
+      if (qTimeLeft <= 0) {
+        clearInterval(qTimer);
+        // Time's up — treat as wrong
+        answerQuestion(-1, q, qData, true);
+      }
+    }, 1000);
+  }
+
+  async function answerQuestion(chosen, q, qData, timeout = false) {
+    if (waitingForAnswer) return;
+    waitingForAnswer = true;
+    clearInterval(qTimer);
+
+    const correct = chosen === q.ans;
+    const opts = document.querySelectorAll('.q-opt');
+    opts.forEach((btn, i) => {
+      btn.disabled = true;
+      if (i === q.ans)      btn.classList.add('correct');
+      else if (i === chosen) btn.classList.add('wrong');
+    });
+
+    const fb = document.getElementById('qFeedback');
+    fb.className = 'q-feedback show ' + (correct ? 'correct' : 'wrong');
+    document.getElementById('qFeedbackText').innerHTML =
+      (correct ? '✅ Correct! +15 points. ' : (timeout ? '⏰ Time up! 0 points. ' : '❌ Wrong! 0 points. ')) + q.exp;
+
+    if (correct) {
+      const snap = await (await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js")).get(ref(db, 'rooms/' + ROOM + '/gameState/players/' + MY_PID + '/score'));
+      const oldScore = snap.val() || 0;
+      await update(ref(db), { [`rooms/${ROOM}/gameState/players/${MY_PID}/score`]: oldScore + 15 });
+      addLog(`${document.getElementById('turnName').textContent} answered correctly! +15pts`);
+    }
+
+    document.getElementById('qContinueBtn').style.display = 'block';
+  }
+
+  window.continueAfterQ = async function() {
+    waitingForAnswer = false;
+    document.getElementById('qOverlay').classList.remove('open');
+    document.getElementById('qTimer').classList.remove('urgent');
+    // Advance turn
+    const snap = await (await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js")).get(ref(db, 'rooms/' + ROOM));
+    await advanceTurn(snap.val());
+  };
+
+  /* ── CELL POPUP ── */
+  function showCellPopup(msg, color) {
+    let popup = document.querySelector('.cell-popup');
+    if (!popup) { popup = document.createElement('div'); popup.className = 'cell-popup'; document.body.appendChild(popup); }
+    const colors = { red:'#a0453a', green:'#4a7c59', purple:'#6b5b8a', blue:'#4a6fa5' };
+    popup.textContent = msg;
+    popup.style.borderColor = colors[color] || '#888';
+    popup.classList.add('show');
+    setTimeout(() => popup.classList.remove('show'), 1800);
+  }
+
+  /* ── FIREBASE LISTENER ── */
+  function toastOnce(msg) { showToast(msg); }
+
+  onValue(ref(db, 'rooms/' + ROOM), async snap => {
+    if (!snap.exists()) { window.location.href = 'minigames.html'; return; }
+    const room = snap.val();
+    const gs = room.gameState || {};
+    const players = gs.players || room.players || {};
+
+    // Assign colors on first render
+    const colorArr = ['#4a6fa5','#a0453a','#4a7c59','#b8922a','#6b5b8a','#8a5b4a'];
+    Object.entries(players).forEach(([pid, p], i) => {
+      if (!p.color) players[pid] = { ...p, color: colorArr[i % colorArr.length] };
+    });
+
+    const currentTurn = gs.currentTurn;
+    const isMyTurn = currentTurn === MY_PID;
+
+    document.getElementById('turnName').textContent =
+      currentTurn ? (players[currentTurn]?.name || '…') + (isMyTurn ? ' (You!)' : '') : 'Starting…';
+
+    renderTokens(players);
+    renderScores(players, currentTurn);
+
+    document.getElementById('rollBtn').disabled = !isMyTurn || gs.currentQuestion != null;
+
+    // Handle question
+    if (gs.currentQuestion && !gs.currentQuestion.answeredAt) {
+      if (!document.getElementById('qOverlay').classList.contains('open')) {
+        const isAnswering = gs.currentQuestion.askedTo === MY_PID;
+        if (isAnswering) {
+          document.getElementById('qSpectateMsg').style.display = 'none';
+        } else {
+          document.getElementById('qActivePlayer').textContent = players[gs.currentQuestion.askedTo]?.name || '…';
+        }
+        showQuestion(gs.currentQuestion, isAnswering);
+      }
+    }
+
+    // Check win condition
+    Object.entries(players).forEach(([pid, p]) => {
+      if (p.position >= TOTAL - 1) endGame(players);
+    });
+  });
+
+  /* ── WIN ── */
+  function endGame(players) {
+    if (document.getElementById('winOverlay').classList.contains('open')) return;
+    off(ref(db, 'rooms/' + ROOM));
+    const arr = players ? Object.entries(players).sort((a,b) => (b[1].score||0) - (a[1].score||0)) : [];
+    const winner = arr[0];
+    document.getElementById('winTitle').textContent = winner ? winner[1].name + ' Wins! 🏆' : 'Game Over!';
+    document.getElementById('winSub').textContent = 'Final scores — Wunderbar!';
+    const sc = document.getElementById('winScores');
+    sc.innerHTML = '';
+    arr.forEach(([pid, p], i) => {
+      const div = document.createElement('div');
+      div.className = 'win-score-row' + (i === 0 ? ' first' : '');
+      div.innerHTML = `<span style="font-size:1.2rem">${i===0?'🥇':i===1?'🥈':'🥉'}</span>
+        <span style="font-family:var(--font-hand);font-size:1.1rem;flex:1">${p.name}</span>
+        <span style="font-family:var(--font-hand);font-size:1.1rem;font-weight:700;color:var(--blue)">${p.score||0} pts</span>`;
+      sc.appendChild(div);
+    });
+    document.getElementById('winOverlay').classList.add('open');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  /* ── INIT ── */
+  buildBoard();
+  if (!ROOM || !MY_PID) {
+    showToast('No room found — redirecting…');
+    setTimeout(() => window.location.href = 'minigames.html', 2000);
+  }
+</script>
+</body>
+</html>

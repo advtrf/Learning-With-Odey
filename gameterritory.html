@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChemClaim — Learning with Odey</title>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--paper:#f5f0e8;--paper-dark:#ede7d9;--paper-lines:#d6cfc0;--ink:#2c2416;--ink-soft:#5a5040;--ink-faint:#9a8e7a;--blue:#4a6fa5;--blue-pale:#c8d9ed;--blue-light:#7a9cc4;--green:#4a7c59;--green-pale:#c4dbc9;--green-light:#7aaa8a;--red:#a0453a;--red-pale:#e8c4c0;--red-light:#c47a72;--yellow:#b8922a;--yellow-pale:#f0dfa0;--yellow-light:#d4b060;--purple:#6b5b8a;--purple-pale:#d0c4e0;--font-hand:'Caveat',cursive;--font-ui:'Nunito',sans-serif;--radius-sm:6px;--radius-md:12px;--radius-lg:20px;--shadow-sm:2px 3px 0 rgba(44,36,22,.15);--shadow-md:4px 6px 0 rgba(44,36,22,.15);--shadow-lg:6px 10px 0 rgba(44,36,22,.12)}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font-ui);background:var(--paper);color:var(--ink);min-height:100vh}
+    .topbar{background:var(--paper-dark);border-bottom:2px solid var(--paper-lines);padding:.7rem 1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+    .topbar-logo{font-family:var(--font-hand);font-size:1.3rem;font-weight:700;color:var(--green);text-decoration:none}
+    .topbar-logo span{color:var(--blue)}
+    .topbar-game{font-family:var(--font-hand);font-size:1.2rem;font-weight:700;color:var(--ink)}
+    .topbar-room{font-size:.8rem;color:var(--ink-faint);margin-left:auto}
+    .topbar-code{font-family:var(--font-hand);font-size:1rem;font-weight:700;color:var(--green);letter-spacing:2px}
+
+    .game-layout{display:grid;grid-template-columns:1fr 260px;gap:1rem;padding:1rem;max-width:1100px;margin:0 auto}
+    @media(max-width:780px){.game-layout{grid-template-columns:1fr}}
+
+    /* TERRITORY GRID */
+    .board-wrap{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);padding:1rem;box-shadow:var(--shadow-md)}
+    .board-title{font-family:var(--font-hand);font-size:1.3rem;color:var(--ink-soft);margin-bottom:.8rem}
+    .terr-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+    .terr-cell{aspect-ratio:1.3;border-radius:var(--radius-md);border:2.5px solid var(--paper-lines);background:var(--paper);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .25s;padding:.3rem;text-align:center;position:relative;overflow:hidden}
+    .terr-cell:hover:not(.claimed-other):not(.disabled){transform:scale(1.05);box-shadow:var(--shadow-sm)}
+    .terr-cell.claimable{border-color:var(--green);animation:pulse-border 1.2s ease-in-out infinite}
+    @keyframes pulse-border{0%,100%{border-color:var(--green)}50%{border-color:var(--green-light)}}
+    .terr-cell.disabled{opacity:.5;cursor:default}
+    .terr-cell.claimed-me{border-width:3px}
+    .terr-cell.claimed-other{cursor:default;opacity:.85}
+    .terr-icon{font-size:1.4rem;margin-bottom:.1rem}
+    .terr-name{font-family:var(--font-hand);font-size:.7rem;font-weight:700;color:var(--ink-soft);line-height:1.2}
+    .terr-owner{position:absolute;top:3px;right:4px;font-size:.6rem;font-weight:700;padding:.1rem .3rem;border-radius:99px;color:white}
+    .terr-pts{position:absolute;bottom:3px;left:4px;font-size:.6rem;color:var(--ink-faint)}
+    .territory-categories{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.7rem}
+    .cat-pill{font-size:.72rem;font-weight:700;padding:.2rem .6rem;border-radius:99px;border:1.5px solid;cursor:pointer;transition:all .15s}
+    .cat-pill.sel{color:white!important}
+    .cat-pill.colorant  {color:var(--blue);  border-color:var(--blue)}
+    .cat-pill.sweetener {color:var(--yellow);border-color:var(--yellow)}
+    .cat-pill.preservative{color:var(--green);border-color:var(--green)}
+    .cat-pill.flavoring {color:var(--purple);border-color:var(--purple)}
+    .cat-pill.narcotic  {color:var(--red);   border-color:var(--red)}
+    .cat-pill.psychotropic{color:#8a5b4a;   border-color:#8a5b4a}
+
+    /* SIDEBAR */
+    .sidebar{display:flex;flex-direction:column;gap:.8rem}
+    .card{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);padding:1rem;box-shadow:var(--shadow-sm)}
+    .card-title{font-family:var(--font-hand);font-size:1.1rem;color:var(--ink-soft);margin-bottom:.7rem}
+    .score-row{display:flex;align-items:center;gap:.5rem;padding:.35rem .4rem;border-radius:var(--radius-sm);margin-bottom:.25rem}
+    .score-row.active{background:var(--green-pale);border:1.5px solid var(--green-light)}
+    .score-row.me{background:var(--yellow-pale);border:1.5px solid var(--yellow-light)}
+    .score-avatar{font-size:.95rem}
+    .score-name{font-family:var(--font-hand);font-size:.95rem;font-weight:700;flex:1}
+    .score-terr{font-family:var(--font-hand);font-size:.85rem;color:var(--green);font-weight:700}
+    .score-pts{font-family:var(--font-hand);font-size:.85rem;color:var(--blue);font-weight:700;margin-left:.3rem}
+
+    .turn-card{background:white;border:2.5px solid var(--green);border-radius:var(--radius-lg);padding:1rem;box-shadow:var(--shadow-sm)}
+    .turn-label{font-family:var(--font-hand);font-size:.95rem;color:var(--ink-faint);margin-bottom:.3rem}
+    .turn-name{font-family:var(--font-hand);font-size:1.4rem;font-weight:700;color:var(--green);margin-bottom:.6rem}
+    .attack-info{font-family:var(--font-hand);font-size:.9rem;color:var(--ink-faint);margin-bottom:.5rem;font-style:italic}
+    .pass-btn{width:100%;padding:.55rem;border-radius:var(--radius-md);border:2px solid var(--paper-lines);background:var(--paper);color:var(--ink-faint);font-family:var(--font-hand);font-size:1rem;cursor:pointer;transition:all .15s}
+    .pass-btn:hover:not(:disabled){border-color:var(--green);color:var(--green)}
+    .pass-btn:disabled{opacity:.4;cursor:default}
+
+    /* QUESTION */
+    .q-overlay{display:none;position:fixed;inset:0;background:rgba(44,36,22,.55);z-index:5000;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(5px)}
+    .q-overlay.open{display:flex;animation:fadeIn .25s ease}
+    .q-box{background:var(--paper);border:3px solid var(--paper-lines);border-radius:var(--radius-lg);max-width:520px;width:100%;box-shadow:var(--shadow-lg);overflow:hidden;max-height:90vh;overflow-y:auto}
+    .q-header{padding:1rem 1.5rem;border-bottom:2px dashed var(--paper-lines);display:flex;align-items:center;gap:.8rem;flex-wrap:wrap}
+    .q-territory-name{font-family:var(--font-hand);font-size:1.2rem;font-weight:700;color:var(--green)}
+    .q-type-badge{padding:.2rem .7rem;border-radius:99px;font-size:.75rem;font-weight:700;text-transform:uppercase;background:var(--green-pale);color:var(--green);border:1.5px solid var(--green-light)}
+    .q-timer{margin-left:auto;font-family:var(--font-hand);font-size:1.3rem;font-weight:700;color:var(--red)}
+    .q-timer.urgent{animation:pulse .5s ease-in-out infinite}
+    .q-body{padding:1.5rem}
+    .q-context{background:var(--paper-dark);border-radius:var(--radius-md);padding:.7rem 1rem;margin-bottom:1rem;font-size:.85rem;color:var(--ink-faint);font-style:italic;border-left:3px solid var(--green)}
+    .q-text{font-family:var(--font-hand);font-size:1.3rem;line-height:1.5;color:var(--ink);margin-bottom:1.1rem}
+    .q-options{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+    .q-opt{padding:.7rem 1rem;border-radius:var(--radius-md);border:2px solid var(--paper-lines);background:white;color:var(--ink);font-family:var(--font-hand);font-size:1.05rem;cursor:pointer;text-align:left;transition:all .15s;display:flex;align-items:center;gap:.6rem}
+    .q-opt:hover:not(:disabled){border-color:var(--green);background:var(--green-pale);color:var(--green)}
+    .q-opt:disabled{cursor:default}
+    .q-opt.correct{background:var(--green-pale);border-color:var(--green);color:var(--green)}
+    .q-opt.wrong{background:var(--red-pale);border-color:var(--red);color:var(--red)}
+    .q-opt-letter{width:24px;height:24px;border-radius:50%;background:var(--paper-dark);border:1.5px solid var(--paper-lines);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0}
+    .q-feedback{padding:.8rem 1rem;border-radius:var(--radius-md);margin-bottom:.8rem;display:none;font-family:var(--font-hand);font-size:1rem;line-height:1.5}
+    .q-feedback.show{display:block}
+    .q-feedback.correct{background:var(--green-pale);border:2px solid var(--green);color:var(--green)}
+    .q-feedback.wrong{background:var(--red-pale);border:2px solid var(--red);color:var(--red)}
+    .q-continue-btn{width:100%;padding:.65rem;border-radius:var(--radius-md);border:none;background:var(--green);color:white;font-family:var(--font-hand);font-size:1.1rem;font-weight:700;cursor:pointer}
+    .q-spectate{font-family:var(--font-hand);font-size:.95rem;color:var(--ink-faint);text-align:center;padding:.5rem}
+
+    /* WIN */
+    .win-overlay{display:none;position:fixed;inset:0;background:rgba(44,36,22,.7);z-index:6000;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+    .win-overlay.open{display:flex}
+    .win-box{background:var(--paper);border:4px solid var(--green);border-radius:var(--radius-lg);max-width:420px;width:90%;padding:2rem;text-align:center;box-shadow:var(--shadow-lg);animation:popIn .4s ease}
+    @keyframes popIn{0%{transform:scale(.8);opacity:0}70%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+    .win-emoji{font-size:3.5rem;margin-bottom:.5rem}
+    .win-title{font-family:var(--font-hand);font-size:2rem;font-weight:700;color:var(--green);margin-bottom:.3rem}
+    .win-sub{font-family:var(--font-hand);font-size:1rem;color:var(--ink-soft);margin-bottom:1.2rem}
+    .win-rows{text-align:left;margin-bottom:1.5rem}
+    .win-row{display:flex;align-items:center;gap:.6rem;padding:.35rem .5rem;border-radius:var(--radius-sm);margin-bottom:.3rem}
+    .win-row.first{background:var(--green-pale);border:1.5px solid var(--green-light)}
+    .win-back{padding:.7rem 2rem;border-radius:var(--radius-md);border:none;background:var(--green);color:white;font-family:var(--font-hand);font-size:1.1rem;font-weight:700;cursor:pointer}
+
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--ink);color:white;font-family:var(--font-hand);font-size:1.1rem;padding:.7rem 1.5rem;border-radius:99px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none}
+    .toast.show{opacity:1}
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <a href="minigames.html" class="topbar-logo">Learning with <span>Odey</span></a>
+  <span class="topbar-game">🗺️ ChemClaim</span>
+  <span class="topbar-room">Room: <span class="topbar-code" id="topbarCode">------</span></span>
+</div>
+
+<div class="game-layout">
+  <div class="board-wrap">
+    <div class="board-title">🗺️ Territory Map — Claim by answering correctly!</div>
+    <div class="territory-categories" id="catFilters"></div>
+    <div class="terr-grid" id="terrGrid"></div>
+  </div>
+
+  <div class="sidebar">
+    <div class="turn-card">
+      <div class="turn-label">Current Turn</div>
+      <div class="turn-name" id="turnName">Loading…</div>
+      <div class="attack-info" id="attackInfo">Select an unclaimed territory to claim it!</div>
+      <button class="pass-btn" id="passBtn" onclick="passTurn()" disabled>⏭ Pass Turn</button>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 Territory Count</div>
+      <div id="scoreRows"></div>
+    </div>
+    <div class="card" style="background:var(--paper-dark)">
+      <div class="card-title">📜 Game Rules</div>
+      <div style="font-size:.78rem;color:var(--ink-faint);line-height:1.6">
+        🟢 <b>Unclaimed</b>: Answer → yours<br>
+        ⚔️ <b>Rival's</b>: Answer to attack<br>
+        🏆 Most territories wins!<br>
+        ❓ Each territory has 1 question<br>
+        Rounds end after all claimed
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- QUESTION MODAL -->
+<div class="q-overlay" id="qOverlay">
+  <div class="q-box">
+    <div class="q-header">
+      <span class="q-territory-name" id="qTerrName">Territory</span>
+      <span class="q-type-badge" id="qTypeBadge">Trivia</span>
+      <span class="q-timer" id="qTimer">30</span>
+    </div>
+    <div class="q-body">
+      <div class="q-context" id="qContext" style="display:none"></div>
+      <div class="q-text" id="qText"></div>
+      <div class="q-options" id="qOptions"></div>
+      <div class="q-feedback" id="qFeedback"></div>
+      <button class="q-continue-btn" id="qContinueBtn" onclick="continueAfterQ()" style="display:none">Continue →</button>
+      <div class="q-spectate" id="qSpectate" style="display:none">👀 <span id="qActiveName"></span> is answering…</div>
+    </div>
+  </div>
+</div>
+
+<!-- WIN -->
+<div class="win-overlay" id="winOverlay">
+  <div class="win-box">
+    <div class="win-emoji">🗺️</div>
+    <div class="win-title" id="winTitle">ChemClaim!</div>
+    <div class="win-sub" id="winSub"></div>
+    <div class="win-rows" id="winRows"></div>
+    <button class="win-back" onclick="window.location.href='minigames.html'">← Back to Games</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, onValue, update, off, get }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey:"AIzaSyCgHnNvbz9eLw-986ZjAiqKQD9PwnY0Pho",authDomain:"learningwithiodey.firebaseapp.com",
+    databaseURL:"https://learningwithiodey-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId:"learningwithiodey",storageBucket:"learningwithiodey.firebasestorage.app",
+    messagingSenderId:"286187814406",appId:"1:286187814406:web:2b3362562086fdc3538d87"
+  };
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
+
+  const params = new URLSearchParams(location.search);
+  const ROOM   = params.get('room') || sessionStorage.getItem('odey_room');
+  const MY_PID = params.get('pid')  || sessionStorage.getItem('odey_pid');
+  const IS_HOST= (params.get('host') || sessionStorage.getItem('odey_host')) === '1';
+  document.getElementById('topbarCode').textContent = ROOM || '------';
+
+  /* TERRITORY DEFINITIONS */
+  const TERRITORIES = [
+    {id:'pandan',      name:'Pandan',         icon:'🍃', cat:'colorant',    pts:3},
+    {id:'turmeric',    name:'Turmeric',        icon:'🌿', cat:'colorant',    pts:3},
+    {id:'rhodamine',   name:'Rhodamine B',     icon:'☠️', cat:'colorant',    pts:5},
+    {id:'tartrazine',  name:'Tartrazine',      icon:'🟡', cat:'colorant',    pts:4},
+    {id:'caramel',     name:'Caramel',         icon:'🍮', cat:'colorant',    pts:2},
+    {id:'betacar',     name:'Beta-Carotene',   icon:'🥕', cat:'colorant',    pts:3},
+    {id:'sucrose',     name:'Sucrose',          icon:'🍚', cat:'sweetener',   pts:2},
+    {id:'saccharin',   name:'Saccharin',        icon:'⚗️', cat:'sweetener',   pts:4},
+    {id:'aspartame',   name:'Aspartame',        icon:'🥤', cat:'sweetener',   pts:4},
+    {id:'stevia',      name:'Stevia',           icon:'🍃', cat:'sweetener',   pts:3},
+    {id:'salt',        name:'NaCl',             icon:'🧂', cat:'preservative',pts:2},
+    {id:'citric',      name:'Citric Acid',      icon:'🍋', cat:'preservative',pts:3},
+    {id:'benzoate',    name:'Sodium Benzoate',  icon:'🔬', cat:'preservative',pts:4},
+    {id:'formalin',    name:'Formalin',         icon:'☠️', cat:'preservative',pts:5},
+    {id:'borax',       name:'Borax',            icon:'☠️', cat:'preservative',pts:5},
+    {id:'msg',         name:'MSG',              icon:'🧂', cat:'flavoring',   pts:3},
+    {id:'vanillin',    name:'Vanillin',         icon:'🍦', cat:'flavoring',   pts:3},
+    {id:'isoamyl',     name:'Isoamyl Acetate',  icon:'🍌', cat:'flavoring',   pts:4},
+    {id:'morphine',    name:'Morphine',         icon:'🌺', cat:'narcotic',    pts:5},
+    {id:'heroin',      name:'Heroin',           icon:'💉', cat:'narcotic',    pts:5},
+    {id:'cocaine',     name:'Cocaine',          icon:'🥄', cat:'narcotic',    pts:5},
+    {id:'cannabis',    name:'Cannabis',         icon:'🌿', cat:'narcotic',    pts:4},
+    {id:'mdma',        name:'Ecstasy (MDMA)',   icon:'💊', cat:'psychotropic',pts:5},
+    {id:'methamp',     name:'Methamphetamine',  icon:'⚡', cat:'psychotropic',pts:5},
+    {id:'lsd',         name:'LSD',              icon:'😵', cat:'psychotropic',pts:5},
+    {id:'benzo',       name:'Benzodiazepines',  icon:'💤', cat:'psychotropic',pts:4},
+    {id:'caffeine',    name:'Caffeine',         icon:'☕', cat:'psychotropic',pts:2},
+    {id:'nicotine',    name:'Nicotine',         icon:'🚬', cat:'psychotropic',pts:3},
+  ];
+
+  const QUESTIONS_BY_TERR = {
+    pandan:     {q:"Pandan gives food which natural color?", opts:["Red","Green","Blue","Yellow"], ans:1, exp:"Pandan's chlorophyll produces a distinctive natural green color used throughout Southeast Asian cooking."},
+    turmeric:   {q:"The active colorant compound in turmeric is called:", opts:["Vanillin","Curcumin","Carotene","Lycopene"], ans:1, exp:"Curcumin is the bioactive compound in turmeric responsible for its yellow-orange pigment."},
+    rhodamine:  {q:"Why is Rhodamine B banned from food use?", opts:["It's too expensive","It causes cancer and is a textile dye","It changes food taste","It's unstable at high temperature"], ans:1, exp:"Rhodamine B is a carcinogenic industrial textile dye. Any use in food is illegal and dangerous."},
+    tartrazine: {q:"Tartrazine (E102) is a synthetic colorant producing which color?", opts:["Red","Blue","Yellow","Green"], ans:2, exp:"Tartrazine produces a bright yellow color, one of the most widely used synthetic food colorants."},
+    caramel:    {q:"Caramel color is produced by heating:", opts:["Protein","Sugar","Fat","Starch granules"], ans:1, exp:"Caramel is made by controlled heating (caramelization) of sugar, producing brown pigments."},
+    betacar:    {q:"Beta-carotene is a precursor to which vitamin?", opts:["Vitamin C","Vitamin D","Vitamin A","Vitamin B12"], ans:2, exp:"The body converts beta-carotene into Vitamin A (retinol), making it a valuable nutritional colorant."},
+    sucrose:    {q:"Sucrose is a disaccharide composed of:", opts:["Glucose + Fructose","Glucose + Glucose","Fructose + Galactose","Glucose + Galactose"], ans:0, exp:"Sucrose = glucose + fructose joined by a glycosidic bond. Hydrolysis by invertase splits them."},
+    saccharin:  {q:"Saccharin's caloric content per gram is approximately:", opts:["4 kcal","9 kcal","0 kcal","2 kcal"], ans:2, exp:"Saccharin passes through the body without being metabolized — zero calories despite intense sweetness."},
+    aspartame:  {q:"PKU patients must avoid aspartame because it contains:", opts:["Glucose","Phenylalanine","Fructose","Aspartic acid only"], ans:1, exp:"Aspartame metabolizes into phenylalanine, which cannot be processed by people with Phenylketonuria (PKU)."},
+    stevia:     {q:"Stevia's sweetness comes from compounds called:", opts:["Steviosides","Glycosides","Saccharides","Rebaudes"], ans:0, exp:"Steviosides and rebaudioside A are the glycoside compounds in stevia responsible for its sweetness."},
+    salt:       {q:"How does salt (NaCl) preserve food?", opts:["By adding flavor only","By reducing water activity and inhibiting microbial growth","By lowering pH","By adding antioxidants"], ans:1, exp:"Salt draws water out of food cells by osmosis, lowering water activity and creating an inhospitable environment for microbes."},
+    citric:     {q:"In the apple preservation experiment, citric acid acts as:", opts:["A colorant","An antioxidant that inhibits PPO","A sweetener","A thickener"], ans:1, exp:"Citric acid (Vitamin C) is an antioxidant that inhibits polyphenol oxidase, preventing enzymatic browning."},
+    benzoate:   {q:"Sodium benzoate is MOST effective at preventing microbial growth in:", opts:["Alkaline foods (pH>7)","Neutral foods (pH~7)","Acidic foods (pH<4.5)","Frozen foods only"], ans:2, exp:"Sodium benzoate converts to benzoic acid at low pH, which is the actual antimicrobial agent — hence use in acidic drinks."},
+    formalin:   {q:"Which food texture change suggests illegal formalin use?", opts:["Food becomes sweeter","Food stays unusually firm and springy without refrigeration","Food changes color","Food smells more fragrant"], ans:1, exp:"Formalin cross-links proteins, keeping food artificially firm. Tofu staying firm at room temperature for weeks is a red flag."},
+    borax:      {q:"Borax is most commonly illegally added to:", opts:["Canned fruit","Meatballs (bakso) and fish cakes","Chocolate","Fruit juice"], ans:1, exp:"Borax (sodium tetraborate) gives meatballs a bouncy, elastic texture that consumers mistakenly associate with quality."},
+    msg:        {q:"MSG was first isolated from which food source?", opts:["Soy sauce","Seaweed broth (kombu)","Parmesan cheese","Tomatoes"], ans:1, exp:"Kikunae Ikeda first isolated glutamate from kombu (kelp) broth in 1908 after noticing its distinctive savory taste."},
+    vanillin:   {q:"Vanillin is an artificial version of the aroma from:", opts:["Banana","Pineapple","Vanilla beans","Strawberry"], ans:2, exp:"Vanillin is the primary aromatic compound in vanilla beans, now synthesized chemically as an affordable alternative."},
+    isoamyl:    {q:"Isoamyl acetate mimics the aroma of which fruit?", opts:["Strawberry","Pineapple","Banana","Cherry"], ans:2, exp:"Isoamyl acetate is the ester responsible for banana's distinctive aroma. Interestingly, it's based on the now-rare Gros Michel variety."},
+    morphine:   {q:"Morphine is derived from which plant?", opts:["Cannabis sativa","Coca plant","Opium poppy","Tobacco plant"], ans:2, exp:"Morphine is an opiate alkaloid extracted from the latex of Papaver somniferum (opium poppy)."},
+    heroin:     {q:"Heroin (diacetylmorphine) was originally marketed as:", opts:["An anesthetic","A non-addictive cough medicine","A sleeping aid","An antidepressant"], ans:1, exp:"Bayer marketed heroin in 1898 as a 'non-addictive' substitute for morphine. This claim proved catastrophically wrong."},
+    cocaine:    {q:"Cocaine's mechanism blocks the reuptake of which neurotransmitter?", opts:["Serotonin only","Dopamine, serotonin, and norepinephrine","GABA","Acetylcholine"], ans:1, exp:"Cocaine blocks reuptake transporters for dopamine, serotonin, AND norepinephrine simultaneously — producing intense stimulation."},
+    cannabis:   {q:"The primary psychoactive compound in cannabis is:", opts:["CBD","THC","CBN","THCA"], ans:1, exp:"Δ9-Tetrahydrocannabinol (THC) is the main psychoactive compound. CBD is non-psychoactive."},
+    mdma:       {q:"MDMA causes dangerous overheating by:", opts:["Reducing sweating","Increasing serotonin release causing hyperthermia and impaired thermoregulation","Blocking dopamine","Raising blood pressure only"], ans:1, exp:"MDMA floods serotonin receptors and disrupts the body's temperature regulation — often combined with dehydration at raves."},
+    methamp:    {q:"Methamphetamine was historically administered to:", opts:["Treat diabetes","Soldiers in WWII to prevent fatigue","Treat depression in the 1960s","Athletes only"], ans:1, exp:"Both Allied and Axis forces used amphetamines to keep soldiers alert — with devastating long-term neurological consequences."},
+    lsd:        {q:"LSD was discovered accidentally by Albert Hofmann in:", opts:["1898","1924","1943","1960"], ans:2, exp:"Hofmann accidentally absorbed LSD-25 through his fingertips on April 16, 1943 — documenting history's first acid trip on his bicycle."},
+    benzo:      {q:"Benzodiazepines work by enhancing which inhibitory neurotransmitter?", opts:["Dopamine","Serotonin","GABA","Glutamate"], ans:2, exp:"Benzodiazepines bind to GABA-A receptors, amplifying GABA's inhibitory effect — producing sedation and anxiolysis."},
+    caffeine:   {q:"Caffeine's half-life in the human body is approximately:", opts:["1 hour","3-5 hours","12 hours","24 hours"], ans:1, exp:"Caffeine has a half-life of ~3-5 hours — meaning half of your morning coffee is still in your system at dinner."},
+    nicotine:   {q:"Nicotine acts on which receptor type?", opts:["Muscarinic receptors","Nicotinic acetylcholine receptors","Dopamine D2 receptors","GABA-A receptors"], ans:1, exp:"Nicotine mimics acetylcholine at nicotinic receptors, triggering dopamine release — the basis of its addictive properties."},
+  };
+
+  const PLAYER_COLORS = ['#4a6fa5','#a0453a','#4a7c59','#b8922a','#6b5b8a','#8a5b4a'];
+  const CAT_COLORS = { colorant:'#4a6fa5', sweetener:'#b8922a', preservative:'#4a7c59', flavoring:'#6b5b8a', narcotic:'#a0453a', psychotropic:'#8a5b4a' };
+
+  let qTimer = null;
+  let qTimeLeft = 30;
+  let waitingForAnswer = false;
+  let pendingClaim = null;
+
+  /* BUILD TERRITORY GRID */
+  function buildGrid() {
+    const grid = document.getElementById('terrGrid');
+    grid.innerHTML = '';
+    TERRITORIES.forEach(t => {
+      const cell = document.createElement('div');
+      cell.className = 'terr-cell';
+      cell.id = 'terr-' + t.id;
+      cell.dataset.id = t.id;
+      cell.innerHTML = `<span class="terr-icon">${t.icon}</span><span class="terr-name">${t.name}</span><span class="terr-pts">${t.pts}pt</span>`;
+      cell.onclick = () => attemptClaim(t.id);
+      grid.appendChild(cell);
+    });
+
+    // Category filters
+    const cats = [...new Set(TERRITORIES.map(t => t.cat))];
+    const cf = document.getElementById('catFilters');
+    const all = document.createElement('div');
+    all.className = 'cat-pill sel';
+    all.textContent = 'All';
+    all.style.cssText = 'color:#5a5040;border-color:#d6cfc0;background:#f5f0e8';
+    all.onclick = () => filterCat(null, all);
+    cf.appendChild(all);
+    cats.forEach(cat => {
+      const pill = document.createElement('div');
+      pill.className = 'cat-pill ' + cat;
+      pill.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+      pill.onclick = () => filterCat(cat, pill);
+      cf.appendChild(pill);
+    });
+  }
+
+  function filterCat(cat, el) {
+    document.querySelectorAll('.cat-pill').forEach(p => { p.classList.remove('sel'); p.style.background = ''; p.style.color = ''; });
+    el.classList.add('sel');
+    if (cat) { el.style.background = CAT_COLORS[cat]; el.style.color = 'white'; el.style.borderColor = CAT_COLORS[cat]; }
+    TERRITORIES.forEach(t => {
+      const cell = document.getElementById('terr-' + t.id);
+      if (cell) cell.style.display = (!cat || t.cat === cat) ? '' : 'none';
+    });
+  }
+
+  async function attemptClaim(terrId) {
+    const snap = await get(ref(db, 'rooms/' + ROOM));
+    const room = snap.val();
+    const gs = room.gameState || {};
+    if (gs.currentTurn !== MY_PID) { showToast('⚠️ Not your turn!'); return; }
+    if (gs.currentQuestion) { showToast('Answer the current question first!'); return; }
+
+    const claimed = gs.claimed || {};
+    if (claimed[terrId] === MY_PID) { showToast('You already own this!'); return; }
+
+    pendingClaim = terrId;
+    const q = QUESTIONS_BY_TERR[terrId];
+    if (!q) return;
+
+    await update(ref(db), {
+      [`rooms/${ROOM}/gameState/currentQuestion`]: {
+        terrId, askedTo: MY_PID,
+        type: claimed[terrId] ? 'attack' : 'claim',
+        defendedBy: claimed[terrId] || null
+      }
+    });
+  }
+
+  function showQuestion(qData, isMyTurn) {
+    const terr = TERRITORIES.find(t => t.id === qData.terrId);
+    if (!terr) return;
+    const q = QUESTIONS_BY_TERR[qData.terrId];
+    if (!q) return;
+
+    document.getElementById('qTerrName').textContent = terr.icon + ' ' + terr.name;
+    document.getElementById('qTypeBadge').textContent = qData.type === 'attack' ? '⚔️ Attack' : '🏴 Claim';
+    document.getElementById('qText').textContent = q.q;
+
+    const ctx = document.getElementById('qContext');
+    if (qData.type === 'attack') {
+      ctx.style.display = 'block';
+      ctx.textContent = '⚔️ Attack attempt! Answer correctly to take this territory.';
+    } else {
+      ctx.style.display = 'none';
+    }
+
+    const optsEl = document.getElementById('qOptions');
+    optsEl.innerHTML = '';
+    const letters = ['A','B','C','D'];
+    q.opts.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'q-opt';
+      btn.innerHTML = `<span class="q-opt-letter">${letters[i]}</span>${opt}`;
+      btn.disabled = !isMyTurn;
+      btn.onclick = () => answerQuestion(i, q, qData, isMyTurn);
+      optsEl.appendChild(btn);
+    });
+
+    document.getElementById('qFeedback').className = 'q-feedback';
+    document.getElementById('qContinueBtn').style.display = 'none';
+    document.getElementById('qSpectate').style.display = isMyTurn ? 'none' : 'block';
+    document.getElementById('qActiveName').textContent = '';
+    document.getElementById('qOverlay').classList.add('open');
+
+    if (isMyTurn) {
+      qTimeLeft = 30;
+      document.getElementById('qTimer').textContent = 30;
+      document.getElementById('qTimer').classList.remove('urgent');
+      clearInterval(qTimer);
+      qTimer = setInterval(() => {
+        qTimeLeft--;
+        const el = document.getElementById('qTimer');
+        el.textContent = qTimeLeft;
+        if (qTimeLeft <= 10) el.classList.add('urgent');
+        if (qTimeLeft <= 0) { clearInterval(qTimer); answerQuestion(-1, q, qData, true); }
+      }, 1000);
+    }
+  }
+
+  async function answerQuestion(chosen, q, qData, timeout = false) {
+    if (waitingForAnswer) return;
+    waitingForAnswer = true;
+    clearInterval(qTimer);
+
+    const correct = chosen === q.ans;
+    document.querySelectorAll('.q-opt').forEach((btn, i) => {
+      btn.disabled = true;
+      if (i === q.ans) btn.classList.add('correct');
+      else if (i === chosen) btn.classList.add('wrong');
+    });
+
+    const fb = document.getElementById('qFeedback');
+    fb.className = 'q-feedback show ' + (correct ? 'correct' : 'wrong');
+    fb.textContent = (correct ? '✅ Correct! Territory claimed! ' : (timeout ? '⏰ Time up! ' : '❌ Wrong! ')) + q.exp;
+
+    if (correct) {
+      const terr = TERRITORIES.find(t => t.id === qData.terrId);
+      const snap = await get(ref(db, 'rooms/' + ROOM + '/gameState/players/' + MY_PID + '/score'));
+      const oldScore = snap.val() || 0;
+      await update(ref(db), {
+        [`rooms/${ROOM}/gameState/claimed/${qData.terrId}`]: MY_PID,
+        [`rooms/${ROOM}/gameState/players/${MY_PID}/score`]: oldScore + (terr?.pts || 3)
+      });
+    }
+
+    document.getElementById('qContinueBtn').style.display = 'block';
+  }
+
+  window.continueAfterQ = async function() {
+    waitingForAnswer = false;
+    document.getElementById('qOverlay').classList.remove('open');
+    document.getElementById('qTimer').classList.remove('urgent');
+    pendingClaim = null;
+    const snap = await get(ref(db, 'rooms/' + ROOM));
+    await advanceTurn(snap.val());
+  };
+
+  async function advanceTurn(room) {
+    const players = room.gameState?.players || room.players || {};
+    const order = Object.keys(players).sort((a,b) => (players[a].joinedAt||0) - (players[b].joinedAt||0));
+    const currIdx = order.indexOf(room.gameState?.currentTurn || order[0]);
+    const next = (currIdx + 1) % order.length;
+    await update(ref(db), {
+      [`rooms/${ROOM}/gameState/currentTurn`]: order[next],
+      [`rooms/${ROOM}/gameState/currentQuestion`]: null
+    });
+  }
+
+  window.passTurn = async function() {
+    const snap = await get(ref(db, 'rooms/' + ROOM));
+    await advanceTurn(snap.val());
+  };
+
+  /* RENDER */
+  function renderTerritories(claimed, players) {
+    const colorMap = {};
+    Object.keys(players).forEach((pid, i) => { colorMap[pid] = PLAYER_COLORS[i % PLAYER_COLORS.length]; });
+
+    TERRITORIES.forEach(t => {
+      const cell = document.getElementById('terr-' + t.id);
+      if (!cell) return;
+      const owner = claimed?.[t.id];
+      cell.className = 'terr-cell' + (owner ? (owner === MY_PID ? ' claimed-me' : ' claimed-other') : ' claimable');
+      if (owner) {
+        const col = colorMap[owner] || '#888';
+        cell.style.background = col + '22';
+        cell.style.borderColor = col;
+        let ownerBadge = cell.querySelector('.terr-owner');
+        if (!ownerBadge) { ownerBadge = document.createElement('span'); ownerBadge.className = 'terr-owner'; cell.appendChild(ownerBadge); }
+        ownerBadge.textContent = players[owner]?.name?.slice(0,6) || '?';
+        ownerBadge.style.background = col;
+      } else {
+        cell.style.background = '';
+        cell.style.borderColor = '';
+        const badge = cell.querySelector('.terr-owner');
+        if (badge) badge.remove();
+      }
+    });
+  }
+
+  function renderScores(players, claimed) {
+    const rows = document.getElementById('scoreRows');
+    const terrCount = {};
+    if (claimed) Object.values(claimed).forEach(pid => { terrCount[pid] = (terrCount[pid]||0)+1; });
+    const arr = Object.entries(players).sort((a,b) => (b[1].score||0) - (a[1].score||0));
+    rows.innerHTML = '';
+    arr.forEach(([pid, p], i) => {
+      const div = document.createElement('div');
+      div.className = 'score-row' + (pid === MY_PID ? ' me' : '');
+      div.style.borderLeft = '3px solid ' + (PLAYER_COLORS[i % PLAYER_COLORS.length]);
+      div.innerHTML = `<span class="score-avatar">${p.avatar||'👤'}</span>
+        <span class="score-name">${p.name}${pid===MY_PID?' (you)':''}</span>
+        <span class="score-terr">${terrCount[pid]||0}🏴</span>
+        <span class="score-pts">${p.score||0}pt</span>`;
+      rows.appendChild(div);
+    });
+  }
+
+  /* FIREBASE LISTENER */
+  onValue(ref(db, 'rooms/' + ROOM), snap => {
+    if (!snap.exists()) { window.location.href = 'minigames.html'; return; }
+    const room = snap.val();
+    const gs = room.gameState || {};
+    const players = gs.players || room.players || {};
+    const claimed = gs.claimed || {};
+    const currentTurn = gs.currentTurn;
+    const isMyTurn = currentTurn === MY_PID;
+
+    document.getElementById('turnName').textContent = currentTurn ? (players[currentTurn]?.name || '…') + (isMyTurn ? ' (You!)' : '') : 'Starting…';
+    document.getElementById('attackInfo').textContent = isMyTurn ? 'Select a territory to claim or attack!' : 'Wait for your turn…';
+    document.getElementById('passBtn').disabled = !isMyTurn || !!gs.currentQuestion;
+
+    renderTerritories(claimed, players);
+    renderScores(players, claimed);
+
+    if (gs.currentQuestion && !document.getElementById('qOverlay').classList.contains('open')) {
+      const isAnswering = gs.currentQuestion.askedTo === MY_PID;
+      if (!isAnswering) document.getElementById('qActiveName').textContent = players[gs.currentQuestion.askedTo]?.name || '…';
+      showQuestion(gs.currentQuestion, isAnswering);
+    }
+
+    // Check end: all territories claimed
+    const totalClaimed = Object.keys(claimed).length;
+    if (totalClaimed >= TERRITORIES.length && !document.getElementById('winOverlay').classList.contains('open')) {
+      off(ref(db, 'rooms/' + ROOM));
+      showWin(players, claimed);
+    }
+  });
+
+  function showWin(players, claimed) {
+    const terrCount = {};
+    if (claimed) Object.values(claimed).forEach(pid => { terrCount[pid] = (terrCount[pid]||0)+1; });
+    const arr = Object.entries(players).sort((a,b) => (b[1].score||0)-(a[1].score||0));
+    const winner = arr[0];
+    document.getElementById('winTitle').textContent = (winner?.[1]?.name || '?') + ' Dominates! 🗺️';
+    document.getElementById('winSub').textContent = 'All territories claimed — final standings:';
+    const rows = document.getElementById('winRows');
+    rows.innerHTML = '';
+    arr.forEach(([pid,p],i) => {
+      const div = document.createElement('div');
+      div.className = 'win-row' + (i===0?' first':'');
+      div.innerHTML = `<span>${i===0?'🥇':i===1?'🥈':'🥉'}</span><span style="font-family:var(--font-hand);flex:1">${p.name}</span><span style="font-family:var(--font-hand);color:var(--green)">${terrCount[pid]||0}🏴</span><span style="font-family:var(--font-hand);color:var(--blue);margin-left:.5rem">${p.score||0}pt</span>`;
+      rows.appendChild(div);
+    });
+    document.getElementById('winOverlay').classList.add('open');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  buildGrid();
+  if (!ROOM || !MY_PID) { showToast('No room — redirecting…'); setTimeout(() => window.location.href = 'minigames.html', 2000); }
+</script>
+</body>
+</html>

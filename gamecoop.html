@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pandemic Protocol — Learning with Odey</title>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--paper:#f5f0e8;--paper-dark:#ede7d9;--paper-lines:#d6cfc0;--ink:#2c2416;--ink-soft:#5a5040;--ink-faint:#9a8e7a;--blue:#4a6fa5;--blue-pale:#c8d9ed;--blue-light:#7a9cc4;--green:#4a7c59;--green-pale:#c4dbc9;--green-light:#7aaa8a;--red:#a0453a;--red-pale:#e8c4c0;--red-light:#c47a72;--yellow:#b8922a;--yellow-pale:#f0dfa0;--yellow-light:#d4b060;--purple:#6b5b8a;--purple-pale:#d0c4e0;--font-hand:'Caveat',cursive;--font-ui:'Nunito',sans-serif;--radius-sm:6px;--radius-md:12px;--radius-lg:20px;--shadow-sm:2px 3px 0 rgba(44,36,22,.15);--shadow-md:4px 6px 0 rgba(44,36,22,.15);--shadow-lg:6px 10px 0 rgba(44,36,22,.12)}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font-ui);background:var(--paper);color:var(--ink);min-height:100vh}
+
+    .topbar{background:var(--paper-dark);border-bottom:2px solid var(--paper-lines);padding:.7rem 1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+    .topbar-logo{font-family:var(--font-hand);font-size:1.3rem;font-weight:700;color:var(--red);text-decoration:none}
+    .topbar-game{font-family:var(--font-hand);font-size:1.2rem;font-weight:700;color:var(--ink)}
+    .topbar-room{font-size:.8rem;color:var(--ink-faint);margin-left:auto}
+    .topbar-code{font-family:var(--font-hand);font-size:1rem;font-weight:700;color:var(--red);letter-spacing:2px}
+
+    .game-layout{display:grid;grid-template-columns:1fr 280px;gap:1rem;padding:1rem;max-width:1100px;margin:0 auto}
+    @media(max-width:800px){.game-layout{grid-template-columns:1fr}}
+
+    /* CRISIS BOARD */
+    .board-wrap{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);padding:1rem;box-shadow:var(--shadow-md)}
+    .board-title{font-family:var(--font-hand);font-size:1.3rem;color:var(--red);margin-bottom:.8rem;display:flex;align-items:center;gap:.6rem}
+
+    /* OUTBREAK TRACKER */
+    .outbreak-bar{background:var(--red-pale);border:2px solid var(--red-light);border-radius:var(--radius-md);padding:.8rem 1rem;margin-bottom:1rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+    .outbreak-label{font-family:var(--font-hand);font-size:1rem;font-weight:700;color:var(--red);white-space:nowrap}
+    .outbreak-track{flex:1;height:18px;background:white;border-radius:99px;border:2px solid var(--red-light);overflow:hidden;min-width:120px}
+    .outbreak-fill{height:100%;background:linear-gradient(90deg,var(--yellow),var(--red));border-radius:99px;transition:width .5s ease}
+    .outbreak-val{font-family:var(--font-hand);font-size:1.1rem;font-weight:700;color:var(--red);white-space:nowrap}
+    .timer-display{font-family:var(--font-hand);font-size:1.3rem;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:.4rem}
+    .timer-display.urgent{color:var(--red);animation:pulse .6s ease-in-out infinite}
+
+    /* CRISIS ZONES */
+    .crisis-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem}
+    .crisis-zone{border:2.5px solid var(--paper-lines);border-radius:var(--radius-md);padding:.8rem;position:relative;transition:all .3s;cursor:pointer}
+    .crisis-zone:hover:not(.resolved){box-shadow:var(--shadow-sm);border-color:var(--blue)}
+    .crisis-zone.active{border-color:var(--red);background:var(--red-pale);animation:pulse-red .8s ease-in-out infinite}
+    .crisis-zone.resolved{background:var(--green-pale);border-color:var(--green);cursor:default}
+    .crisis-zone.cooldown{opacity:.6;cursor:default}
+    @keyframes pulse-red{0%,100%{border-color:var(--red)}50%{border-color:var(--red-light)}}
+    .zone-icon{font-size:1.8rem;margin-bottom:.4rem}
+    .zone-name{font-family:var(--font-hand);font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:.2rem}
+    .zone-status{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:.15rem .5rem;border-radius:99px;display:inline-block}
+    .zone-status.active  {background:var(--red-pale);  color:var(--red);  border:1.5px solid var(--red-light)}
+    .zone-status.resolved{background:var(--green-pale);color:var(--green);border:1.5px solid var(--green-light)}
+    .zone-status.normal  {background:var(--paper-dark); color:var(--ink-faint);border:1.5px solid var(--paper-lines)}
+    .zone-severity{position:absolute;top:.4rem;right:.5rem;font-size:1.1rem}
+    .zone-responders{margin-top:.4rem;min-height:1.2rem;font-size:.7rem;color:var(--ink-faint)}
+
+    /* SIDEBAR */
+    .sidebar{display:flex;flex-direction:column;gap:.8rem}
+    .card{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);padding:1rem;box-shadow:var(--shadow-sm)}
+    .card-title{font-family:var(--font-hand);font-size:1.1rem;color:var(--ink-soft);margin-bottom:.6rem}
+
+    /* PLAYER LIST */
+    .player-row{display:flex;align-items:center;gap:.6rem;padding:.35rem .4rem;border-radius:var(--radius-sm);margin-bottom:.3rem;transition:background .2s}
+    .player-row.active{background:var(--blue-pale);border:1.5px solid var(--blue-light)}
+    .player-row.me{background:var(--yellow-pale);border:1.5px solid var(--yellow-light)}
+    .player-avatar{font-size:.95rem}
+    .player-name{font-family:var(--font-hand);font-size:.95rem;font-weight:700;flex:1}
+    .player-score{font-family:var(--font-hand);font-size:.85rem;color:var(--blue);font-weight:700}
+    .player-actions-left{font-size:.72rem;color:var(--ink-faint)}
+
+    /* TURN / ACTION */
+    .action-card{background:white;border:2.5px solid var(--red);border-radius:var(--radius-lg);padding:1rem;box-shadow:var(--shadow-sm)}
+    .action-turn{font-family:var(--font-hand);font-size:.9rem;color:var(--ink-faint);margin-bottom:.3rem}
+    .action-player{font-family:var(--font-hand);font-size:1.4rem;font-weight:700;color:var(--red);margin-bottom:.5rem}
+    .action-label{font-family:var(--font-hand);font-size:.85rem;color:var(--ink-faint);margin-bottom:.4rem}
+    .action-points-bar{display:flex;gap:.3rem;margin-bottom:.7rem}
+    .ap-dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--paper-lines);background:var(--paper);transition:all .2s}
+    .ap-dot.used{background:var(--red);border-color:var(--red)}
+    .act-btn{width:100%;padding:.6rem;border-radius:var(--radius-md);border:2px solid;font-family:var(--font-hand);font-size:1rem;font-weight:700;cursor:pointer;transition:all .15s;margin-bottom:.4rem;text-align:center}
+    .act-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:var(--shadow-sm)}
+    .act-btn:disabled{opacity:.4;cursor:default;transform:none}
+    .act-btn.respond {background:var(--red-pale);  color:var(--red);  border-color:var(--red)}
+    .act-btn.pass    {background:var(--paper-dark); color:var(--ink-faint);border-color:var(--paper-lines)}
+
+    /* QUESTION */
+    .q-overlay{display:none;position:fixed;inset:0;background:rgba(44,36,22,.6);z-index:5000;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(5px)}
+    .q-overlay.open{display:flex;animation:fadeIn .25s ease}
+    .q-box{background:var(--paper);border:3px solid var(--red);border-radius:var(--radius-lg);max-width:540px;width:100%;box-shadow:var(--shadow-lg);overflow:hidden;max-height:90vh;overflow-y:auto}
+    .q-header{padding:1rem 1.5rem;background:var(--red-pale);border-bottom:2px dashed var(--red-light);display:flex;align-items:center;gap:.8rem;flex-wrap:wrap}
+    .q-zone-name{font-family:var(--font-hand);font-size:1.1rem;font-weight:700;color:var(--red)}
+    .q-difficulty{padding:.2rem .6rem;border-radius:99px;font-size:.72rem;font-weight:700;background:var(--red);color:white;text-transform:uppercase}
+    .q-timer{margin-left:auto;font-family:var(--font-hand);font-size:1.4rem;font-weight:700;color:var(--red)}
+    .q-timer.urgent{animation:pulse .5s ease-in-out infinite}
+    .q-body{padding:1.5rem}
+    .q-scenario-box{background:var(--paper-dark);border-left:4px solid var(--red);border-radius:var(--radius-sm);padding:.8rem 1rem;margin-bottom:1rem;font-size:.88rem;line-height:1.6;color:var(--ink-soft)}
+    .q-text{font-family:var(--font-hand);font-size:1.3rem;line-height:1.5;color:var(--ink);margin-bottom:1.1rem}
+    .q-opts{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+    .q-opt{padding:.7rem 1rem;border-radius:var(--radius-md);border:2px solid var(--paper-lines);background:white;color:var(--ink);font-family:var(--font-hand);font-size:1.05rem;cursor:pointer;text-align:left;transition:all .15s;display:flex;align-items:center;gap:.6rem}
+    .q-opt:hover:not(:disabled){border-color:var(--red);background:var(--red-pale);color:var(--red)}
+    .q-opt:disabled{cursor:default}
+    .q-opt.correct{background:var(--green-pale);border-color:var(--green);color:var(--green)}
+    .q-opt.wrong{background:var(--red-pale);border-color:var(--red);color:var(--red)}
+    .q-opt-letter{width:24px;height:24px;border-radius:50%;background:var(--paper-dark);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0}
+    .q-result{padding:.8rem 1rem;border-radius:var(--radius-md);margin-bottom:.8rem;display:none;font-family:var(--font-hand);font-size:1rem;line-height:1.5}
+    .q-result.show{display:block}
+    .q-result.correct{background:var(--green-pale);border:2px solid var(--green);color:var(--green)}
+    .q-result.wrong{background:var(--red-pale);border:2px solid var(--red);color:var(--red)}
+    .q-cont{width:100%;padding:.65rem;border-radius:var(--radius-md);border:none;background:var(--red);color:white;font-family:var(--font-hand);font-size:1.1rem;font-weight:700;cursor:pointer}
+    .q-spectate{font-family:var(--font-hand);font-size:.95rem;color:var(--ink-faint);text-align:center;padding:.5rem;font-style:italic}
+
+    /* WIN/LOSE */
+    .end-overlay{display:none;position:fixed;inset:0;background:rgba(44,36,22,.75);z-index:6000;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+    .end-overlay.open{display:flex;animation:fadeIn .3s ease}
+    .end-box{background:var(--paper);border:4px solid;border-radius:var(--radius-lg);max-width:440px;width:90%;padding:2rem;text-align:center;box-shadow:var(--shadow-lg);animation:popIn .4s ease}
+    .end-box.win{border-color:var(--green)}
+    .end-box.lose{border-color:var(--red)}
+    @keyframes popIn{0%{transform:scale(.8);opacity:0}70%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+    .end-emoji{font-size:3.5rem;margin-bottom:.5rem}
+    .end-title{font-family:var(--font-hand);font-size:2rem;font-weight:700;margin-bottom:.4rem}
+    .end-sub{font-family:var(--font-hand);font-size:1.05rem;color:var(--ink-soft);margin-bottom:1.5rem;line-height:1.5}
+    .end-stats{display:flex;gap:1rem;justify-content:center;margin-bottom:1.5rem;flex-wrap:wrap}
+    .end-stat{text-align:center;padding:.5rem .9rem;background:var(--paper-dark);border-radius:var(--radius-md);border:1.5px solid var(--paper-lines)}
+    .end-stat-val{font-family:var(--font-hand);font-size:1.4rem;font-weight:700;color:var(--ink)}
+    .end-stat-label{font-size:.72rem;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.4px}
+    .end-back{padding:.7rem 2rem;border-radius:var(--radius-md);border:none;font-family:var(--font-hand);font-size:1.1rem;font-weight:700;cursor:pointer;color:white}
+    .end-back.win{background:var(--green)}
+    .end-back.lose{background:var(--red)}
+
+    /* LOG */
+    .log-scroll{max-height:140px;overflow-y:auto}
+    .log-entry{font-family:var(--font-hand);font-size:.85rem;color:var(--ink-soft);padding:.12rem 0;border-bottom:1px dashed var(--paper-lines)}
+    .log-entry.good{color:var(--green)}
+    .log-entry.bad{color:var(--red)}
+
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--ink);color:white;font-family:var(--font-hand);font-size:1.1rem;padding:.7rem 1.5rem;border-radius:99px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none}
+    .toast.show{opacity:1}
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <a href="minigames.html" class="topbar-logo">🦠 Pandemic Protocol</a>
+  <span class="topbar-game">Cooperative Crisis Mode</span>
+  <span class="topbar-room">Room: <span class="topbar-code" id="topbarCode">------</span></span>
+</div>
+
+<div class="game-layout">
+  <!-- MAIN BOARD -->
+  <div class="board-wrap">
+    <div class="board-title">
+      🦠 Crisis Map
+      <span style="font-family:var(--font-hand);font-size:.9rem;color:var(--ink-faint);margin-left:auto">Resolve all outbreaks together!</span>
+    </div>
+
+    <!-- OUTBREAK TRACKER -->
+    <div class="outbreak-bar">
+      <span class="outbreak-label">☣️ Outbreak Level</span>
+      <div class="outbreak-track"><div class="outbreak-fill" id="outbreakFill" style="width:0%"></div></div>
+      <span class="outbreak-val" id="outbreakVal">0 / 10</span>
+      <div class="timer-display" id="timerDisplay">⏱ <span id="timerVal">--:--</span></div>
+    </div>
+
+    <!-- CRISIS ZONES GRID -->
+    <div class="crisis-grid" id="crisisGrid"></div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="action-card">
+      <div class="action-turn">Current Turn</div>
+      <div class="action-player" id="actionPlayer">Loading…</div>
+      <div class="action-label">Action Points</div>
+      <div class="action-points-bar" id="apBar"></div>
+      <button class="act-btn respond" id="respondBtn" onclick="chooseCrisis()" disabled>🦠 Respond to Crisis</button>
+      <button class="act-btn pass"    id="passBtn"    onclick="passTurn()"    disabled>⏭ End Turn</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">👥 Team</div>
+      <div id="playerList"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📊 Progress</div>
+      <div id="progressStats" style="font-family:var(--font-hand);font-size:.9rem;color:var(--ink-soft);line-height:1.8"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📜 Log</div>
+      <div class="log-scroll" id="gameLog"></div>
+    </div>
+  </div>
+</div>
+
+<!-- QUESTION -->
+<div class="q-overlay" id="qOverlay">
+  <div class="q-box">
+    <div class="q-header">
+      <span class="q-zone-name" id="qZoneName">🦠 Zone</span>
+      <span class="q-difficulty" id="qDiff">Crisis</span>
+      <span class="q-timer" id="qTimer">30</span>
+    </div>
+    <div class="q-body">
+      <div class="q-scenario-box" id="qScenario"></div>
+      <div class="q-text" id="qText"></div>
+      <div class="q-opts" id="qOpts"></div>
+      <div class="q-result" id="qResult"></div>
+      <button class="q-cont" id="qCont" onclick="continueAfterQ()" style="display:none">Continue →</button>
+      <div class="q-spectate" id="qSpectate" style="display:none">👀 <span id="qActivePlayer"></span> is responding…</div>
+    </div>
+  </div>
+</div>
+
+<!-- END SCREEN -->
+<div class="end-overlay" id="endOverlay">
+  <div class="end-box" id="endBox">
+    <div class="end-emoji" id="endEmoji">🎉</div>
+    <div class="end-title" id="endTitle">Game Over</div>
+    <div class="end-sub" id="endSub"></div>
+    <div class="end-stats" id="endStats"></div>
+    <button class="end-back" id="endBack" onclick="window.location.href='minigames.html'">← Back to Games</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, onValue, update, off, get }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey:"AIzaSyCgHnNvbz9eLw-986ZjAiqKQD9PwnY0Pho",authDomain:"learningwithiodey.firebaseapp.com",
+    databaseURL:"https://learningwithiodey-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId:"learningwithiodey",storageBucket:"learningwithiodey.firebasestorage.app",
+    messagingSenderId:"286187814406",appId:"1:286187814406:web:2b3362562086fdc3538d87"
+  };
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
+
+  const params = new URLSearchParams(location.search);
+  const ROOM   = params.get('room') || sessionStorage.getItem('odey_room');
+  const MY_PID = params.get('pid')  || sessionStorage.getItem('odey_pid');
+  const IS_HOST= (params.get('host') || sessionStorage.getItem('odey_host')) === '1';
+  document.getElementById('topbarCode').textContent = ROOM || '------';
+
+  /* CRISIS ZONES */
+  const ZONES = [
+    { id:'market',  name:'Pasar Tradisional', icon:'🏪', desc:'Street food vendors found using Rhodamine B and formalin', severity:3 },
+    { id:'factory', name:'Food Factory',       icon:'🏭', desc:'Processing plant using borax in meatball production', severity:4 },
+    { id:'school',  name:'School Canteen',     icon:'🏫', desc:'Suspicious synthetic colorants in children\'s snacks', severity:2 },
+    { id:'port',    name:'Import Port',        icon:'⚓', desc:'Unregulated food imports without BPOM clearance', severity:3 },
+    { id:'farm',    name:'Chemical Farm',      icon:'🌾', desc:'Pesticide residues exceeding safety limits in produce', severity:3 },
+    { id:'hospital',name:'Hospital Report',    icon:'🏥', desc:'Multiple patients with symptoms of food poisoning', severity:5 },
+    { id:'bpom',    name:'BPOM Lab Alert',     icon:'🔬', desc:'Lab detects banned substance in popular brand', severity:4 },
+    { id:'social',  name:'Social Media Crisis',icon:'📱', desc:'Viral misinformation about safe vs banned additives', severity:2 },
+    { id:'drug',    name:'Narcotics Bust',     icon:'🚨', desc:'Psychotropic substances found near school premises', severity:5 },
+  ];
+
+  /* CRISIS QUESTIONS */
+  const CRISIS_QUESTIONS = [
+    { zone:'market', scenario:'Street vendor\'s red-colored kerupuk remain bright after months in a jar under sunlight.', q:'What banned substance is MOST likely responsible?', opts:['Carmoisine (permitted red dye)','Rhodamine B (toxic textile dye)','Curcumin (natural colorant)','Tartrazine (yellow dye)'], ans:1, exp:'Rhodamine B is carcinogenic, banned, and resistant to fading — a key identification indicator.' },
+    { zone:'factory', scenario:'Health inspectors find meatballs that bounce like rubber balls and don\'t spoil after 2 weeks unrefrigerated.', q:'Which TWO substances are most likely present?', opts:['Formalin + Borax','MSG + Salt','Agar-agar + Carrageenan','Citric Acid + Benzoate'], ans:0, exp:'Formalin preserves via protein cross-linking; Borax creates the rubbery texture. Both are banned from food.' },
+    { zone:'school', scenario:'After analyzing wool threads dipped in children\'s jelly, threads retain bright pink color after thorough rinsing.', q:'What does this result indicate?', opts:['Natural colorant — safe','High quality permitted colorant','Likely synthetic/banned colorant that bonds to protein fibers','The test was performed incorrectly'], ans:2, exp:'Synthetic colorants (especially banned ones like Rhodamine B) bind permanently to wool protein, unlike natural colorants which rinse off.' },
+    { zone:'port', scenario:'Imported drink sachets have no BPOM registration number. Lab analysis shows saccharin concentration 15× above the ADI.', q:'What health risk does exceeding ADI pose?', opts:['No risk — sweeteners are always safe','Potential carcinogenicity and metabolic disruption at high doses','Only causes mild headaches','Reduces dental cavities'], ans:1, exp:'While saccharin is safe within ADI, massively exceeding it presents potential health risks. ADI is set to include safety margins.' },
+    { zone:'farm', scenario:'Pesticide residue test detects organophosphates at 8× the MRL (Maximum Residue Limit) in vegetables.', q:'Organophosphates primarily damage which body system?', opts:['Skeletal system','Nervous system — inhibit acetylcholinesterase','Digestive system only','Lymphatic system'], ans:1, exp:'Organophosphate pesticides irreversibly inhibit acetylcholinesterase, causing nerve impulse overstimulation. This is the same mechanism as nerve agents.' },
+    { zone:'hospital', scenario:'ER admits 14 patients with: nausea, kidney pain, bloody urine after eating tofu from the same vendor.', q:'Which banned preservative most likely caused these symptoms?', opts:['Excessive salt','Sorbic acid overdose','Formalin poisoning','Expired citric acid'], ans:2, exp:'Formalin (formaldehyde) in food causes acute kidney damage, liver toxicity, and characteristic bleeding. This is a medical emergency.' },
+    { zone:'bpom', scenario:'BPOM detects Metanil Yellow in popular turmeric chips. The manufacturer claims "it\'s just turmeric color."', q:'Why is this defense scientifically invalid?', opts:['It is valid — both are yellow','Metanil Yellow is an azo dye chemically unrelated to turmeric\'s curcumin — it\'s carcinogenic','Turmeric is also banned','The color is identical so the test is wrong'], ans:1, exp:'Curcumin and Metanil Yellow are completely different chemicals. Metanil Yellow is a carcinogenic industrial azo dye. The defense is scientifically fraudulent.' },
+    { zone:'social', scenario:'Viral post claims: "MSG causes brain damage — it\'s the same as glutamate used in pesticides." Parents panic and ban MSG from school canteens.', q:'What is the scientifically accurate response to this viral claim?', opts:['It\'s completely true — MSG is pesticide-related','MSG is chemically identical to the glutamate in your brain and tomatoes; no peer-reviewed evidence supports neurotoxicity at normal doses','MSG is safe only for adults','MSG should be banned as a precaution'], ans:1, exp:'Glutamate is an endogenous neurotransmitter. The MSG-neurotoxicity claim, popularized from one 1969 mouse study using extreme doses, has been consistently rejected by WHO, FDA, and BPOM.' },
+    { zone:'drug', scenario:'Police find a student with pills labeled "Happy Five" — later identified as MDMA. The student claims "it just makes me social, not addicted."', q:'Why is this self-assessment dangerously incorrect?', opts:['It\'s correct — MDMA causes no addiction','MDMA permanently damages serotonin transporters, causing long-term depression, anxiety, and cognitive impairment','Only physical dependence matters; psychological dependence is harmless','One dose causes no harm'], ans:1, exp:'MDMA kills serotonin-producing neurons. Even occasional use causes lasting mood, memory, and cognitive damage — the "social" effect hides progressive neurological destruction.' },
+    { zone:'market', scenario:'A vendor uses "yellow powder" to color food, claiming it\'s turmeric. Under UV light, the food fluoresces bright yellow-green.', q:'What does fluorescence under UV strongly suggest?', opts:['High-quality natural turmeric','Presence of Metanil Yellow or similar fluorescent banned dye','Normal food coloring behavior','Vitamin B2 (riboflavin) which is permitted'], ans:1, exp:'Natural food colorants don\'t fluoresce under UV. Bright yellow-green fluorescence is a rapid field test indicator for Metanil Yellow contamination.' },
+    { zone:'factory', scenario:'A new factory employee asks why they must use sodium benzoate, not formalin, to preserve sauces. How do you explain correctly?', q:'What is the key difference in their safety profiles?', opts:['No difference — both are equally safe','Sodium benzoate is BPOM-approved at correct doses and metabolized harmlessly; formalin is carcinogenic and cross-links proteins destructively','Formalin is cheaper so it\'s preferred','Sodium benzoate is only for drinks, not sauces'], ans:1, exp:'Sodium benzoate converts to benzoic acid in the body, which is metabolized and excreted safely. Formaldehyde cross-links DNA and proteins, causing cellular damage and cancer.' },
+    { zone:'hospital', scenario:'Patient has: rapid heart rate (125 BPM), 39.8°C temperature, confusion, after attending an event. Friends say he took "a party vitamin."', q:'Based on symptoms, which substance is most likely involved?', opts:['Caffeine overdose','MDMA (Ecstasy) — hyperthermia + tachycardia + confusion is classic toxidrome','Alcohol poisoning','Benzodiazepine overdose'], ans:1, exp:'The MDMA toxidrome: hyperthermia + tachycardia + altered consciousness. This is a life-threatening emergency requiring immediate medical intervention and cooling.' },
+  ];
+
+  /* STATE */
+  let qTimer = null;
+  let qTimeLeft = 30;
+  let waitingForAnswer = false;
+  let currentZoneId = null;
+  let gameTimerInterval = null;
+
+  /* BUILD ZONES */
+  function buildZones() {
+    const grid = document.getElementById('crisisGrid');
+    grid.innerHTML = '';
+    ZONES.forEach(z => {
+      const cell = document.createElement('div');
+      cell.className = 'crisis-zone normal';
+      cell.id = 'zone-' + z.id;
+      cell.innerHTML = `<div class="zone-severity">${'🔴'.repeat(Math.min(z.severity,3))}</div>
+        <div class="zone-icon">${z.icon}</div>
+        <div class="zone-name">${z.name}</div>
+        <span class="zone-status normal">Monitoring</span>
+        <div class="zone-responders" id="responders-${z.id}"></div>`;
+      cell.onclick = () => respondToZone(z.id);
+      grid.appendChild(cell);
+    });
+  }
+
+  /* RESPOND */
+  async function respondToZone(zoneId) {
+    const snap = await get(ref(db, 'rooms/' + ROOM));
+    const room = snap.val();
+    const gs = room.gameState || {};
+    if (gs.currentTurn !== MY_PID) { showToast('⚠️ Not your turn!'); return; }
+    if (gs.currentQuestion) return;
+    const zone = ZONES.find(z => z.id === zoneId);
+    const resolved = gs.resolved || {};
+    if (resolved[zoneId]) { showToast('✅ Already resolved!'); return; }
+    const qs = CRISIS_QUESTIONS.filter(q => q.zone === zoneId);
+    if (!qs.length) return;
+    const q = qs[Math.floor(Math.random() * qs.length)];
+    const qIdx = CRISIS_QUESTIONS.indexOf(q);
+    currentZoneId = zoneId;
+    await update(ref(db), {
+      [`rooms/${ROOM}/gameState/currentQuestion`]: { zoneId, askedTo: MY_PID, qIdx }
+    });
+  }
+
+  window.chooseCrisis = function() {
+    showToast('Click on an active or monitored zone to respond!');
+  };
+
+  function showQuestion(qData, isMyTurn) {
+    const q = CRISIS_QUESTIONS[qData.qIdx];
+    if (!q) return;
+    const zone = ZONES.find(z => z.id === qData.zoneId);
+
+    document.getElementById('qZoneName').textContent = (zone?.icon || '🦠') + ' ' + (zone?.name || '');
+    document.getElementById('qDiff').textContent = '🚨 Crisis Level ' + (zone?.severity || '?');
+    document.getElementById('qScenario').textContent = '📋 Scenario: ' + q.scenario;
+    document.getElementById('qText').textContent = q.q;
+
+    const optsEl = document.getElementById('qOpts');
+    optsEl.innerHTML = '';
+    const letters = ['A','B','C','D'];
+    q.opts.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'q-opt';
+      btn.innerHTML = `<span class="q-opt-letter">${letters[i]}</span>${opt}`;
+      btn.disabled = !isMyTurn;
+      btn.onclick = () => answerQ(i, q, qData);
+      optsEl.appendChild(btn);
+    });
+
+    document.getElementById('qResult').className = 'q-result';
+    document.getElementById('qCont').style.display = 'none';
+    document.getElementById('qSpectate').style.display = isMyTurn ? 'none' : 'block';
+    document.getElementById('qOverlay').classList.add('open');
+
+    if (isMyTurn) {
+      qTimeLeft = 30; document.getElementById('qTimer').textContent = 30;
+      document.getElementById('qTimer').classList.remove('urgent');
+      clearInterval(qTimer);
+      qTimer = setInterval(() => {
+        qTimeLeft--;
+        const el = document.getElementById('qTimer');
+        el.textContent = qTimeLeft;
+        if (qTimeLeft <= 10) el.classList.add('urgent');
+        if (qTimeLeft <= 0) { clearInterval(qTimer); answerQ(-1, q, qData, true); }
+      }, 1000);
+    }
+  }
+
+  async function answerQ(chosen, q, qData, timeout = false) {
+    if (waitingForAnswer) return;
+    waitingForAnswer = true;
+    clearInterval(qTimer);
+    const correct = chosen === q.ans;
+
+    document.querySelectorAll('.q-opt').forEach((b, i) => {
+      b.disabled = true;
+      if (i === q.ans) b.classList.add('correct');
+      else if (i === chosen) b.classList.add('wrong');
+    });
+
+    const res = document.getElementById('qResult');
+    res.className = 'q-result show ' + (correct ? 'correct' : 'wrong');
+    res.textContent = (correct ? '✅ Crisis contained! +20 pts. ' : (timeout ? '⏰ Time up! Outbreak worsens! ' : '❌ Wrong! Outbreak worsens! ')) + q.exp;
+
+    const snap = await get(ref(db, 'rooms/' + ROOM));
+    const room = snap.val();
+    const gs = room.gameState || {};
+    const players = gs.players || room.players || {};
+    const updates = {};
+
+    if (correct) {
+      const oldScore = players[MY_PID]?.score || 0;
+      updates[`rooms/${ROOM}/gameState/players/${MY_PID}/score`] = oldScore + 20;
+      updates[`rooms/${ROOM}/gameState/resolved/${qData.zoneId}`] = true;
+      addLog('✅ ' + (players[MY_PID]?.name || 'Player') + ' resolved ' + qData.zoneId + '!', 'good');
+    } else {
+      const oldOutbreak = gs.outbreakLevel || 0;
+      updates[`rooms/${ROOM}/gameState/outbreakLevel`] = oldOutbreak + 1;
+      addLog('❌ Outbreak in ' + qData.zoneId + ' worsens!', 'bad');
+    }
+    await update(ref(db), updates);
+    document.getElementById('qCont').style.display = 'block';
+  }
+
+  window.continueAfterQ = async function() {
+    waitingForAnswer = false;
+    document.getElementById('qOverlay').classList.remove('open');
+    document.getElementById('qTimer').classList.remove('urgent');
+    currentZoneId = null;
+    const snap = await get(ref(db, 'rooms/' + ROOM));
+    await advanceTurn(snap.val());
+  };
+
+  window.passTurn = async function() {
+    const snap = await get(ref(db, 'rooms/' + ROOM));
+    await advanceTurn(snap.val());
+  };
+
+  async function advanceTurn(room) {
+    const players = room.gameState?.players || room.players || {};
+    const order = Object.keys(players).sort((a,b) => (players[a].joinedAt||0) - (players[b].joinedAt||0));
+    const curr = order.indexOf(room.gameState?.currentTurn || order[0]);
+    const next = (curr + 1) % order.length;
+    await update(ref(db), {
+      [`rooms/${ROOM}/gameState/currentTurn`]: order[next],
+      [`rooms/${ROOM}/gameState/currentQuestion`]: null
+    });
+  }
+
+  /* RENDER */
+  function renderZones(resolved, outbreakLevel) {
+    ZONES.forEach((z, i) => {
+      const cell = document.getElementById('zone-' + z.id);
+      const badge = cell?.querySelector('.zone-status');
+      if (!cell || !badge) return;
+      if (resolved?.[z.id]) {
+        cell.className = 'crisis-zone resolved';
+        badge.className = 'zone-status resolved'; badge.textContent = '✅ Resolved';
+      } else if (outbreakLevel >= (i * 1.1)) {
+        cell.className = 'crisis-zone active';
+        badge.className = 'zone-status active'; badge.textContent = '🚨 Active Crisis';
+      } else {
+        cell.className = 'crisis-zone';
+        badge.className = 'zone-status normal'; badge.textContent = 'Monitoring';
+      }
+    });
+  }
+
+  function renderPlayers(players, currentTurn) {
+    const list = document.getElementById('playerList');
+    const arr = Object.entries(players).sort((a,b) => (b[1].score||0) - (a[1].score||0));
+    list.innerHTML = '';
+    arr.forEach(([pid, p]) => {
+      const div = document.createElement('div');
+      div.className = 'player-row' + (pid === MY_PID ? ' me' : '') + (pid === currentTurn ? ' active' : '');
+      div.innerHTML = `<span class="player-avatar">${p.avatar||'👤'}</span>
+        <span class="player-name">${p.name}${pid===MY_PID?' (you)':''}</span>
+        <span class="player-score">${p.score||0}pt</span>`;
+      list.appendChild(div);
+    });
+  }
+
+  function renderProgress(resolved, outbreakLevel) {
+    const resolvedCount = Object.keys(resolved || {}).length;
+    document.getElementById('progressStats').innerHTML =
+      `✅ Resolved: ${resolvedCount} / ${ZONES.length}<br>
+       ☣️ Outbreak Level: ${outbreakLevel || 0} / 10<br>
+       📊 Team Score: — see sidebar`;
+    document.getElementById('outbreakFill').style.width = ((outbreakLevel || 0) / 10 * 100) + '%';
+    document.getElementById('outbreakVal').textContent = (outbreakLevel || 0) + ' / 10';
+    if ((outbreakLevel || 0) >= 7) document.getElementById('outbreakFill').style.background = 'var(--red)';
+  }
+
+  function addLog(msg, cls = '') {
+    const log = document.getElementById('gameLog');
+    const entry = document.createElement('div');
+    entry.className = 'log-entry ' + cls;
+    entry.textContent = msg;
+    log.insertBefore(entry, log.firstChild);
+  }
+
+  /* FIREBASE LISTENER */
+  onValue(ref(db, 'rooms/' + ROOM), snap => {
+    if (!snap.exists()) { window.location.href = 'minigames.html'; return; }
+    const room = snap.val();
+    const gs = room.gameState || {};
+    const players = gs.players || room.players || {};
+    const resolved = gs.resolved || {};
+    const outbreakLevel = gs.outbreakLevel || 0;
+    const currentTurn = gs.currentTurn;
+    const isMyTurn = currentTurn === MY_PID;
+
+    document.getElementById('actionPlayer').textContent =
+      currentTurn ? (players[currentTurn]?.name || '…') + (isMyTurn ? ' (You!)' : '') : 'Loading…';
+    document.getElementById('respondBtn').disabled = !isMyTurn || !!gs.currentQuestion;
+    document.getElementById('passBtn').disabled = !isMyTurn || !!gs.currentQuestion;
+
+    // AP bar — decorative, 3 actions per turn
+    const apBar = document.getElementById('apBar');
+    apBar.innerHTML = '';
+    for (let i = 0; i < 3; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'ap-dot';
+      apBar.appendChild(dot);
+    }
+
+    renderZones(resolved, outbreakLevel);
+    renderPlayers(players, currentTurn);
+    renderProgress(resolved, outbreakLevel);
+
+    // Show question
+    if (gs.currentQuestion && !document.getElementById('qOverlay').classList.contains('open')) {
+      const isAnswering = gs.currentQuestion.askedTo === MY_PID;
+      if (!isAnswering) document.getElementById('qActivePlayer').textContent = players[gs.currentQuestion.askedTo]?.name || '…';
+      showQuestion(gs.currentQuestion, isAnswering);
+    }
+
+    // Win: all zones resolved
+    const resolvedCount = Object.keys(resolved).length;
+    if (resolvedCount >= ZONES.length) { endGame(true, players, resolvedCount, outbreakLevel); return; }
+    // Lose: outbreak maxed
+    if (outbreakLevel >= 10) { endGame(false, players, resolvedCount, outbreakLevel); }
+  });
+
+  function endGame(win, players, resolved, outbreakLevel) {
+    if (document.getElementById('endOverlay').classList.contains('open')) return;
+    off(ref(db, 'rooms/' + ROOM));
+    const box = document.getElementById('endBox');
+    box.className = 'end-box ' + (win ? 'win' : 'lose');
+    document.getElementById('endEmoji').textContent = win ? '🎉' : '☣️';
+    document.getElementById('endTitle').textContent = win ? 'Outbreak Contained!' : 'Pandemic Overwhelming!';
+    document.getElementById('endSub').textContent = win
+      ? 'Your team successfully resolved all food safety crises! SDG 3 is protected!'
+      : `Outbreak level reached 10. ${resolved} / ${ZONES.length} zones resolved. Try again!`;
+    const totalScore = Object.values(players).reduce((s, p) => s + (p.score||0), 0);
+    document.getElementById('endStats').innerHTML = `
+      <div class="end-stat"><div class="end-stat-val">${resolved}</div><div class="end-stat-label">Zones Resolved</div></div>
+      <div class="end-stat"><div class="end-stat-val">${outbreakLevel}</div><div class="end-stat-label">Outbreak Level</div></div>
+      <div class="end-stat"><div class="end-stat-val">${totalScore}</div><div class="end-stat-label">Team Score</div></div>`;
+    const backBtn = document.getElementById('endBack');
+    backBtn.className = 'end-back ' + (win ? 'win' : 'lose');
+    document.getElementById('endOverlay').classList.add('open');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  buildZones();
+  if (!ROOM || !MY_PID) { showToast('No room — redirecting…'); setTimeout(() => window.location.href = 'minigames.html', 2000); }
+</script>
+</body>
+</html>

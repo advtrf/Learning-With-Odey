@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Initializer — Learning with Odey</title>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--paper:#f5f0e8;--blue:#4a6fa5;--green:#4a7c59;--red:#a0453a;--ink:#2c2416;--font-hand:'Caveat',cursive;--font-ui:'Nunito',sans-serif}
+    body{font-family:var(--font-ui);background:var(--paper);color:var(--ink);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+    .box{background:white;border:3px solid #d6cfc0;border-radius:16px;padding:2rem;max-width:480px;width:100%;text-align:center;box-shadow:4px 6px 0 rgba(44,36,22,.15)}
+    h1{font-family:var(--font-hand);font-size:2rem;color:var(--blue);margin-bottom:.5rem}
+    p{color:#9a8e7a;font-size:.9rem;margin-bottom:1.5rem}
+    .status{font-family:var(--font-hand);font-size:1.1rem;margin:1rem 0;min-height:1.5rem}
+    .btn{display:inline-block;padding:.75rem 2rem;border-radius:12px;border:none;font-family:var(--font-hand);font-size:1.2rem;font-weight:700;cursor:pointer;margin:.3rem;transition:all .2s}
+    .btn.blue{background:var(--blue);color:white}
+    .btn.green{background:var(--green);color:white}
+    .btn:hover{filter:brightness(1.1);transform:translateY(-2px)}
+    code{background:#ede7d9;border-radius:6px;padding:.2rem .5rem;font-size:.85rem;letter-spacing:1px}
+  </style>
+</head>
+<body>
+<div class="box">
+  <h1>🎮 Game Setup</h1>
+  <p>This page initializes the Firebase game state when a room starts. It's called automatically when the host presses "Start Game" in the lobby.</p>
+  <div class="status" id="status">Ready to initialize…</div>
+  <p>Room: <code id="roomCode">------</code></p>
+  <button class="btn blue" onclick="initGame()">⚙️ Initialize Game State</button>
+  <button class="btn green" onclick="goBack()">← Back to Lobby</button>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, get, update, set }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey:"AIzaSyCgHnNvbz9eLw-986ZjAiqKQD9PwnY0Pho",
+    authDomain:"learningwithiodey.firebaseapp.com",
+    databaseURL:"https://learningwithiodey-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId:"learningwithiodey",
+    storageBucket:"learningwithiodey.firebasestorage.app",
+    messagingSenderId:"286187814406",
+    appId:"1:286187814406:web:2b3362562086fdc3538d87"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
+
+  const params = new URLSearchParams(location.search);
+  const ROOM   = params.get('room') || sessionStorage.getItem('odey_room');
+  const MY_PID = params.get('pid')  || sessionStorage.getItem('odey_pid');
+
+  document.getElementById('roomCode').textContent = ROOM || '------';
+
+  const GAME_FILES = {
+    roll: 'game-roll.html',
+    terr: 'game-territory.html',
+    coop: 'game-coop.html',
+    card: 'game-card.html'
+  };
+
+  const PLAYER_AVATARS = ['🟡','🔵','🔴','🟢','🟣','🟠'];
+
+  window.initGame = async function() {
+    if (!ROOM) { setStatus('❌ No room code found'); return; }
+    setStatus('⏳ Loading room data…');
+
+    const snap = await get(ref(db, 'rooms/' + ROOM));
+    if (!snap.exists()) { setStatus('❌ Room not found'); return; }
+
+    const room = snap.val();
+    const players = room.players || {};
+    const gameType = room.game;
+    const playerOrder = Object.entries(players).sort((a,b) => (a[1].joinedAt||0) - (b[1].joinedAt||0));
+
+    setStatus('⚙️ Building game state for ' + playerOrder.length + ' players…');
+
+    // Build player entries with position/score
+    const gamePlayers = {};
+    playerOrder.forEach(([pid, p], i) => {
+      gamePlayers[pid] = {
+        name: p.name,
+        isHost: p.isHost || false,
+        joinedAt: p.joinedAt || Date.now(),
+        score: 0,
+        position: 0,
+        avatar: PLAYER_AVATARS[i % PLAYER_AVATARS.length],
+        color: ['#4a6fa5','#a0453a','#4a7c59','#b8922a','#6b5b8a','#8a5b4a'][i % 6]
+      };
+    });
+
+    const firstPlayer = playerOrder[0]?.[0] || null;
+
+    // Base game state
+    const gameState = {
+      players: gamePlayers,
+      currentTurn: firstPlayer,
+      currentQuestion: null,
+      startedAt: Date.now(),
+      turnCount: 0
+    };
+
+    // Game-specific additions
+    if (gameType === 'coop') {
+      gameState.outbreakLevel = 0;
+      gameState.resolved = {};
+    }
+    if (gameType === 'card') {
+      gameState.hands = {};
+      gameState.shields = {};
+      gameState.skipNext = {};
+      playerOrder.forEach(([pid]) => { gameState.hands[pid] = []; });
+    }
+    if (gameType === 'terr') {
+      gameState.claimed = {};
+    }
+
+    await update(ref(db), {
+      [`rooms/${ROOM}/gameState`]: gameState,
+      [`rooms/${ROOM}/status`]: 'playing'
+    });
+
+    setStatus('✅ Game initialized! Redirecting…');
+    const file = GAME_FILES[gameType] || 'minigames.html';
+    setTimeout(() => {
+      window.location.href = file + '?room=' + ROOM + '&pid=' + MY_PID + '&host=1';
+    }, 1200);
+  };
+
+  window.goBack = function() { window.location.href = 'minigames.html'; };
+
+  function setStatus(msg) { document.getElementById('status').textContent = msg; }
+
+  // Auto-init if coming from lobby start button
+  if (params.get('auto') === '1') { window.addEventListener('load', () => initGame()); }
+</script>
+</body>
+</html>
