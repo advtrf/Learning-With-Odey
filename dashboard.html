@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Dashboard — Learning with Odey</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    :root{
+      --paper:#f5f0e8;--paper-dark:#ede7d9;--paper-lines:#d6cfc0;
+      --ink:#2c2416;--ink-soft:#5a5040;--ink-faint:#9a8e7a;
+      --blue:#4a6fa5;--blue-pale:#c8d9ed;--blue-light:#7a9cc4;
+      --green:#4a7c59;--green-pale:#c4dbc9;--green-light:#7aaa8a;
+      --red:#a0453a;--red-pale:#e8c4c0;--red-light:#c47a72;
+      --yellow:#b8922a;--yellow-pale:#f0dfa0;--yellow-light:#d4b060;
+      --purple:#6b5b8a;--purple-pale:#d0c4e0;
+      --font-hand:'Caveat',cursive;--font-ui:'Nunito',sans-serif;
+      --nav-height:64px;--radius-sm:6px;--radius-md:12px;--radius-lg:20px;
+      --shadow-sm:2px 3px 0 rgba(44,36,22,.15);
+      --shadow-md:4px 6px 0 rgba(44,36,22,.15);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font-ui);background:var(--paper);color:var(--ink);min-height:100vh}
+
+    /* ── LOGIN SCREEN ── */
+    .login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1rem}
+    .login-box{background:white;border:3px solid var(--paper-lines);border-radius:var(--radius-lg);padding:2.5rem;max-width:400px;width:100%;text-align:center;box-shadow:var(--shadow-md)}
+    .login-icon{font-size:3rem;margin-bottom:.5rem}
+    .login-title{font-family:var(--font-hand);font-size:1.8rem;color:var(--blue);margin-bottom:.3rem}
+    .login-sub{font-family:var(--font-hand);font-size:.95rem;color:var(--ink-faint);margin-bottom:1.5rem}
+    .login-input{width:100%;padding:.7rem 1rem;border:2px solid var(--paper-lines);border-radius:var(--radius-md);font-family:var(--font-ui);font-size:1rem;outline:none;margin-bottom:.8rem;background:var(--paper)}
+    .login-input:focus{border-color:var(--blue);background:white}
+    .login-btn{width:100%;padding:.75rem;border-radius:var(--radius-md);border:none;background:var(--blue);color:white;font-family:var(--font-hand);font-size:1.2rem;font-weight:700;cursor:pointer;transition:all .2s}
+    .login-btn:hover{filter:brightness(1.1)}
+    .login-error{color:var(--red);font-family:var(--font-hand);font-size:.95rem;margin-top:.5rem;display:none}
+    .login-hint{font-family:var(--font-hand);font-size:.78rem;color:var(--ink-faint);margin-top:1rem}
+
+    /* ── DASHBOARD ── */
+    .dashboard{display:none}
+    .dashboard.show{display:block}
+
+    /* HEADER */
+    .dash-header{background:var(--paper-dark);border-bottom:2px solid var(--paper-lines);padding:1rem 1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+    .dash-logo{font-family:var(--font-hand);font-size:1.3rem;font-weight:700;color:var(--blue);text-decoration:none}
+    .dash-logo span{color:var(--green)}
+    .dash-title{font-family:var(--font-hand);font-size:1.2rem;font-weight:700;color:var(--ink)}
+    .dash-badge{background:var(--blue-pale);border:1.5px solid var(--blue-light);border-radius:99px;padding:.2rem .8rem;font-family:var(--font-hand);font-size:.85rem;color:var(--blue)}
+    .dash-logout{margin-left:auto;padding:.4rem 1rem;border-radius:99px;border:2px solid var(--paper-lines);background:var(--paper);color:var(--ink-faint);font-family:var(--font-hand);font-size:.9rem;cursor:pointer;transition:all .15s}
+    .dash-logout:hover{border-color:var(--red);color:var(--red)}
+    .live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:blink 1.5s ease-in-out infinite;display:inline-block;margin-right:.3rem}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+    /* LAYOUT */
+    .dash-body{max-width:1200px;margin:0 auto;padding:1.5rem}
+    .dash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;margin-bottom:1.5rem}
+
+    /* STAT CARDS */
+    .stat-card{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);padding:1.2rem;box-shadow:var(--shadow-sm);display:flex;align-items:center;gap:1rem}
+    .stat-icon{font-size:2.2rem;flex-shrink:0}
+    .stat-val{font-family:var(--font-hand);font-size:2rem;font-weight:700;color:var(--ink);line-height:1}
+    .stat-label{font-size:.75rem;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.5px;margin-top:.2rem}
+    .stat-card.blue   {border-color:var(--blue);  }
+    .stat-card.green  {border-color:var(--green); }
+    .stat-card.yellow {border-color:var(--yellow);}
+    .stat-card.red    {border-color:var(--red);   }
+    .stat-card.purple {border-color:var(--purple);}
+    .stat-card.blue   .stat-val{color:var(--blue)}
+    .stat-card.green  .stat-val{color:var(--green)}
+    .stat-card.yellow .stat-val{color:var(--yellow)}
+    .stat-card.red    .stat-val{color:var(--red)}
+    .stat-card.purple .stat-val{color:var(--purple)}
+
+    /* SECTION TITLE */
+    .section-title{font-family:var(--font-hand);font-size:1.3rem;color:var(--ink);margin:1.5rem 0 .8rem;display:flex;align-items:center;gap:.5rem}
+    .section-title::after{content:'';flex:1;height:2px;background:var(--paper-lines);border-radius:1px}
+
+    /* SCORE DISTRIBUTION */
+    .score-dist{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);padding:1.2rem;box-shadow:var(--shadow-sm);margin-bottom:1.5rem}
+    .score-dist-title{font-family:var(--font-hand);font-size:1rem;color:var(--ink-soft);margin-bottom:1rem}
+    .dist-bars{display:flex;align-items:flex-end;gap:.4rem;height:120px;padding:0 .2rem}
+    .dist-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:.3rem}
+    .dist-bar{width:100%;border-radius:var(--radius-sm) var(--radius-sm) 0 0;background:var(--blue-pale);border:1.5px solid var(--blue-light);transition:height .5s ease;min-height:4px;position:relative}
+    .dist-bar:hover{background:var(--blue);cursor:default}
+    .dist-bar-count{font-family:var(--font-hand);font-size:.72rem;color:var(--ink-faint)}
+    .dist-bar-label{font-size:.65rem;color:var(--ink-faint);white-space:nowrap}
+
+    /* RECENT ACTIVITY TABLE */
+    .activity-table-wrap{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm);margin-bottom:1.5rem}
+    .activity-table{width:100%;border-collapse:collapse}
+    .activity-table th{background:var(--paper-dark);font-family:var(--font-hand);font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-faint);padding:.6rem 1rem;text-align:left;border-bottom:2px solid var(--paper-lines)}
+    .activity-table td{padding:.55rem 1rem;border-bottom:1.5px solid var(--paper-lines);font-size:.88rem;color:var(--ink-soft)}
+    .activity-table tr:last-child td{border-bottom:none}
+    .activity-table tr:hover td{background:var(--paper-dark)}
+    .score-pill{display:inline-block;padding:.1rem .5rem;border-radius:99px;font-family:var(--font-hand);font-size:.85rem;font-weight:700}
+    .score-pill.high  {background:var(--green-pale);color:var(--green)}
+    .score-pill.mid   {background:var(--yellow-pale);color:var(--yellow)}
+    .score-pill.low   {background:var(--red-pale);color:var(--red)}
+
+    /* GAME BREAKDOWN */
+    .game-breakdown-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-bottom:1.5rem}
+    .game-breakdown-card{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);padding:1rem;box-shadow:var(--shadow-sm)}
+    .gb-header{display:flex;align-items:center;gap:.6rem;margin-bottom:.8rem}
+    .gb-icon{font-size:1.4rem}
+    .gb-name{font-family:var(--font-hand);font-size:1rem;font-weight:700;color:var(--ink)}
+    .gb-stats{display:flex;flex-direction:column;gap:.4rem}
+    .gb-stat-row{display:flex;justify-content:space-between;align-items:center;font-size:.82rem}
+    .gb-stat-label{color:var(--ink-faint)}
+    .gb-stat-val{font-family:var(--font-hand);font-size:.95rem;font-weight:700;color:var(--ink)}
+    .gb-bar{height:6px;background:var(--paper-lines);border-radius:3px;overflow:hidden;margin-top:.3rem}
+    .gb-bar-fill{height:100%;border-radius:3px;transition:width .5s ease}
+
+    /* TOP PERFORMERS */
+    .performers-list{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm);margin-bottom:1.5rem}
+    .performer-row{display:flex;align-items:center;gap:.8rem;padding:.7rem 1.2rem;border-bottom:1.5px solid var(--paper-lines);transition:background .15s}
+    .performer-row:last-child{border-bottom:none}
+    .performer-row:hover{background:var(--paper-dark)}
+    .performer-rank{font-family:var(--font-hand);font-size:1.1rem;width:28px;text-align:center;flex-shrink:0}
+    .performer-avatar{font-size:1rem;width:28px;text-align:center}
+    .performer-name{font-family:var(--font-hand);font-size:1rem;font-weight:700;flex:1}
+    .performer-score{font-family:var(--font-hand);font-size:1rem;font-weight:700;color:var(--blue)}
+    .performer-streak{font-size:.8rem;color:var(--yellow)}
+
+    /* ACTIVE ROOMS */
+    .active-rooms{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm);margin-bottom:1.5rem}
+    .room-row{display:flex;align-items:center;gap:.8rem;padding:.7rem 1.2rem;border-bottom:1.5px solid var(--paper-lines)}
+    .room-row:last-child{border-bottom:none}
+    .room-game-icon{font-size:1.3rem;flex-shrink:0}
+    .room-info{flex:1}
+    .room-code{font-family:var(--font-hand);font-size:1rem;font-weight:700;color:var(--blue);letter-spacing:2px}
+    .room-meta{font-size:.75rem;color:var(--ink-faint)}
+    .room-players{font-family:var(--font-hand);font-size:.9rem;color:var(--green);font-weight:700}
+    .room-status{font-size:.72rem;padding:.15rem .5rem;border-radius:99px;font-weight:700}
+    .room-status.waiting{background:var(--yellow-pale);color:var(--yellow)}
+    .room-status.playing{background:var(--green-pale);color:var(--green)}
+    .empty-state{text-align:center;padding:2rem;color:var(--ink-faint);font-family:var(--font-hand);font-size:1rem}
+
+    /* EXPORT */
+    .export-btn{padding:.5rem 1.2rem;border-radius:var(--radius-sm);border:2px solid var(--green);background:var(--green-pale);color:var(--green);font-family:var(--font-hand);font-size:.95rem;font-weight:700;cursor:pointer;transition:all .15s}
+    .export-btn:hover{background:var(--green);color:white}
+
+    /* LOADING */
+    .pulse{animation:pulse 1.5s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+    @media(max-width:700px){
+      .dash-grid{grid-template-columns:repeat(2,1fr)}
+      .game-breakdown-grid{grid-template-columns:1fr}
+      .activity-table th:nth-child(4),
+      .activity-table td:nth-child(4){display:none}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── LOGIN SCREEN ── -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-icon">👨‍🏫</div>
+    <div class="login-title">Teacher Dashboard</div>
+    <div class="login-sub">Enter the teacher password to access analytics</div>
+    <input class="login-input" type="password" id="loginPass" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">🔐 Enter Dashboard</button>
+    <div class="login-error" id="loginError">❌ Wrong password. Try again.</div>
+    <div class="login-hint">Default password: <strong>odey2026</strong><br>Change it in the code.</div>
+  </div>
+</div>
+
+<!-- ── DASHBOARD ── -->
+<div class="dashboard" id="dashboard">
+
+  <div class="dash-header">
+    <a href="index.html" class="dash-logo">Learning with <span>Odey</span></a>
+    <div class="dash-title">📊 Teacher Dashboard</div>
+    <div class="dash-badge"><span class="live-dot"></span>Live Data</div>
+    <button class="dash-logout" onclick="doLogout()">← Back to Site</button>
+  </div>
+
+  <div class="dash-body">
+
+    <!-- OVERVIEW STATS -->
+    <div class="section-title">📈 Overview</div>
+    <div class="dash-grid" id="overviewStats">
+      <div class="stat-card blue">  <div class="stat-icon">📝</div><div><div class="stat-val" id="totalQuizzes">—</div><div class="stat-label">Quiz Attempts</div></div></div>
+      <div class="stat-card green"> <div class="stat-icon">🏆</div><div><div class="stat-val" id="avgScore">—</div><div class="stat-label">Avg Quiz Score</div></div></div>
+      <div class="stat-card yellow"><div class="stat-icon">🔥</div><div><div class="stat-val" id="bestStreak">—</div><div class="stat-label">Best Streak Ever</div></div></div>
+      <div class="stat-card red">   <div class="stat-icon">🎮</div><div><div class="stat-val" id="totalGames">—</div><div class="stat-label">Games Played</div></div></div>
+      <div class="stat-card purple"><div class="stat-icon">👥</div><div><div class="stat-val" id="uniquePlayers">—</div><div class="stat-label">Unique Players</div></div></div>
+    </div>
+
+    <!-- SCORE DISTRIBUTION -->
+    <div class="section-title">📊 Quiz Score Distribution</div>
+    <div class="score-dist">
+      <div class="score-dist-title">How many students scored in each range?</div>
+      <div class="dist-bars" id="distBars"><div class="pulse" style="color:var(--ink-faint);font-family:var(--font-hand)">Loading chart…</div></div>
+    </div>
+
+    <!-- TOP PERFORMERS -->
+    <div class="section-title" style="display:flex;align-items:center;gap:.5rem">
+      🥇 Top Performers
+      <button class="export-btn" onclick="exportCSV()" style="margin-left:auto;font-size:.8rem;padding:.3rem .8rem">⬇️ Export CSV</button>
+    </div>
+    <div class="performers-list" id="performersList">
+      <div class="empty-state pulse">Loading…</div>
+    </div>
+
+    <!-- RECENT ACTIVITY -->
+    <div class="section-title">🕐 Recent Quiz Attempts</div>
+    <div class="activity-table-wrap">
+      <table class="activity-table">
+        <thead>
+          <tr>
+            <th>Player</th>
+            <th>Score</th>
+            <th>Streak</th>
+            <th>Accuracy</th>
+            <th>Date & Time</th>
+          </tr>
+        </thead>
+        <tbody id="recentActivity">
+          <tr><td colspan="5" style="text-align:center;padding:1.5rem;color:var(--ink-faint);font-family:var(--font-hand)" class="pulse">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- GAME BREAKDOWN -->
+    <div class="section-title">🎮 Board Game Stats</div>
+    <div class="game-breakdown-grid" id="gameBreakdown"></div>
+
+    <!-- ACTIVE ROOMS -->
+    <div class="section-title">📡 Active Game Rooms</div>
+    <div class="active-rooms" id="activeRooms">
+      <div class="empty-state pulse">Loading…</div>
+    </div>
+
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, onValue, query, orderByChild, limitToLast, off }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey:"AIzaSyCgHnNvbz9eLw-986ZjAiqKQD9PwnY0Pho",
+    authDomain:"learningwithiodey.firebaseapp.com",
+    databaseURL:"https://learningwithiodey-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId:"learningwithiodey",
+    storageBucket:"learningwithiodey.firebasestorage.app",
+    messagingSenderId:"286187814406",
+    appId:"1:286187814406:web:2b3362562086fdc3538d87"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
+
+  /* ── PASSWORD ── */
+  const TEACHER_PASS = 'odey2026'; // Change this!
+  const AVATARS = ['🦊','🐼','🦁','🐯','🐨','🦋','🐸','🦩','🐙','🦑','🐳','🦄'];
+
+  window.doLogin = function() {
+    const val = document.getElementById('loginPass').value;
+    if (val === TEACHER_PASS) {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('dashboard').classList.add('show');
+      initDashboard();
+    } else {
+      document.getElementById('loginError').style.display = 'block';
+      document.getElementById('loginPass').value = '';
+    }
+  };
+
+  window.doLogout = function() {
+    window.location.href = 'index.html';
+  };
+
+  function getAvatar(name = '?') {
+    let h = 0;
+    for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) & 0xffff;
+    return AVATARS[h % AVATARS.length];
+  }
+
+  function fmtDateTime(ts) {
+    if (!ts) return '—';
+    return new Date(ts).toLocaleString('en-GB', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+  }
+
+  function fmtDate(ts) {
+    if (!ts) return '—';
+    return new Date(ts).toLocaleDateString('en-GB', { day:'2-digit', month:'short' });
+  }
+
+  let allQuizData = [];
+
+  /* ── INIT DASHBOARD ── */
+  function initDashboard() {
+    loadQuizStats();
+    loadGameStats();
+    loadActiveRooms();
+  }
+
+  /* ── QUIZ STATS ── */
+  function loadQuizStats() {
+    const dbRef = query(ref(db, 'leaderboard/quiz'), orderByChild('score'), limitToLast(200));
+    onValue(dbRef, snap => {
+      const entries = [];
+      if (snap.exists()) snap.forEach(c => entries.push({ id:c.key, ...c.val() }));
+      entries.sort((a,b) => (b.score||0) - (a.score||0));
+      allQuizData = entries;
+
+      // Overview stats
+      const total    = entries.length;
+      const avgScore = total ? Math.round(entries.reduce((s,e) => s+(e.score||0), 0) / total) : 0;
+      const topStreak= entries.reduce((m,e) => Math.max(m, e.bestStreak||0), 0);
+      const names    = new Set(entries.map(e => e.name||'Anonymous'));
+
+      document.getElementById('totalQuizzes').textContent  = total;
+      document.getElementById('avgScore').textContent      = avgScore;
+      document.getElementById('bestStreak').textContent    = topStreak + '🔥';
+      document.getElementById('uniquePlayers').textContent = names.size;
+
+      // Score distribution
+      renderScoreDist(entries);
+      // Top performers
+      renderTopPerformers(entries.slice(0,10));
+      // Recent activity
+      renderRecentActivity(entries.slice(0,15));
+    });
+  }
+
+  /* ── SCORE DISTRIBUTION ── */
+  function renderScoreDist(entries) {
+    const ranges = [
+      { label:'0–20',   min:0,   max:20  },
+      { label:'21–40',  min:21,  max:40  },
+      { label:'41–60',  min:41,  max:60  },
+      { label:'61–80',  min:61,  max:80  },
+      { label:'81–100', min:81,  max:100 },
+      { label:'101+',   min:101, max:9999},
+    ];
+    const counts = ranges.map(r => entries.filter(e => (e.score||0) >= r.min && (e.score||0) <= r.max).length);
+    const maxCount = Math.max(...counts, 1);
+
+    const barsEl = document.getElementById('distBars');
+    barsEl.innerHTML = '';
+
+    ranges.forEach((r, i) => {
+      const pct = Math.round((counts[i] / maxCount) * 100);
+      const barColor = i < 2 ? 'var(--red)' : i < 4 ? 'var(--yellow)' : 'var(--green)';
+      const wrap = document.createElement('div');
+      wrap.className = 'dist-bar-wrap';
+      wrap.innerHTML = `
+        <div class="dist-bar-count">${counts[i]}</div>
+        <div class="dist-bar" style="height:${Math.max(pct, 4)}%;background:${barColor}22;border-color:${barColor}55" title="${counts[i]} students scored ${r.label}"></div>
+        <div class="dist-bar-label">${r.label}</div>`;
+      barsEl.appendChild(wrap);
+    });
+  }
+
+  /* ── TOP PERFORMERS ── */
+  function renderTopPerformers(entries) {
+    const el = document.getElementById('performersList');
+    if (entries.length === 0) { el.innerHTML = '<div class="empty-state">No quiz attempts yet.</div>'; return; }
+    el.innerHTML = '';
+    entries.forEach((e, i) => {
+      const row = document.createElement('div');
+      row.className = 'performer-row';
+      const rank = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i+1);
+      const accPct = e.accuracy || 0;
+      row.innerHTML = `
+        <div class="performer-rank">${rank}</div>
+        <div class="performer-avatar">${getAvatar(e.name||'?')}</div>
+        <div class="performer-name">${e.name || 'Anonymous'}</div>
+        <div style="flex:1;margin:0 .8rem">
+          <div style="height:6px;background:var(--paper-lines);border-radius:3px;overflow:hidden">
+            <div style="height:100%;width:${accPct}%;background:var(--green);border-radius:3px;transition:width .5s"></div>
+          </div>
+          <div style="font-size:.68rem;color:var(--ink-faint);margin-top:.1rem">${accPct}% accuracy</div>
+        </div>
+        <div class="performer-score">${e.score || 0} pts</div>
+        <div class="performer-streak" style="margin-left:.5rem">${e.bestStreak || 0}🔥</div>`;
+      el.appendChild(row);
+    });
+  }
+
+  /* ── RECENT ACTIVITY ── */
+  function renderRecentActivity(entries) {
+    const tbody = document.getElementById('recentActivity');
+    if (entries.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:var(--ink-faint);font-family:var(--font-hand)">No data yet</td></tr>';
+      return;
+    }
+    // Sort by timestamp descending
+    const sorted = [...entries].sort((a,b) => (b.timestamp||0) - (a.timestamp||0));
+    tbody.innerHTML = '';
+    sorted.slice(0,15).forEach(e => {
+      const scoreClass = (e.score||0) >= 80 ? 'high' : (e.score||0) >= 50 ? 'mid' : 'low';
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td><span style="margin-right:.4rem">${getAvatar(e.name||'?')}</span>${e.name || 'Anonymous'}</td>
+        <td><span class="score-pill ${scoreClass}">${e.score || 0} pts</span></td>
+        <td>${e.bestStreak || 0}🔥</td>
+        <td>${e.accuracy || 0}%</td>
+        <td style="font-size:.78rem;color:var(--ink-faint)">${fmtDateTime(e.timestamp)}</td>`;
+      tbody.appendChild(row);
+    });
+  }
+
+  /* ── GAME STATS ── */
+  const GAMES = [
+    { key:'roll', name:'BioTrail',         icon:'🎲', color:'var(--blue)',   colorPale:'var(--blue-pale)'   },
+    { key:'terr', name:'ChemClaim',         icon:'🗺️', color:'var(--green)',  colorPale:'var(--green-pale)'  },
+    { key:'coop', name:'Pandemic Protocol', icon:'🦠', color:'var(--red)',    colorPale:'var(--red-pale)'    },
+    { key:'card', name:'Toxin Duel',        icon:'🃏', color:'var(--purple)', colorPale:'var(--purple-pale)' },
+  ];
+
+  function loadGameStats() {
+    const grid = document.getElementById('gameBreakdown');
+    grid.innerHTML = '';
+    let totalGamesCount = 0;
+
+    GAMES.forEach(game => {
+      const card = document.createElement('div');
+      card.className = 'game-breakdown-card';
+      card.style.borderColor = game.color;
+      card.innerHTML = `
+        <div class="gb-header">
+          <div class="gb-icon">${game.icon}</div>
+          <div class="gb-name">${game.name}</div>
+        </div>
+        <div class="gb-stats" id="gbStats-${game.key}">
+          <div style="font-family:var(--font-hand);font-size:.85rem;color:var(--ink-faint)" class="pulse">Loading…</div>
+        </div>`;
+      grid.appendChild(card);
+
+      onValue(query(ref(db, 'leaderboard/' + game.key), orderByChild('score'), limitToLast(100)), snap => {
+        const entries = [];
+        if (snap.exists()) snap.forEach(c => entries.push({ id:c.key, ...c.val() }));
+
+        totalGamesCount += entries.length;
+        document.getElementById('totalGames').textContent = totalGamesCount;
+
+        const statsEl = document.getElementById('gbStats-' + game.key);
+        if (entries.length === 0) {
+          statsEl.innerHTML = '<div style="font-family:var(--font-hand);font-size:.85rem;color:var(--ink-faint)">No games played yet</div>';
+          return;
+        }
+
+        entries.sort((a,b) => (b.score||0) - (a.score||0));
+        const avg    = Math.round(entries.reduce((s,e) => s+(e.score||0), 0) / entries.length);
+        const top    = entries[0];
+        const names  = new Set(entries.map(e => e.name||'?'));
+        const topPct = entries.length > 0 ? Math.round(((entries.filter(e => (e.score||0) >= avg).length) / entries.length) * 100) : 0;
+
+        statsEl.innerHTML = `
+          <div class="gb-stat-row"><span class="gb-stat-label">Games played</span><span class="gb-stat-val">${entries.length}</span></div>
+          <div class="gb-stat-row"><span class="gb-stat-label">Unique players</span><span class="gb-stat-val">${names.size}</span></div>
+          <div class="gb-stat-row"><span class="gb-stat-label">Avg score</span><span class="gb-stat-val" style="color:${game.color}">${avg} pts</span></div>
+          <div class="gb-stat-row"><span class="gb-stat-label">Top player</span><span class="gb-stat-val">${top?.name || '?'}</span></div>
+          <div class="gb-stat-row"><span class="gb-stat-label">Top score</span><span class="gb-stat-val" style="color:${game.color}">${top?.score || 0} pts</span></div>
+          <div class="gb-bar"><div class="gb-bar-fill" style="width:${topPct}%;background:${game.color}"></div></div>
+          <div style="font-size:.65rem;color:var(--ink-faint)">${topPct}% scored at or above average</div>`;
+      });
+    });
+  }
+
+  /* ── ACTIVE ROOMS ── */
+  function loadActiveRooms() {
+    const GAME_META = {
+      roll:{ name:'BioTrail',         icon:'🎲' },
+      terr:{ name:'ChemClaim',        icon:'🗺️' },
+      coop:{ name:'Pandemic Protocol',icon:'🦠' },
+      card:{ name:'Toxin Duel',       icon:'🃏' }
+    };
+
+    onValue(ref(db, 'rooms'), snap => {
+      const el = document.getElementById('activeRooms');
+      if (!snap.exists()) { el.innerHTML = '<div class="empty-state">No active rooms right now.</div>'; return; }
+
+      const rooms = [];
+      snap.forEach(c => rooms.push({ code:c.key, ...c.val() }));
+      const active = rooms.filter(r => r.status === 'waiting' || r.status === 'playing');
+
+      if (active.length === 0) { el.innerHTML = '<div class="empty-state">No active rooms right now.</div>'; return; }
+
+      el.innerHTML = '';
+      active.forEach(room => {
+        const meta    = GAME_META[room.game] || { icon:'🎲', name:room.game };
+        const players = Object.values(room.players || {});
+        const row     = document.createElement('div');
+        row.className = 'room-row';
+        row.innerHTML = `
+          <div class="room-game-icon">${meta.icon}</div>
+          <div class="room-info">
+            <div class="room-code">${room.code}</div>
+            <div class="room-meta">${meta.name} · ${room.roomLabel || ''} · ${room.difficulty || 'mixed'}</div>
+          </div>
+          <div class="room-players">${players.length}/${room.maxPlayers} players</div>
+          <div class="room-status ${room.status}">${room.status === 'playing' ? '▶ Playing' : '⏳ Waiting'}</div>`;
+        el.appendChild(row);
+      });
+    });
+  }
+
+  /* ── EXPORT CSV ── */
+  window.exportCSV = function() {
+    if (allQuizData.length === 0) { alert('No data to export yet.'); return; }
+    const rows = [['Name','Score','Best Streak','Accuracy (%)','Date']];
+    allQuizData.forEach(e => {
+      rows.push([
+        e.name || 'Anonymous',
+        e.score || 0,
+        e.bestStreak || 0,
+        e.accuracy || 0,
+        e.timestamp ? new Date(e.timestamp).toLocaleDateString('en-GB') : '—'
+      ]);
+    });
+    const csv = rows.map(r => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type:'text/csv' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = 'odey_quiz_scores_' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+</script>
+
+</body>
+</html>
