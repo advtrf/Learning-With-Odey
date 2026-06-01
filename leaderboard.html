@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leaderboard — Learning with Odey</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    :root{
+      --paper:#f5f0e8;--paper-dark:#ede7d9;--paper-lines:#d6cfc0;
+      --ink:#2c2416;--ink-soft:#5a5040;--ink-faint:#9a8e7a;
+      --blue:#4a6fa5;--blue-pale:#c8d9ed;--blue-light:#7a9cc4;
+      --green:#4a7c59;--green-pale:#c4dbc9;--green-light:#7aaa8a;
+      --red:#a0453a;--red-pale:#e8c4c0;--red-light:#c47a72;
+      --yellow:#b8922a;--yellow-pale:#f0dfa0;--yellow-light:#d4b060;
+      --purple:#6b5b8a;--purple-pale:#d0c4e0;
+      --font-hand:'Caveat',cursive;--font-ui:'Nunito',sans-serif;
+      --nav-height:64px;--radius-sm:6px;--radius-md:12px;--radius-lg:20px;
+      --shadow-sm:2px 3px 0 rgba(44,36,22,.15);
+      --shadow-md:4px 6px 0 rgba(44,36,22,.15);
+      --shadow-lg:6px 10px 0 rgba(44,36,22,.12);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font-ui);background:var(--paper);color:var(--ink);min-height:100vh}
+
+    /* HERO */
+    .lb-hero{background:var(--paper-dark);border-bottom:2px solid var(--paper-lines);padding:2rem 2rem 0;text-align:center;overflow:hidden}
+    .lb-hero h1{font-family:var(--font-hand);color:var(--yellow);font-size:clamp(1.8rem,4vw,2.8rem);display:inline-block;position:relative}
+    .lb-hero h1::after{content:'';position:absolute;bottom:-5px;left:0;right:0;height:4px;background:var(--blue);border-radius:2px;transform:rotate(-.5deg)}
+    .lb-hero p{font-family:var(--font-hand);color:var(--ink-faint);margin:.6rem 0 0}
+
+    /* TABS */
+    .lb-tabs{display:flex;justify-content:center;gap:.4rem;padding:1.5rem 1.5rem 0;flex-wrap:wrap}
+    .lb-tab{display:flex;align-items:center;gap:.4rem;padding:.6rem 1.2rem;border-radius:var(--radius-md) var(--radius-md) 0 0;border:2px solid var(--paper-lines);border-bottom:none;background:var(--paper-dark);color:var(--ink-faint);font-family:var(--font-hand);font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
+    .lb-tab.active-quiz  {background:white;color:var(--green); border-color:var(--green); position:relative;bottom:-2px;padding-bottom:calc(.6rem + 2px)}
+    .lb-tab.active-roll  {background:white;color:var(--blue);  border-color:var(--blue);  position:relative;bottom:-2px;padding-bottom:calc(.6rem + 2px)}
+    .lb-tab.active-terr  {background:white;color:var(--green); border-color:var(--green); position:relative;bottom:-2px;padding-bottom:calc(.6rem + 2px)}
+    .lb-tab.active-coop  {background:white;color:var(--red);   border-color:var(--red);   position:relative;bottom:-2px;padding-bottom:calc(.6rem + 2px)}
+    .lb-tab.active-card  {background:white;color:var(--purple);border-color:var(--purple);position:relative;bottom:-2px;padding-bottom:calc(.6rem + 2px)}
+
+    /* PANEL */
+    .lb-container{max-width:800px;margin:0 auto;padding:0 1.5rem 4rem}
+    .lb-panel{display:none;background:white;border:2.5px solid var(--paper-lines);border-radius:0 var(--radius-md) var(--radius-md) var(--radius-md);box-shadow:var(--shadow-md);overflow:hidden}
+    .lb-panel.show{display:block;animation:fadeInUp .3s ease forwards}
+    .lb-panel.border-green {border-color:var(--green)}
+    .lb-panel.border-blue  {border-color:var(--blue)}
+    .lb-panel.border-red   {border-color:var(--red)}
+    .lb-panel.border-purple{border-color:var(--purple)}
+
+    /* TOP 3 PODIUM */
+    .podium{display:flex;align-items:flex-end;justify-content:center;gap:.8rem;padding:2rem 1rem 1rem;background:linear-gradient(180deg,var(--paper-dark) 0%,white 100%)}
+    .podium-place{display:flex;flex-direction:column;align-items:center;gap:.3rem;flex:1;max-width:160px}
+    .podium-crown{font-size:1.8rem;line-height:1}
+    .podium-avatar{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;border:3px solid;box-shadow:var(--shadow-sm)}
+    .podium-place.first  .podium-avatar{border-color:var(--yellow);background:var(--yellow-pale)}
+    .podium-place.second .podium-avatar{border-color:#b0b0b0;background:#f0f0f0}
+    .podium-place.third  .podium-avatar{border-color:#cd7f32;background:#fef0e0}
+    .podium-name{font-family:var(--font-hand);font-size:.95rem;font-weight:700;color:var(--ink);text-align:center;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .podium-score{font-family:var(--font-hand);font-size:1.2rem;font-weight:700}
+    .podium-place.first  .podium-score{color:var(--yellow)}
+    .podium-place.second .podium-score{color:#888}
+    .podium-place.third  .podium-score{color:#cd7f32}
+    .podium-block{height:60px;border-radius:var(--radius-sm) var(--radius-sm) 0 0;width:100%;display:flex;align-items:center;justify-content:center;font-family:var(--font-hand);font-size:1.2rem;font-weight:700;color:white}
+    .podium-place.first  .podium-block{height:80px;background:var(--yellow)}
+    .podium-place.second .podium-block{height:60px;background:#b0b0b0}
+    .podium-place.third  .podium-block{height:44px;background:#cd7f32}
+
+    /* FULL LIST */
+    .lb-list{padding:0 1rem 1.5rem}
+    .lb-list-header{display:grid;grid-template-columns:40px 1fr 80px 80px 60px;gap:.5rem;padding:.5rem .8rem;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-faint);border-bottom:2px solid var(--paper-lines);margin-bottom:.3rem}
+    .lb-row{display:grid;grid-template-columns:40px 1fr 80px 80px 60px;gap:.5rem;padding:.55rem .8rem;border-radius:var(--radius-sm);margin-bottom:.2rem;transition:background .15s;align-items:center}
+    .lb-row:hover{background:var(--paper-dark)}
+    .lb-row.mine{background:var(--yellow-pale);border:1.5px solid var(--yellow-light)}
+    .lb-row.top1{background:linear-gradient(90deg,var(--yellow-pale),white)}
+    .lb-row.top2{background:linear-gradient(90deg,#f0f0f0,white)}
+    .lb-row.top3{background:linear-gradient(90deg,#fef0e0,white)}
+    .lb-rank{font-family:var(--font-hand);font-size:1.1rem;font-weight:700;text-align:center}
+    .lb-rank.r1{color:var(--yellow)}
+    .lb-rank.r2{color:#888}
+    .lb-rank.r3{color:#cd7f32}
+    .lb-player{display:flex;align-items:center;gap:.5rem}
+    .lb-player-avatar{font-size:1rem}
+    .lb-player-name{font-family:var(--font-hand);font-size:1rem;font-weight:700;color:var(--ink)}
+    .lb-score{font-family:var(--font-hand);font-size:1rem;font-weight:700;color:var(--blue);text-align:right}
+    .lb-streak{font-family:var(--font-hand);font-size:.9rem;color:var(--yellow);text-align:right}
+    .lb-date{font-size:.72rem;color:var(--ink-faint);text-align:right}
+
+    /* LOADING / EMPTY */
+    .lb-loading{text-align:center;padding:2.5rem;color:var(--ink-faint);font-family:var(--font-hand);font-size:1.1rem}
+    .lb-empty{text-align:center;padding:2.5rem;color:var(--ink-faint);font-family:var(--font-hand);font-size:1.1rem;border:2px dashed var(--paper-lines);border-radius:var(--radius-md);margin:1rem}
+    .pulse{animation:pulse 1.5s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+    /* STATS BAR */
+    .lb-stats{display:flex;gap:.8rem;padding:.8rem 1rem;background:var(--paper-dark);border-bottom:1.5px solid var(--paper-lines);flex-wrap:wrap}
+    .lb-stat{text-align:center;flex:1;min-width:60px}
+    .lb-stat-val{font-family:var(--font-hand);font-size:1.3rem;font-weight:700;color:var(--ink)}
+    .lb-stat-label{font-size:.68rem;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.4px}
+
+    /* CLEAR BTN */
+    .lb-actions{padding:.8rem 1rem;display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;border-top:1.5px dashed var(--paper-lines)}
+    .lb-refresh-btn{padding:.4rem 1rem;border-radius:var(--radius-sm);border:2px solid var(--blue);background:var(--blue-pale);color:var(--blue);font-family:var(--font-hand);font-size:.95rem;font-weight:700;cursor:pointer;transition:all .15s}
+    .lb-refresh-btn:hover{background:var(--blue);color:white}
+    .lb-last-updated{font-family:var(--font-hand);font-size:.8rem;color:var(--ink-faint);margin-left:auto}
+
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="nav-logo">Learning with <span>Odey</span></a>
+  <button class="nav-toggle" id="navToggle"><span></span><span></span><span></span></button>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="materials.html">Materials</a></li>
+    <li><a href="quiz.html">Quiz</a></li>
+    <li><a href="minigames.html">Mini Games</a></li>
+    <li><a href="experiment.html">Experiment</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
+</nav>
+
+<div class="page-content">
+  <div class="lb-hero">
+    <h1>🏆 Leaderboard</h1>
+    <p>Top scores from Quiz and Board Games — updated in real time!</p>
+    <div class="lb-tabs">
+      <button class="lb-tab active-quiz" id="tab-quiz"  onclick="switchTab('quiz')">📝 Quiz</button>
+      <button class="lb-tab"             id="tab-roll"  onclick="switchTab('roll')">🎲 BioTrail</button>
+      <button class="lb-tab"             id="tab-terr"  onclick="switchTab('terr')">🗺️ ChemClaim</button>
+      <button class="lb-tab"             id="tab-coop"  onclick="switchTab('coop')">🦠 Pandemic</button>
+      <button class="lb-tab"             id="tab-card"  onclick="switchTab('card')">🃏 Toxin Duel</button>
+    </div>
+  </div>
+
+  <div class="lb-container">
+
+    <!-- QUIZ PANEL -->
+    <div class="lb-panel border-green show" id="panel-quiz">
+      <div class="lb-stats" id="stats-quiz"></div>
+      <div class="podium" id="podium-quiz"><div class="lb-loading pulse">Loading scores…</div></div>
+      <div class="lb-list">
+        <div class="lb-list-header">
+          <div>#</div><div>Player</div><div style="text-align:right">Score</div><div style="text-align:right">Streak</div><div style="text-align:right">Date</div>
+        </div>
+        <div id="list-quiz"><div class="lb-loading pulse">Loading…</div></div>
+      </div>
+      <div class="lb-actions">
+        <button class="lb-refresh-btn" onclick="loadBoard('quiz')">🔄 Refresh</button>
+        <span class="lb-last-updated" id="updated-quiz"></span>
+      </div>
+    </div>
+
+    <!-- BIOTRAIL PANEL -->
+    <div class="lb-panel border-blue" id="panel-roll">
+      <div class="lb-stats" id="stats-roll"></div>
+      <div class="podium" id="podium-roll"><div class="lb-loading pulse">Loading scores…</div></div>
+      <div class="lb-list">
+        <div class="lb-list-header">
+          <div>#</div><div>Player</div><div style="text-align:right">Score</div><div style="text-align:right">Pos</div><div style="text-align:right">Date</div>
+        </div>
+        <div id="list-roll"><div class="lb-loading pulse">Loading…</div></div>
+      </div>
+      <div class="lb-actions">
+        <button class="lb-refresh-btn" onclick="loadBoard('roll')">🔄 Refresh</button>
+        <span class="lb-last-updated" id="updated-roll"></span>
+      </div>
+    </div>
+
+    <!-- CHEMCLAIM PANEL -->
+    <div class="lb-panel border-green" id="panel-terr">
+      <div class="lb-stats" id="stats-terr"></div>
+      <div class="podium" id="podium-terr"><div class="lb-loading pulse">Loading scores…</div></div>
+      <div class="lb-list">
+        <div class="lb-list-header">
+          <div>#</div><div>Player</div><div style="text-align:right">Score</div><div style="text-align:right">🏴</div><div style="text-align:right">Date</div>
+        </div>
+        <div id="list-terr"><div class="lb-loading pulse">Loading…</div></div>
+      </div>
+      <div class="lb-actions">
+        <button class="lb-refresh-btn" onclick="loadBoard('terr')">🔄 Refresh</button>
+        <span class="lb-last-updated" id="updated-terr"></span>
+      </div>
+    </div>
+
+    <!-- PANDEMIC PANEL -->
+    <div class="lb-panel border-red" id="panel-coop">
+      <div class="lb-stats" id="stats-coop"></div>
+      <div class="podium" id="podium-coop"><div class="lb-loading pulse">Loading scores…</div></div>
+      <div class="lb-list">
+        <div class="lb-list-header">
+          <div>#</div><div>Player</div><div style="text-align:right">Score</div><div style="text-align:right">Zones</div><div style="text-align:right">Date</div>
+        </div>
+        <div id="list-coop"><div class="lb-loading pulse">Loading…</div></div>
+      </div>
+      <div class="lb-actions">
+        <button class="lb-refresh-btn" onclick="loadBoard('coop')">🔄 Refresh</button>
+        <span class="lb-last-updated" id="updated-coop"></span>
+      </div>
+    </div>
+
+    <!-- TOXIN DUEL PANEL -->
+    <div class="lb-panel border-purple" id="panel-card">
+      <div class="lb-stats" id="stats-card"></div>
+      <div class="podium" id="podium-card"><div class="lb-loading pulse">Loading scores…</div></div>
+      <div class="lb-list">
+        <div class="lb-list-header">
+          <div>#</div><div>Player</div><div style="text-align:right">Score</div><div style="text-align:right">Cards</div><div style="text-align:right">Date</div>
+        </div>
+        <div id="list-card"><div class="lb-loading pulse">Loading…</div></div>
+      </div>
+      <div class="lb-actions">
+        <button class="lb-refresh-btn" onclick="loadBoard('card')">🔄 Refresh</button>
+        <span class="lb-last-updated" id="updated-card"></span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="site-footer">
+  <p>© 2026 Fauzan Ahmad</p>
+</footer>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, onValue, query, orderByChild, limitToLast }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey:"AIzaSyCgHnNvbz9eLw-986ZjAiqKQD9PwnY0Pho",
+    authDomain:"learningwithiodey.firebaseapp.com",
+    databaseURL:"https://learningwithiodey-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId:"learningwithiodey",
+    storageBucket:"learningwithiodey.firebasestorage.app",
+    messagingSenderId:"286187814406",
+    appId:"1:286187814406:web:2b3362562086fdc3538d87"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
+
+  const AVATARS = ['🦊','🐼','🦁','🐯','🐨','🦋','🐸','🦩','🐙','🦑','🐳','🦄'];
+  const TABS = ['quiz','roll','terr','coop','card'];
+  const TAB_COLORS = { quiz:'active-quiz', roll:'active-roll', terr:'active-terr', coop:'active-coop', card:'active-card' };
+
+  let currentTab = 'quiz';
+  const listeners = {};
+
+  /* ── TAB SWITCH ── */
+  window.switchTab = function(tab) {
+    currentTab = tab;
+    TABS.forEach(t => {
+      document.getElementById('panel-' + t).classList.toggle('show', t === tab);
+      const btn = document.getElementById('tab-' + t);
+      btn.className = 'lb-tab' + (t === tab ? ' ' + TAB_COLORS[t] : '');
+    });
+    loadBoard(tab);
+  };
+
+  /* ── LOAD BOARD ── */
+  window.loadBoard = function(tab) {
+    const listEl   = document.getElementById('list-'   + tab);
+    const podiumEl = document.getElementById('podium-' + tab);
+    const statsEl  = document.getElementById('stats-'  + tab);
+    const updEl    = document.getElementById('updated-' + tab);
+
+    listEl.innerHTML   = '<div class="lb-loading pulse">Loading…</div>';
+    podiumEl.innerHTML = '<div class="lb-loading pulse">Loading scores…</div>';
+
+    // Unsubscribe old listener
+    if (listeners[tab]) listeners[tab]();
+
+    const dbRef = query(ref(db, 'leaderboard/' + tab), orderByChild('score'), limitToLast(50));
+    listeners[tab] = onValue(dbRef, snap => {
+      if (!snap.exists()) {
+        podiumEl.innerHTML = '';
+        listEl.innerHTML   = '<div class="lb-empty">No scores yet — be the first! 🚀</div>';
+        statsEl.innerHTML  = '';
+        return;
+      }
+
+      // Sort descending
+      const entries = [];
+      snap.forEach(child => entries.push({ id: child.key, ...child.val() }));
+      entries.sort((a,b) => (b.score||0) - (a.score||0));
+
+      updEl.textContent = 'Updated ' + new Date().toLocaleTimeString();
+
+      // Stats bar
+      const totalGames  = entries.length;
+      const topScore    = entries[0]?.score || 0;
+      const avgScore    = Math.round(entries.reduce((s,e) => s+(e.score||0),0) / totalGames);
+      statsEl.innerHTML = `
+        <div class="lb-stat"><div class="lb-stat-val">${totalGames}</div><div class="lb-stat-label">Total Games</div></div>
+        <div class="lb-stat"><div class="lb-stat-val">${topScore}</div><div class="lb-stat-label">Top Score</div></div>
+        <div class="lb-stat"><div class="lb-stat-val">${avgScore}</div><div class="lb-stat-label">Avg Score</div></div>
+        ${tab === 'quiz' ? `<div class="lb-stat"><div class="lb-stat-val">${entries[0]?.bestStreak || 0}🔥</div><div class="lb-stat-label">Best Streak</div></div>` : ''}`;
+
+      // Podium (top 3)
+      renderPodium(podiumEl, entries.slice(0,3), tab);
+
+      // Full list (top 20)
+      renderList(listEl, entries.slice(0,20), tab);
+    });
+  };
+
+  function getAvatar(name) {
+    let h = 0;
+    for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) & 0xffff;
+    return AVATARS[h % AVATARS.length];
+  }
+
+  function fmtDate(ts) {
+    if (!ts) return '—';
+    const d = new Date(ts);
+    return d.toLocaleDateString('en-GB', { day:'2-digit', month:'short' });
+  }
+
+  function getExtra(entry, tab) {
+    if (tab === 'quiz') return (entry.bestStreak || 0) + '🔥';
+    if (tab === 'terr') return (entry.territories || 0) + '🏴';
+    if (tab === 'coop') return (entry.zonesResolved || 0) + '✅';
+    if (tab === 'card') return (entry.cardsPlayed || 0) + '🃏';
+    return (entry.position || 0) + '📍';
+  }
+
+  function renderPodium(el, top, tab) {
+    if (top.length === 0) { el.innerHTML = ''; return; }
+    const order = [1,0,2]; // 2nd, 1st, 3rd visually
+    const classes = ['second','first','third'];
+    const crowns  = ['🥈','🥇','🥉'];
+    el.innerHTML = '';
+
+    order.forEach((dataIdx, visualIdx) => {
+      const entry = top[dataIdx];
+      const place = document.createElement('div');
+      place.className = 'podium-place ' + classes[visualIdx];
+
+      if (!entry) {
+        place.innerHTML = `<div class="podium-crown" style="opacity:.2">${crowns[visualIdx]}</div>
+          <div class="podium-avatar" style="opacity:.3">?</div>
+          <div class="podium-name" style="color:var(--ink-faint)">—</div>
+          <div class="podium-block">${dataIdx+1}</div>`;
+      } else {
+        place.innerHTML = `
+          <div class="podium-crown">${crowns[visualIdx]}</div>
+          <div class="podium-avatar">${getAvatar(entry.name||'?')}</div>
+          <div class="podium-name">${entry.name || 'Anonymous'}</div>
+          <div class="podium-score">${entry.score || 0} pts</div>
+          <div class="podium-block">${dataIdx+1}</div>`;
+      }
+      el.appendChild(place);
+    });
+  }
+
+  function renderList(el, entries, tab) {
+    el.innerHTML = '';
+    if (entries.length === 0) {
+      el.innerHTML = '<div class="lb-empty">No scores yet!</div>';
+      return;
+    }
+    entries.forEach((entry, i) => {
+      const row = document.createElement('div');
+      const rankClass = i===0?' top1':i===1?' top2':i===2?' top3':'';
+      row.className = 'lb-row' + rankClass;
+      const rankDisplay = i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
+      const rankColor   = i===0?' r1':i===1?' r2':i===2?' r3':'';
+      row.innerHTML = `
+        <div class="lb-rank${rankColor}">${rankDisplay}</div>
+        <div class="lb-player">
+          <span class="lb-player-avatar">${getAvatar(entry.name||'?')}</span>
+          <span class="lb-player-name">${entry.name || 'Anonymous'}</span>
+        </div>
+        <div class="lb-score">${entry.score || 0} pts</div>
+        <div class="lb-streak">${getExtra(entry, tab)}</div>
+        <div class="lb-date">${fmtDate(entry.timestamp)}</div>`;
+      el.appendChild(row);
+    });
+  }
+
+  /* ── NAV ── */
+  document.getElementById('navToggle').addEventListener('click', () => {
+    document.getElementById('navLinks').classList.toggle('open');
+  });
+
+  /* ── INIT ── */
+  loadBoard('quiz');
+</script>
+</body>
+</html>
