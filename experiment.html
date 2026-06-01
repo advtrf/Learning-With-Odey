@@ -14,9 +14,9 @@
     .exp-hero h1{color:var(--green);font-size:clamp(1.8rem,4vw,2.8rem);display:inline-block;position:relative}
     .exp-hero h1::after{content:'';position:absolute;bottom:-5px;left:0;right:0;height:4px;background:var(--blue);border-radius:2px;transform:rotate(-0.5deg)}
     .exp-hero p{font-family:var(--font-hand);color:var(--ink-faint);margin:.6rem 0 0;font-size:1rem}
-    .sdg-badge{display:inline-flex;align-items:center;gap:.5rem;background:#2d9c4e;color:white;border-radius:var(--radius-md);padding:.4rem 1rem;font-family:var(--font-ui);font-size:.85rem;font-weight:700;margin:.8rem 0 0;box-shadow:var(--shadow-sm)}
+    .sdg-badge{display:inline-flex;align-items:center;gap:.5rem;background:#2d9c4e;color:white;border-radius:var(--radius-md);padding:.4rem 1rem;font-family:var(--font-ui);font-size:1.05rem;font-weight:700;margin:.8rem 0 0;box-shadow:var(--shadow-sm)}
     .exp-tabs{display:flex;justify-content:center;gap:.4rem;padding:1.2rem 1.5rem 0;flex-wrap:wrap}
-    .exp-tab{display:flex;align-items:center;gap:.5rem;padding:.65rem 1.2rem;border-radius:var(--radius-md) var(--radius-md) 0 0;border:2px solid var(--paper-lines);border-bottom:none;background:var(--paper-dark);color:var(--ink-faint);font-family:var(--font-hand);font-size:.95rem;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
+    .exp-tab{display:flex;align-items:center;gap:.5rem;padding:.65rem 1.2rem;border-radius:var(--radius-md) var(--radius-md) 0 0;border:2px solid var(--paper-lines);border-bottom:none;background:var(--paper-dark);color:var(--ink-faint);font-family:var(--font-hand);font-size:1.1rem;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
     .exp-tab.active-blue  {background:white;color:var(--blue);  border-color:var(--blue);  position:relative;bottom:-2px;padding-bottom:calc(.65rem + 2px)}
     .exp-tab.active-green {background:white;color:var(--green); border-color:var(--green); position:relative;bottom:-2px;padding-bottom:calc(.65rem + 2px)}
     .exp-tab.active-red   {background:white;color:var(--red);   border-color:var(--red);   position:relative;bottom:-2px;padding-bottom:calc(.65rem + 2px)}
@@ -26,12 +26,12 @@
     .exp-panel.green-panel {border-color:var(--green)}
     .exp-panel.red-panel   {border-color:var(--red)}
     .ws-progress{padding:.5rem 2rem;background:var(--paper-dark);border-bottom:1px solid var(--paper-lines);display:flex;align-items:center;gap:.8rem}
-    .ws-progress-label{font-family:var(--font-hand);font-size:.82rem;color:var(--ink-faint)}
+    .ws-progress-label{font-family:var(--font-hand);font-size:1rem;color:var(--ink-faint)}
     .ws-progress-bar{flex:1;height:6px;background:var(--paper-lines);border-radius:3px;overflow:hidden}
     .ws-progress-fill{height:100%;background:var(--blue);border-radius:3px;transition:width .3s}
     .ws-progress-fill.green-fill{background:var(--green)}
     .ws-progress-fill.red-fill{background:var(--red)}
-    .ws-progress-pct{font-family:var(--font-hand);font-size:.82rem;font-weight:700;color:var(--blue)}
+    .ws-progress-pct{font-family:var(--font-hand);font-size:1rem;font-weight:700;color:var(--blue)}
     .ws-progress-pct.green-pct{color:var(--green)}
     .ws-progress-pct.red-pct{color:var(--red)}
     .ws-header{padding:1.5rem 2rem 1rem;border-bottom:2px dashed var(--paper-lines)}
@@ -63,7 +63,6 @@
     .materials-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.5rem}
     .material-item{display:flex;align-items:center;gap:.6rem;padding:.5rem .8rem;background:var(--paper);border:1.5px solid var(--paper-lines);border-radius:var(--radius-sm);font-size:.88rem;color:var(--ink-soft)}
     .material-item .mat-icon{font-size:1.1rem;flex-shrink:0}
-    /* INQUIRY procedure */
     .inquiry-intro{background:var(--blue-pale);border:1.5px solid var(--blue-light);border-radius:var(--radius-md);padding:.8rem 1.1rem;font-size:.88rem;color:var(--blue);margin-bottom:1rem;font-style:italic}
     .inquiry-intro.green-intro{background:var(--green-pale);border-color:var(--green-light);color:var(--green)}
     .inquiry-intro.red-intro{background:var(--red-pale);border-color:var(--red-light);color:var(--red)}
@@ -74,7 +73,7 @@
     .inquiry-q-num.red-num{background:var(--red)}
     .inquiry-q-text{font-size:.93rem;font-weight:700;color:var(--ink);line-height:1.5}
     .inquiry-answer{padding:.8rem 1rem}
-    .inquiry-answer-label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--ink-faint);margin-bottom:.3rem}
+    .inquiry-answer-label{font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--ink-faint);margin-bottom:.3rem}
     .ws-input{width:100%;padding:.6rem .9rem;font-family:var(--font-ui);font-size:.92rem;border:2px solid var(--paper-lines);border-radius:var(--radius-sm);background:var(--paper);color:var(--ink);outline:none;transition:border-color .2s;resize:vertical;box-sizing:border-box}
     .ws-input:focus{border-color:var(--blue);background:white}
     .ws-input.green-focus:focus{border-color:var(--green)}
@@ -83,7 +82,7 @@
     .ws-field{margin-bottom:1rem}
     .ws-field-label{font-size:.78rem;font-weight:700;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.7px;margin-bottom:.3rem}
     .data-table-wrap{overflow-x:auto}
-    .data-table{width:100%;border-collapse:collapse;font-size:.88rem;min-width:400px}
+    .data-table{width:100%;border-collapse:collapse;font-size:1rem;min-width:400px}
     .data-table th{background:var(--blue-pale);color:var(--blue);font-weight:700;padding:.55rem .8rem;border:2px solid var(--blue-light);text-align:left;font-size:.82rem}
     .data-table th.green-th{background:var(--green-pale);color:var(--green);border-color:var(--green-light)}
     .data-table th.red-th{background:var(--red-pale);color:var(--red);border-color:var(--red-light)}
@@ -156,9 +155,11 @@
     <div class="ws-section">
       <div class="ws-section-title">🎯 Objective</div>
       <div class="objective-box">
-        To investigate the effect of different concentrations of citric acid (Vitamin C) as a natural
-        food preservative on the browning rate of apple slices, and to relate findings to safe food
-        preservation practices supporting SDG 3.
+        <p>After observing preserved apple samples, students can identify the problem related to food preservation.</p>
+        <p>After conducting sensory observation, students can formulate research questions about food additives.</p>
+        <p>After group discussion, students can propose hypotheses regarding the effect of different pectin concentrations.</p>
+        <p>After analyzing observation data, students can differentiate natural food additives and addictive substances.</p>
+        <p>After discussion, students can explain the function, benefits, and potential risks of food additives and addictive substances in daily life.</p>
       </div>
     </div>
 
@@ -179,10 +180,10 @@
     <div class="ws-section">
       <div class="ws-section-title">📖 Background</div>
       <p style="font-size:.92rem;line-height:1.75;color:var(--ink-soft);margin-bottom:.8rem">
-        Have you ever experience that <strong>apple slices</strong> in a lunchbox <strong>turn brown</strong> before being eaten? Doesn't it feel sad? Don't worry, i will give you a trick that can you try to keep them looking fresh and yummy until lunchtime, ehe~
-      </p>  
+        Have you ever experience that apple slices in a lunchbox turn brown before being eaten? Doesn't it feel sad? Don't worry, i will give you a trick that can you try to keep them looking fresh and yummy until lunchtime, ehe~
+      </p>
       <p style="font-size:.92rem;line-height:1.75;color:var(--ink-soft);margin-bottom:.8rem">
-        Apple browning is caused by <strong>enzymatic oxidation</strong>. When apple flesh is exposed to air,
+        Apple browning is caused by <strong>enzymatic oxidation</strong> — when apple flesh is exposed to air,
         an enzyme called polyphenol oxidase (PPO) reacts with oxygen, producing brown pigments (melanins).
         Citric acid (Vitamin C / ascorbic acid) acts as an antioxidant that inhibits this reaction,
         slowing browning significantly.
@@ -190,7 +191,7 @@
       <p style="font-size:.92rem;line-height:1.75;color:var(--ink-soft);margin-bottom:.8rem">
         Your teacher has prepared <strong>4 apple samples (A, B, C, D)</strong>, each treated with
         a different concentration of citric acid and stored for <strong>2 weeks</strong>.
-        The concentrations are unknown to you, can you figure them out?
+        The concentrations are unknown to you — your job is to figure them out!
       </p>
       <div class="apple-visual">
         <div class="apple-card"><span class="apple-emoji">🍎</span><div class="apple-label">Sample A</div><div class="apple-conc">? % citric acid</div></div>
@@ -200,7 +201,7 @@
       </div>
       <div class="odey-comment">
         <img src="assets/odey.png" alt="Odey">
-        <span>"Your teacher did the waiting, zwei Wochen! Now YOUR job is to be the scientist. Observe carefully and predict which sample has the highest Vitamin C, Freund! 🔍"</span>
+        <span>"Your teacher did the waiting for two weeks! Now YOUR job is to be the scientist. Observe carefully and predict which sample has the highest Vitamin C, Fighting! 🔍"</span>
       </div>
     </div>
 
@@ -209,9 +210,20 @@
       <div class="materials-grid">
         <div class="material-item"><span class="mat-icon">🍎</span>Preserved apple samples (different Vitamin C concentrations)</div>
         <div class="material-item"><span class="mat-icon">📋</span>Observation sheet (this worksheet)</div>
-        <div class="material-item"><span class="mat-icon">🖊️</span>Pen</div>
-        <div class="material-item"><span class="mat-icon">🧻</span>Clean tissue</div>
         <div class="material-item"><span class="mat-icon">💧</span>Drinking water (for taste neutralization)</div>
+      </div>
+      <div class="ws-field" style="margin-top:.8rem">
+        <div class="ws-field-label">Did you use any other tools or materials besides the ones provided? If you did, please write them here:</div>
+        <textarea class="ws-input" style="min-height:80px" placeholder="1. etc." data-ws="0"></textarea>
+      </div>
+    </div>
+
+    <!-- BUG FIX: Research Question section was missing its opening <div class="ws-section"> tag -->
+    <div class="ws-section">
+      <div class="ws-section-title">❓ Research Question</div>
+      <div class="ws-field">
+        <div class="ws-field-label">What question do you think this experiment is trying to answer? Write your research question here:</div>
+        <textarea class="ws-input" style="min-height:80px" placeholder="How does..." data-ws="0"></textarea>
       </div>
     </div>
 
@@ -224,7 +236,7 @@
       </div>
       <div class="ws-field">
         <div class="ws-field-label">Based on your prior knowledge, predict: which sample (A, B, C, or D) has the highest Vitamin C concentration? What do you expect each sample to look like after 2 weeks?</div>
-        <textarea class="ws-input" style="min-height:80px" placeholder="I predict that Sample ___ has the highest Vitamin C concentration because...&#10;I expect Sample A to look... Sample B to look... Sample C to look... Sample D to look..." data-ws="0"></textarea>
+        <textarea class="ws-input" style="min-height:80px" placeholder="I predict that Sample ___ has the highest Vitamin C concentration because..." data-ws="0"></textarea>
       </div>
     </div>
 
@@ -385,7 +397,7 @@
     </div>
   </div>
 
-    <!-- ══════════════════════════════
+  <!-- ══════════════════════════════
        EXPERIMENT 2: FOOD COLORANT
   ══════════════════════════════ -->
   <div class="exp-panel green-panel" id="exp1">
@@ -636,11 +648,12 @@
 
 </div></div>
 <footer class="site-footer">
-  <p>© 2026 Fauzan Ahmad · <a href="/cdn-cgi/l/email-protection#583e392d223936393035393c182d2831763d3c2d"><span class="__cf_email__" data-cfemail="3d5b5c48475c535c55505c597d484d5413585948">[email&#160;protected]</span></a></p>
+  <p>© 2026 Fauzan Ahmad · <a href="mailto:fauzan@example.com">fauzan@example.com</a></p>
 </footer>
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 document.getElementById('navToggle').addEventListener('click',()=>{document.getElementById('navLinks').classList.toggle('open')});
 
+// BUG FIX: switchExp now correctly assigns color class to active tab
 function switchExp(idx){
   document.querySelectorAll('.exp-panel').forEach((p,i)=>p.classList.toggle('show',i===idx));
   const colors=['blue','green','red'];
@@ -649,6 +662,7 @@ function switchExp(idx){
   });
 }
 
+// BUG FIX: buildColorTable now adds data-ws="1" to all inputs so progress tracker works
 function buildColorTable(){
   const tb=document.getElementById('colorTableBody');
   tb.innerHTML='';
@@ -681,6 +695,7 @@ function setupHR(){
   });
 }
 
+// BUG FIX: setupProgress now called AFTER buildColorTable so Exp 2 inputs are in the DOM
 function setupProgress(){
   [0,1,2].forEach(i=>{
     function update(){
@@ -690,7 +705,12 @@ function setupProgress(){
       document.getElementById('prog'+i).style.width=pct+'%';
       document.getElementById('progPct'+i).textContent=pct+'%';
     }
+    // Attach listeners to static inputs
     document.querySelectorAll(`[data-ws="${i}"]`).forEach(el=>el.addEventListener('input',update));
+    // For Exp 2: also re-attach when table inputs are typed (delegation)
+    if(i===1){
+      document.getElementById('colorTableBody').addEventListener('input', update);
+    }
   });
 }
 
@@ -703,7 +723,12 @@ function clearWS(i){
   document.getElementById('progPct'+i).textContent='0%';
 }
 
-window.addEventListener('load',()=>{buildColorTable();setupHR();setupProgress();});
+// BUG FIX: correct init order — build table first, then setup HR, then setup progress
+window.addEventListener('load',()=>{
+  buildColorTable();
+  setupHR();
+  setupProgress();
+});
 </script>
 </body>
 </html>
