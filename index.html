@@ -134,23 +134,11 @@
         <path d="M0 6 Q50 2 100 6 Q150 10 200 6 Q250 2 300 6 Q350 10 400 6" stroke="#b8922a" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
       </svg>
 
-      <!-- ── PROGRESS TRACKER ── -->
-      <div class="progress-tracker" id="progressTracker">
-        <div class="pt-header">
-          <div class="pt-title">📊 Your Progress</div>
-          <div style="display:flex;align-items:center;gap:.8rem">
-            <div class="pt-overall">Overall: <span id="ptOverall">0%</span></div>
-            <button class="pt-reset" onclick="resetProgress()">↺ Reset</button>
-          </div>
-        </div>
-        <div class="pt-sections" id="ptSections"></div>
-      </div>
-
       <!-- Dialog: Odey LEFT | Bubble RIGHT -->
       <div class="dialog-scene" id="dialogScene">
         <div class="odey-wrapper">
           <img src="assets/odey.png" alt="Odey" class="odey-img" id="odeyImg">
-          <div class="odey-nametag">Odey 🤖</div>
+          <div class="odey-nametag">Odey</div>
           <div class="odey-reaction" id="odeyReaction"></div>
         </div>
         <div class="dialog-bubble-wrapper">
@@ -184,111 +172,11 @@
     <p>© 2026 Fauzan Ahmad</p>
   </footer>
 
-  <script>
-    /* ════════════════════════════════════════════
-       PROGRESS TRACKER
-    ════════════════════════════════════════════ */
-    const SECTIONS = [
-      { key:'materials', name:'Materials',   icon:'📖', href:'materials.html',  trackKey:'odey_materials' },
-      { key:'quiz',      name:'Quiz',        icon:'📝', href:'quiz.html',        trackKey:'odey_quiz'      },
-      { key:'minigames', name:'Mini Games',  icon:'🎮', href:'minigames.html',   trackKey:'odey_minigames' },
-      { key:'experiment',name:'Experiment',  icon:'🔬', href:'experiment.html',  trackKey:'odey_experiment'},
-      { key:'askodey',   name:'Ask Odey',    icon:'🦦', href:'askodey.html',     trackKey:'odey_askodey'   },
-    ];
-
-    function getProgress(key) {
-      try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch { return null; }
-    }
-
-    function getSectionStatus(section) {
-      const data = getProgress(section.trackKey);
-      if (!data) return { status:'not-started', pct:0, detail:'' };
-
-      if (section.key === 'quiz') {
-        if (data.completed) return { status:'done', pct:100, detail: data.bestScore ? data.bestScore + ' pts' : 'Done' };
-        if (data.started)   return { status:'in-progress', pct:50, detail:'In progress' };
-        return { status:'not-started', pct:0, detail:'' };
-      }
-      if (section.key === 'materials') {
-        const pct = data.readPct || 0;
-        if (pct >= 90) return { status:'done', pct:100, detail:'Read ✓' };
-        if (pct > 0)   return { status:'in-progress', pct, detail: pct + '% read' };
-        return { status:'not-started', pct:0, detail:'' };
-      }
-      if (section.key === 'experiment') {
-        const pct = data.completionPct || 0;
-        if (pct >= 80) return { status:'done', pct:100, detail:'Completed ✓' };
-        if (pct > 0)   return { status:'in-progress', pct, detail: pct + '% done' };
-        return { status:'not-started', pct:0, detail:'' };
-      }
-      if (data.visited) return { status:'done', pct:100, detail:'Visited ✓' };
-      return { status:'not-started', pct:0, detail:'' };
-    }
-
-    function renderProgressTracker() {
-      const container = document.getElementById('ptSections');
-      container.innerHTML = '';
-      let completedCount = 0;
-
-      SECTIONS.forEach(section => {
-        const { status, pct, detail } = getSectionStatus(section);
-        if (status === 'done') completedCount++;
-
-        const el = document.createElement('a');
-        el.href = section.href;
-        el.className = 'pt-section' + (status === 'done' ? ' done' : status === 'in-progress' ? ' in-progress' : '');
-
-        const statusText = status === 'done' ? '✅ Done' : status === 'in-progress' ? '⏳ Started' : '○ Not started';
-        const quizExtra  = section.key === 'quiz' && detail && status === 'done'
-          ? `<div class="pt-quiz-score">🏆 ${detail}</div>` : '';
-
-        el.innerHTML = `
-          <div class="pt-section-icon">${section.icon}</div>
-          <div class="pt-section-name">${section.name}</div>
-          <div class="pt-section-status">${statusText}</div>
-          ${quizExtra}
-          <div class="pt-progress-mini"><div class="pt-progress-fill" style="width:${pct}%"></div></div>`;
-        container.appendChild(el);
-      });
-
-      const overallPct = Math.round((completedCount / SECTIONS.length) * 100);
-      document.getElementById('ptOverall').textContent = overallPct + '%';
-
-      // Update Odey dialog based on progress
-      updateDialogForProgress(completedCount);
-    }
-
-    function updateDialogForProgress(completedCount) {
-      if (completedCount >= SECTIONS.length) {
-        DIALOGS[0].text = "Wunderbar!! You've completed EVERYTHING, Freund! 🎉 You're a true science scholar! Maybe try the leaderboard next?";
-      } else if (completedCount >= 3) {
-        DIALOGS[0].text = "Sehr gut! You're " + completedCount + "/" + SECTIONS.length + " through the material! Almost there, Freund! Keep going! 💪";
-      } else if (completedCount >= 1) {
-        DIALOGS[0].text = "Good start, Freund! You've completed " + completedCount + " section" + (completedCount>1?'s':'') + " so far. Keep exploring! 🚀";
-      }
-    }
-
-    window.resetProgress = function() {
-      if (!confirm('Reset all your progress? This cannot be undone.')) return;
-      SECTIONS.forEach(s => localStorage.removeItem(s.trackKey));
-      renderProgressTracker();
-    };
-
-    // Track page visits automatically
-    function trackVisit(key, data = {}) {
-      const existing = getProgress(key) || {};
-      localStorage.setItem(key, JSON.stringify({ ...existing, visited: true, lastVisit: Date.now(), ...data }));
-    }
-
-    // Track materials reading progress via scroll
-    if (window.location.pathname.includes('materials')) {
-      window.addEventListener('scroll', () => {
-        const el  = document.documentElement;
-        const pct = Math.round((el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100);
-        trackVisit('odey_materials', { readPct: pct });
-      });
-    }
-
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    /* Nav toggle */
+    document.getElementById('navToggle').addEventListener('click', () => {
+      document.getElementById('navLinks').classList.toggle('open');
+    });
     /* ════════════════════════════════════════════
        DIALOG
     ════════════════════════════════════════════ */
@@ -297,7 +185,7 @@
       { text: "I was built by my good friend, Fauzan to help YOU explore the fascinating world of science. Pretty cool, ja?", reaction: "🚀" },
       { text: "This website is all about Additive and Addictive Substances. Sounds serious, but we'll make it fun, I promise! Hehe~", reaction: "😄" },
       { text: "You'll find interactive Materials, a Quiz to test your knowledge, fun Mini Games, a hands-on Experiment, and more!", reaction: "📚" },
-      { text: "Also, you can ask me anything about the material! Just click 🦦 Ask Odey! in the navbar — I'm always here, Freund!", reaction: "✍️" },
+      { text: "Also, you can ask me anything about the material! Just click 🦦 Ask Odey! in the navbar, I'm happy to help you!", reaction: "✍️" },
       { text: "Ready to dive in? Check your progress tracker above and choose where to continue. I'll be cheering for you all the way!", reaction: "🌟" }
     ];
 
