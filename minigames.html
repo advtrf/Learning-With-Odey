@@ -366,10 +366,10 @@
 
   /* ── STATE ── */
   const GAME_META = {
-    roll: { name:'BioTrail',           icon:'🎲', color:'blue',   file:'game-roll.html'      },
-    terr: { name:'ChemClaim',          icon:'🗺️', color:'green',  file:'game-territory.html' },
-    coop: { name:'Pandemic Protocol',  icon:'🦠', color:'red',    file:'game-coop.html'      },
-    card: { name:'Toxin Duel',         icon:'🃏', color:'purple', file:'game-card.html'      }
+    roll: { name:'BioTrail',           icon:'🎲', color:'blue',   file:'gameroll.html'      },
+    terr: { name:'ChemClaim',          icon:'🗺️', color:'green',  file:'gameterritory.html' },
+    coop: { name:'Pandemic Protocol',  icon:'🦠', color:'red',    file:'gamecoop.html'      },
+    card: { name:'Toxin Duel',         icon:'🃏', color:'purple', file:'gamecard.html'      }
   };
 
   let currentGameType = null;
@@ -503,9 +503,11 @@
   };
 
   window.startGame = async function() {
-    if (!isHost) return;
-    await update(ref(db, 'rooms/' + currentRoomCode), { status: 'playing' });
-  };
+  if (!isHost) return;
+  // Redirect ke game-init.html dulu untuk setup gameState
+  const meta = GAME_META[currentGameType];
+  window.location.href = 'game-init.html?room=' + currentRoomCode + '&pid=' + currentPlayerId + '&host=1&auto=1';
+};
 
   function openLobby(code) {
     document.getElementById('lobbyCode').textContent = code;
@@ -564,12 +566,15 @@
       document.getElementById('lobbyStatus').textContent =
         count < room.maxPlayers ? 'Share code ' + code + ' with friends!' : 'Room full — ready to start!';
 
-      // If game started → redirect to game page
       if (room.status === 'playing') {
-        off(ref(db, 'rooms/' + code));
-        const url = meta.file + '?room=' + code + '&pid=' + currentPlayerId + '&host=' + (isHost ? '1' : '0');
-        window.location.href = url;
-      }
+  off(ref(db, 'rooms/' + code));
+  // Host sudah redirect via startGame
+  // Player lain redirect ke game langsung
+  if (!isHost) {
+    const meta = GAME_META[room.game];
+    const url = meta.file + '?room=' + code + '&pid=' + currentPlayerId + '&host=0';
+    window.location.href = url;
+  }
     });
   }
 
