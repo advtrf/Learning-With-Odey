@@ -19,20 +19,18 @@
     .game-layout{display:grid;grid-template-columns:1fr 280px;gap:1rem;padding:1rem;max-width:1100px;margin:0 auto}
     @media(max-width:800px){.game-layout{grid-template-columns:1fr}}
 
-    /* CRISIS BOARD */
     .board-wrap{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);padding:1rem;box-shadow:var(--shadow-md)}
     .board-title{font-family:var(--font-hand);font-size:1.3rem;color:var(--red);margin-bottom:.8rem;display:flex;align-items:center;gap:.6rem}
 
-    /* OUTBREAK TRACKER */
     .outbreak-bar{background:var(--red-pale);border:2px solid var(--red-light);border-radius:var(--radius-md);padding:.8rem 1rem;margin-bottom:1rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
     .outbreak-label{font-family:var(--font-hand);font-size:1rem;font-weight:700;color:var(--red);white-space:nowrap}
     .outbreak-track{flex:1;height:18px;background:white;border-radius:99px;border:2px solid var(--red-light);overflow:hidden;min-width:120px}
     .outbreak-fill{height:100%;background:linear-gradient(90deg,var(--yellow),var(--red));border-radius:99px;transition:width .5s ease}
     .outbreak-val{font-family:var(--font-hand);font-size:1.1rem;font-weight:700;color:var(--red);white-space:nowrap}
-    .timer-display{font-family:var(--font-hand);font-size:1.3rem;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:.4rem}
+    /* FIX: timer display — sekarang berfungsi */
+    .timer-display{font-family:var(--font-hand);font-size:1.3rem;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:.4rem;white-space:nowrap}
     .timer-display.urgent{color:var(--red);animation:pulse .6s ease-in-out infinite}
 
-    /* CRISIS ZONES */
     .crisis-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem}
     .crisis-zone{border:2.5px solid var(--paper-lines);border-radius:var(--radius-md);padding:.8rem;position:relative;transition:all .3s;cursor:pointer}
     .crisis-zone:hover:not(.resolved){box-shadow:var(--shadow-sm);border-color:var(--blue)}
@@ -49,21 +47,17 @@
     .zone-severity{position:absolute;top:.4rem;right:.5rem;font-size:1.1rem}
     .zone-responders{margin-top:.4rem;min-height:1.2rem;font-size:.7rem;color:var(--ink-faint)}
 
-    /* SIDEBAR */
     .sidebar{display:flex;flex-direction:column;gap:.8rem}
     .card{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);padding:1rem;box-shadow:var(--shadow-sm)}
     .card-title{font-family:var(--font-hand);font-size:1.1rem;color:var(--ink-soft);margin-bottom:.6rem}
 
-    /* PLAYER LIST */
     .player-row{display:flex;align-items:center;gap:.6rem;padding:.35rem .4rem;border-radius:var(--radius-sm);margin-bottom:.3rem;transition:background .2s}
     .player-row.active{background:var(--blue-pale);border:1.5px solid var(--blue-light)}
     .player-row.me{background:var(--yellow-pale);border:1.5px solid var(--yellow-light)}
     .player-avatar{font-size:.95rem}
     .player-name{font-family:var(--font-hand);font-size:.95rem;font-weight:700;flex:1}
     .player-score{font-family:var(--font-hand);font-size:.85rem;color:var(--blue);font-weight:700}
-    .player-actions-left{font-size:.72rem;color:var(--ink-faint)}
 
-    /* TURN / ACTION */
     .action-card{background:white;border:2.5px solid var(--red);border-radius:var(--radius-lg);padding:1rem;box-shadow:var(--shadow-sm)}
     .action-turn{font-family:var(--font-hand);font-size:.9rem;color:var(--ink-faint);margin-bottom:.3rem}
     .action-player{font-family:var(--font-hand);font-size:1.4rem;font-weight:700;color:var(--red);margin-bottom:.5rem}
@@ -77,7 +71,6 @@
     .act-btn.respond {background:var(--red-pale);  color:var(--red);  border-color:var(--red)}
     .act-btn.pass    {background:var(--paper-dark); color:var(--ink-faint);border-color:var(--paper-lines)}
 
-    /* QUESTION */
     .q-overlay{display:none;position:fixed;inset:0;background:rgba(44,36,22,.6);z-index:5000;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(5px)}
     .q-overlay.open{display:flex;animation:fadeIn .25s ease}
     .q-box{background:var(--paper);border:3px solid var(--red);border-radius:var(--radius-lg);max-width:540px;width:100%;box-shadow:var(--shadow-lg);overflow:hidden;max-height:90vh;overflow-y:auto}
@@ -103,7 +96,6 @@
     .q-cont{width:100%;padding:.65rem;border-radius:var(--radius-md);border:none;background:var(--red);color:white;font-family:var(--font-hand);font-size:1.1rem;font-weight:700;cursor:pointer}
     .q-spectate{font-family:var(--font-hand);font-size:.95rem;color:var(--ink-faint);text-align:center;padding:.5rem;font-style:italic}
 
-    /* WIN/LOSE */
     .end-overlay{display:none;position:fixed;inset:0;background:rgba(44,36,22,.75);z-index:6000;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
     .end-overlay.open{display:flex;animation:fadeIn .3s ease}
     .end-box{background:var(--paper);border:4px solid;border-radius:var(--radius-lg);max-width:440px;width:90%;padding:2rem;text-align:center;box-shadow:var(--shadow-lg);animation:popIn .4s ease}
@@ -121,7 +113,6 @@
     .end-back.win{background:var(--green)}
     .end-back.lose{background:var(--red)}
 
-    /* LOG */
     .log-scroll{max-height:140px;overflow-y:auto}
     .log-entry{font-family:var(--font-hand);font-size:.85rem;color:var(--ink-soft);padding:.12rem 0;border-bottom:1px dashed var(--paper-lines)}
     .log-entry.good{color:var(--green)}
@@ -141,26 +132,23 @@
 </div>
 
 <div class="game-layout">
-  <!-- MAIN BOARD -->
   <div class="board-wrap">
     <div class="board-title">
       🦠 Crisis Map
       <span style="font-family:var(--font-hand);font-size:.9rem;color:var(--ink-faint);margin-left:auto">Resolve all outbreaks together!</span>
     </div>
 
-    <!-- OUTBREAK TRACKER -->
     <div class="outbreak-bar">
       <span class="outbreak-label">☣️ Outbreak Level</span>
       <div class="outbreak-track"><div class="outbreak-fill" id="outbreakFill" style="width:0%"></div></div>
       <span class="outbreak-val" id="outbreakVal">0 / 10</span>
-      <div class="timer-display" id="timerDisplay">⏱ <span id="timerVal">--:--</span></div>
+      <!-- FIX: timer sekarang diupdate oleh JS -->
+      <div class="timer-display" id="timerDisplay">⏱ <span id="timerVal">10:00</span></div>
     </div>
 
-    <!-- CRISIS ZONES GRID -->
     <div class="crisis-grid" id="crisisGrid"></div>
   </div>
 
-  <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="action-card">
       <div class="action-turn">Current Turn</div>
@@ -220,6 +208,7 @@
 <div class="toast" id="toast"></div>
 
 <script type="module">
+  // FIX: semua import Firebase di atas — tidak ada dynamic import
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getDatabase, ref, onValue, update, off, get }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -239,7 +228,9 @@
   const IS_HOST= (params.get('host') || sessionStorage.getItem('odey_host')) === '1';
   document.getElementById('topbarCode').textContent = ROOM || '------';
 
-  /* CRISIS ZONES */
+  // Durasi game: 10 menit (600 detik)
+  const GAME_DURATION_SECONDS = 600;
+
   const ZONES = [
     { id:'market',  name:'Pasar Tradisional', icon:'🏪', desc:'Street food vendors found using Rhodamine B and formalin', severity:3 },
     { id:'factory', name:'Food Factory',       icon:'🏭', desc:'Processing plant using borax in meatball production', severity:4 },
@@ -252,28 +243,30 @@
     { id:'drug',    name:'Narcotics Bust',     icon:'🚨', desc:'Psychotropic substances found near school premises', severity:5 },
   ];
 
-  /* CRISIS QUESTIONS */
   const CRISIS_QUESTIONS = [
-    { zone:'market', scenario:'Street vendor\'s red-colored kerupuk remain bright after months in a jar under sunlight.', q:'What banned substance is MOST likely responsible?', opts:['Carmoisine (permitted red dye)','Rhodamine B (toxic textile dye)','Curcumin (natural colorant)','Tartrazine (yellow dye)'], ans:1, exp:'Rhodamine B is carcinogenic, banned, and resistant to fading — a key identification indicator.' },
-    { zone:'factory', scenario:'Health inspectors find meatballs that bounce like rubber balls and don\'t spoil after 2 weeks unrefrigerated.', q:'Which TWO substances are most likely present?', opts:['Formalin + Borax','MSG + Salt','Agar-agar + Carrageenan','Citric Acid + Benzoate'], ans:0, exp:'Formalin preserves via protein cross-linking; Borax creates the rubbery texture. Both are banned from food.' },
-    { zone:'school', scenario:'After analyzing wool threads dipped in children\'s jelly, threads retain bright pink color after thorough rinsing.', q:'What does this result indicate?', opts:['Natural colorant — safe','High quality permitted colorant','Likely synthetic/banned colorant that bonds to protein fibers','The test was performed incorrectly'], ans:2, exp:'Synthetic colorants (especially banned ones like Rhodamine B) bind permanently to wool protein, unlike natural colorants which rinse off.' },
-    { zone:'port', scenario:'Imported drink sachets have no BPOM registration number. Lab analysis shows saccharin concentration 15× above the ADI.', q:'What health risk does exceeding ADI pose?', opts:['No risk — sweeteners are always safe','Potential carcinogenicity and metabolic disruption at high doses','Only causes mild headaches','Reduces dental cavities'], ans:1, exp:'While saccharin is safe within ADI, massively exceeding it presents potential health risks. ADI is set to include safety margins.' },
-    { zone:'farm', scenario:'Pesticide residue test detects organophosphates at 8× the MRL (Maximum Residue Limit) in vegetables.', q:'Organophosphates primarily damage which body system?', opts:['Skeletal system','Nervous system — inhibit acetylcholinesterase','Digestive system only','Lymphatic system'], ans:1, exp:'Organophosphate pesticides irreversibly inhibit acetylcholinesterase, causing nerve impulse overstimulation. This is the same mechanism as nerve agents.' },
+    { zone:'market',   scenario:'Street vendor\'s red-colored kerupuk remain bright after months in a jar under sunlight.', q:'What banned substance is MOST likely responsible?', opts:['Carmoisine (permitted red dye)','Rhodamine B (toxic textile dye)','Curcumin (natural colorant)','Tartrazine (yellow dye)'], ans:1, exp:'Rhodamine B is carcinogenic, banned, and resistant to fading — a key identification indicator.' },
+    { zone:'factory',  scenario:'Health inspectors find meatballs that bounce like rubber balls and don\'t spoil after 2 weeks unrefrigerated.', q:'Which TWO substances are most likely present?', opts:['Formalin + Borax','MSG + Salt','Agar-agar + Carrageenan','Citric Acid + Benzoate'], ans:0, exp:'Formalin preserves via protein cross-linking; Borax creates the rubbery texture. Both are banned from food.' },
+    { zone:'school',   scenario:'After analyzing wool threads dipped in children\'s jelly, threads retain bright pink color after thorough rinsing.', q:'What does this result indicate?', opts:['Natural colorant — safe','High quality permitted colorant','Likely synthetic/banned colorant that bonds to protein fibers','The test was performed incorrectly'], ans:2, exp:'Synthetic colorants (especially banned ones like Rhodamine B) bind permanently to wool protein, unlike natural colorants which rinse off.' },
+    { zone:'port',     scenario:'Imported drink sachets have no BPOM registration number. Lab analysis shows saccharin concentration 15× above the ADI.', q:'What health risk does exceeding ADI pose?', opts:['No risk — sweeteners are always safe','Potential carcinogenicity and metabolic disruption at high doses','Only causes mild headaches','Reduces dental cavities'], ans:1, exp:'While saccharin is safe within ADI, massively exceeding it presents potential health risks. ADI is set to include safety margins.' },
+    { zone:'farm',     scenario:'Pesticide residue test detects organophosphates at 8× the MRL (Maximum Residue Limit) in vegetables.', q:'Organophosphates primarily damage which body system?', opts:['Skeletal system','Nervous system — inhibit acetylcholinesterase','Digestive system only','Lymphatic system'], ans:1, exp:'Organophosphate pesticides irreversibly inhibit acetylcholinesterase, causing nerve impulse overstimulation. This is the same mechanism as nerve agents.' },
     { zone:'hospital', scenario:'ER admits 14 patients with: nausea, kidney pain, bloody urine after eating tofu from the same vendor.', q:'Which banned preservative most likely caused these symptoms?', opts:['Excessive salt','Sorbic acid overdose','Formalin poisoning','Expired citric acid'], ans:2, exp:'Formalin (formaldehyde) in food causes acute kidney damage, liver toxicity, and characteristic bleeding. This is a medical emergency.' },
-    { zone:'bpom', scenario:'BPOM detects Metanil Yellow in popular turmeric chips. The manufacturer claims "it\'s just turmeric color."', q:'Why is this defense scientifically invalid?', opts:['It is valid — both are yellow','Metanil Yellow is an azo dye chemically unrelated to turmeric\'s curcumin — it\'s carcinogenic','Turmeric is also banned','The color is identical so the test is wrong'], ans:1, exp:'Curcumin and Metanil Yellow are completely different chemicals. Metanil Yellow is a carcinogenic industrial azo dye. The defense is scientifically fraudulent.' },
-    { zone:'social', scenario:'Viral post claims: "MSG causes brain damage — it\'s the same as glutamate used in pesticides." Parents panic and ban MSG from school canteens.', q:'What is the scientifically accurate response to this viral claim?', opts:['It\'s completely true — MSG is pesticide-related','MSG is chemically identical to the glutamate in your brain and tomatoes; no peer-reviewed evidence supports neurotoxicity at normal doses','MSG is safe only for adults','MSG should be banned as a precaution'], ans:1, exp:'Glutamate is an endogenous neurotransmitter. The MSG-neurotoxicity claim, popularized from one 1969 mouse study using extreme doses, has been consistently rejected by WHO, FDA, and BPOM.' },
-    { zone:'drug', scenario:'Police find a student with pills labeled "Happy Five" — later identified as MDMA. The student claims "it just makes me social, not addicted."', q:'Why is this self-assessment dangerously incorrect?', opts:['It\'s correct — MDMA causes no addiction','MDMA permanently damages serotonin transporters, causing long-term depression, anxiety, and cognitive impairment','Only physical dependence matters; psychological dependence is harmless','One dose causes no harm'], ans:1, exp:'MDMA kills serotonin-producing neurons. Even occasional use causes lasting mood, memory, and cognitive damage — the "social" effect hides progressive neurological destruction.' },
-    { zone:'market', scenario:'A vendor uses "yellow powder" to color food, claiming it\'s turmeric. Under UV light, the food fluoresces bright yellow-green.', q:'What does fluorescence under UV strongly suggest?', opts:['High-quality natural turmeric','Presence of Metanil Yellow or similar fluorescent banned dye','Normal food coloring behavior','Vitamin B2 (riboflavin) which is permitted'], ans:1, exp:'Natural food colorants don\'t fluoresce under UV. Bright yellow-green fluorescence is a rapid field test indicator for Metanil Yellow contamination.' },
-    { zone:'factory', scenario:'A new factory employee asks why they must use sodium benzoate, not formalin, to preserve sauces. How do you explain correctly?', q:'What is the key difference in their safety profiles?', opts:['No difference — both are equally safe','Sodium benzoate is BPOM-approved at correct doses and metabolized harmlessly; formalin is carcinogenic and cross-links proteins destructively','Formalin is cheaper so it\'s preferred','Sodium benzoate is only for drinks, not sauces'], ans:1, exp:'Sodium benzoate converts to benzoic acid in the body, which is metabolized and excreted safely. Formaldehyde cross-links DNA and proteins, causing cellular damage and cancer.' },
+    { zone:'bpom',     scenario:'BPOM detects Metanil Yellow in popular turmeric chips. The manufacturer claims "it\'s just turmeric color."', q:'Why is this defense scientifically invalid?', opts:['It is valid — both are yellow','Metanil Yellow is an azo dye chemically unrelated to turmeric\'s curcumin — it\'s carcinogenic','Turmeric is also banned','The color is identical so the test is wrong'], ans:1, exp:'Curcumin and Metanil Yellow are completely different chemicals. Metanil Yellow is a carcinogenic industrial azo dye. The defense is scientifically fraudulent.' },
+    { zone:'social',   scenario:'Viral post claims: "MSG causes brain damage — it\'s the same as glutamate used in pesticides." Parents panic and ban MSG from school canteens.', q:'What is the scientifically accurate response to this viral claim?', opts:['It\'s completely true — MSG is pesticide-related','MSG is chemically identical to the glutamate in your brain and tomatoes; no peer-reviewed evidence supports neurotoxicity at normal doses','MSG is safe only for adults','MSG should be banned as a precaution'], ans:1, exp:'Glutamate is an endogenous neurotransmitter. The MSG-neurotoxicity claim has been consistently rejected by WHO, FDA, and BPOM.' },
+    { zone:'drug',     scenario:'Police find a student with pills labeled "Happy Five" — later identified as MDMA. The student claims "it just makes me social, not addicted."', q:'Why is this self-assessment dangerously incorrect?', opts:['It\'s correct — MDMA causes no addiction','MDMA permanently damages serotonin transporters, causing long-term depression, anxiety, and cognitive impairment','Only physical dependence matters; psychological dependence is harmless','One dose causes no harm'], ans:1, exp:'MDMA kills serotonin-producing neurons. Even occasional use causes lasting mood, memory, and cognitive damage — the "social" effect hides progressive neurological destruction.' },
+    { zone:'market',   scenario:'A vendor uses "yellow powder" to color food, claiming it\'s turmeric. Under UV light, the food fluoresces bright yellow-green.', q:'What does fluorescence under UV strongly suggest?', opts:['High-quality natural turmeric','Presence of Metanil Yellow or similar fluorescent banned dye','Normal food coloring behavior','Vitamin B2 (riboflavin) which is permitted'], ans:1, exp:'Natural food colorants don\'t fluoresce under UV. Bright yellow-green fluorescence is a rapid field test indicator for Metanil Yellow contamination.' },
+    { zone:'factory',  scenario:'A new factory employee asks why they must use sodium benzoate, not formalin, to preserve sauces.', q:'What is the key difference in their safety profiles?', opts:['No difference — both are equally safe','Sodium benzoate is BPOM-approved at correct doses and metabolized harmlessly; formalin is carcinogenic and cross-links proteins destructively','Formalin is cheaper so it\'s preferred','Sodium benzoate is only for drinks, not sauces'], ans:1, exp:'Sodium benzoate converts to benzoic acid in the body, which is metabolized and excreted safely. Formaldehyde cross-links DNA and proteins, causing cellular damage and cancer.' },
     { zone:'hospital', scenario:'Patient has: rapid heart rate (125 BPM), 39.8°C temperature, confusion, after attending an event. Friends say he took "a party vitamin."', q:'Based on symptoms, which substance is most likely involved?', opts:['Caffeine overdose','MDMA (Ecstasy) — hyperthermia + tachycardia + confusion is classic toxidrome','Alcohol poisoning','Benzodiazepine overdose'], ans:1, exp:'The MDMA toxidrome: hyperthermia + tachycardia + altered consciousness. This is a life-threatening emergency requiring immediate medical intervention and cooling.' },
   ];
 
   /* STATE */
-  let qTimer = null;
+  let qTimerInterval = null;
   let qTimeLeft = 30;
   let waitingForAnswer = false;
   let currentZoneId = null;
-  let gameTimerInterval = null;
+  // FIX: game countdown timer — variabel dan fungsi diimplementasikan
+  let gameCountdownInterval = null;
+  let gameStartedAt = null;
+  let gameEnded = false;
 
   /* BUILD ZONES */
   function buildZones() {
@@ -291,6 +284,36 @@
       cell.onclick = () => respondToZone(z.id);
       grid.appendChild(cell);
     });
+  }
+
+  /* FIX: game countdown — diimplementasikan dan berjalan dari startedAt di Firebase */
+  function startGameCountdown(startedAt) {
+    if (gameCountdownInterval) clearInterval(gameCountdownInterval);
+    gameStartedAt = startedAt;
+
+    gameCountdownInterval = setInterval(() => {
+      if (gameEnded) { clearInterval(gameCountdownInterval); return; }
+      const elapsed = Math.floor((Date.now() - gameStartedAt) / 1000);
+      const remaining = Math.max(0, GAME_DURATION_SECONDS - elapsed);
+      const mins = Math.floor(remaining / 60);
+      const secs = remaining % 60;
+      const display = document.getElementById('timerVal');
+      const timerEl = document.getElementById('timerDisplay');
+      if (display) display.textContent = `${mins}:${secs.toString().padStart(2,'0')}`;
+      if (remaining <= 60) timerEl.classList.add('urgent');
+      else timerEl.classList.remove('urgent');
+      if (remaining <= 0) {
+        clearInterval(gameCountdownInterval);
+        // Waktu habis — game berakhir, ambil state terkini
+        get(ref(db, 'rooms/' + ROOM)).then(snap => {
+          if (!snap.exists() || gameEnded) return;
+          const gs = snap.val()?.gameState || {};
+          const players = gs.players || {};
+          const resolved = gs.resolved || {};
+          endGame(false, players, Object.keys(resolved).length, gs.outbreakLevel || 0);
+        });
+      }
+    }, 1000);
   }
 
   /* RESPOND */
@@ -345,23 +368,25 @@
     document.getElementById('qOverlay').classList.add('open');
 
     if (isMyTurn) {
-      qTimeLeft = 30; document.getElementById('qTimer').textContent = 30;
+      qTimeLeft = 30;
+      document.getElementById('qTimer').textContent = 30;
       document.getElementById('qTimer').classList.remove('urgent');
-      clearInterval(qTimer);
-      qTimer = setInterval(() => {
+      clearInterval(qTimerInterval);
+      qTimerInterval = setInterval(() => {
         qTimeLeft--;
         const el = document.getElementById('qTimer');
         el.textContent = qTimeLeft;
         if (qTimeLeft <= 10) el.classList.add('urgent');
-        if (qTimeLeft <= 0) { clearInterval(qTimer); answerQ(-1, q, qData, true); }
+        if (qTimeLeft <= 0) { clearInterval(qTimerInterval); answerQ(-1, q, qData, true); }
       }, 1000);
     }
   }
 
+  // FIX: answerQ menggunakan get yang sudah diimport di atas
   async function answerQ(chosen, q, qData, timeout = false) {
     if (waitingForAnswer) return;
     waitingForAnswer = true;
-    clearInterval(qTimer);
+    clearInterval(qTimerInterval);
     const correct = chosen === q.ans;
 
     document.querySelectorAll('.q-opt').forEach((b, i) => {
@@ -374,6 +399,7 @@
     res.className = 'q-result show ' + (correct ? 'correct' : 'wrong');
     res.textContent = (correct ? '✅ Crisis contained! +20 pts. ' : (timeout ? '⏰ Time up! Outbreak worsens! ' : '❌ Wrong! Outbreak worsens! ')) + q.exp;
 
+    // FIX: menggunakan get yang diimport
     const snap = await get(ref(db, 'rooms/' + ROOM));
     const room = snap.val();
     const gs = room.gameState || {};
@@ -454,10 +480,10 @@
 
   function renderProgress(resolved, outbreakLevel) {
     const resolvedCount = Object.keys(resolved || {}).length;
+    const totalScore = '—';
     document.getElementById('progressStats').innerHTML =
       `✅ Resolved: ${resolvedCount} / ${ZONES.length}<br>
-       ☣️ Outbreak Level: ${outbreakLevel || 0} / 10<br>
-       📊 Team Score: — see sidebar`;
+       ☣️ Outbreak Level: ${outbreakLevel || 0} / 10`;
     document.getElementById('outbreakFill').style.width = ((outbreakLevel || 0) / 10 * 100) + '%';
     document.getElementById('outbreakVal').textContent = (outbreakLevel || 0) + ' / 10';
     if ((outbreakLevel || 0) >= 7) document.getElementById('outbreakFill').style.background = 'var(--red)';
@@ -482,12 +508,16 @@
     const currentTurn = gs.currentTurn;
     const isMyTurn = currentTurn === MY_PID;
 
+    // FIX: mulai countdown dari startedAt yang tersimpan di Firebase
+    if (gs.startedAt && !gameCountdownInterval) {
+      startGameCountdown(gs.startedAt);
+    }
+
     document.getElementById('actionPlayer').textContent =
       currentTurn ? (players[currentTurn]?.name || '…') + (isMyTurn ? ' (You!)' : '') : 'Loading…';
     document.getElementById('respondBtn').disabled = !isMyTurn || !!gs.currentQuestion;
     document.getElementById('passBtn').disabled = !isMyTurn || !!gs.currentQuestion;
 
-    // AP bar — decorative, 3 actions per turn
     const apBar = document.getElementById('apBar');
     apBar.innerHTML = '';
     for (let i = 0; i < 3; i++) {
@@ -500,21 +530,28 @@
     renderPlayers(players, currentTurn);
     renderProgress(resolved, outbreakLevel);
 
-    // Show question
     if (gs.currentQuestion && !document.getElementById('qOverlay').classList.contains('open')) {
       const isAnswering = gs.currentQuestion.askedTo === MY_PID;
       if (!isAnswering) document.getElementById('qActivePlayer').textContent = players[gs.currentQuestion.askedTo]?.name || '…';
       showQuestion(gs.currentQuestion, isAnswering);
     }
 
-    // Win: all zones resolved
+    // Win: semua zone resolved
     const resolvedCount = Object.keys(resolved).length;
-    if (resolvedCount >= ZONES.length) { endGame(true, players, resolvedCount, outbreakLevel); return; }
+    if (resolvedCount >= ZONES.length && !gameEnded) {
+      endGame(true, players, resolvedCount, outbreakLevel);
+      return;
+    }
     // Lose: outbreak maxed
-    if (outbreakLevel >= 10) { endGame(false, players, resolvedCount, outbreakLevel); }
+    if (outbreakLevel >= 10 && !gameEnded) {
+      endGame(false, players, resolvedCount, outbreakLevel);
+    }
   });
 
-  function endGame(win, players, resolved, outbreakLevel) {
+  function endGame(win, players, resolvedCount, outbreakLevel) {
+    if (gameEnded) return;
+    gameEnded = true;
+    clearInterval(gameCountdownInterval);
     if (document.getElementById('endOverlay').classList.contains('open')) return;
     off(ref(db, 'rooms/' + ROOM));
     const box = document.getElementById('endBox');
@@ -523,10 +560,10 @@
     document.getElementById('endTitle').textContent = win ? 'Outbreak Contained!' : 'Pandemic Overwhelming!';
     document.getElementById('endSub').textContent = win
       ? 'Your team successfully resolved all food safety crises! SDG 3 is protected!'
-      : `Outbreak level reached 10. ${resolved} / ${ZONES.length} zones resolved. Try again!`;
+      : `Outbreak level reached ${outbreakLevel}. ${resolvedCount} / ${ZONES.length} zones resolved. Try again!`;
     const totalScore = Object.values(players).reduce((s, p) => s + (p.score||0), 0);
     document.getElementById('endStats').innerHTML = `
-      <div class="end-stat"><div class="end-stat-val">${resolved}</div><div class="end-stat-label">Zones Resolved</div></div>
+      <div class="end-stat"><div class="end-stat-val">${resolvedCount}</div><div class="end-stat-label">Zones Resolved</div></div>
       <div class="end-stat"><div class="end-stat-val">${outbreakLevel}</div><div class="end-stat-label">Outbreak Level</div></div>
       <div class="end-stat"><div class="end-stat-val">${totalScore}</div><div class="end-stat-label">Team Score</div></div>`;
     const backBtn = document.getElementById('endBack');
