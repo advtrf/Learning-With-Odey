@@ -31,7 +31,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, get, update, set }
+  import { getDatabase, ref, get, update }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
   const firebaseConfig = {
@@ -53,6 +53,7 @@
 
   document.getElementById('roomCode').textContent = ROOM || '------';
 
+  // FIX: nama file diseragamkan dengan GAME_META di minigames.html
   const GAME_FILES = {
     roll: 'game-roll.html',
     terr: 'game-territory.html',
@@ -76,7 +77,6 @@
 
     setStatus('⚙️ Building game state for ' + playerOrder.length + ' players…');
 
-    // Build player entries with position/score
     const gamePlayers = {};
     playerOrder.forEach(([pid, p], i) => {
       gamePlayers[pid] = {
@@ -92,7 +92,6 @@
 
     const firstPlayer = playerOrder[0]?.[0] || null;
 
-    // Base game state
     const gameState = {
       players: gamePlayers,
       currentTurn: firstPlayer,
@@ -101,7 +100,7 @@
       turnCount: 0
     };
 
-    // Game-specific additions
+    // Game-specific state
     if (gameType === 'coop') {
       gameState.outbreakLevel = 0;
       gameState.resolved = {};
@@ -114,6 +113,10 @@
     }
     if (gameType === 'terr') {
       gameState.claimed = {};
+    }
+    // FIX: BioTrail — simpan layout papan di Firebase agar semua pemain punya susunan yang sama
+    if (gameType === 'roll') {
+      gameState.boardLayout = generateBoardLayout();
     }
 
     await update(ref(db), {
@@ -128,11 +131,28 @@
     }, 1200);
   };
 
+  // FIX: papan deterministik — dibuat sekali oleh host dan disimpan ke Firebase
+  function generateBoardLayout() {
+    const TOTAL = 40;
+    const types = [];
+    for (let i = 0; i < TOTAL; i++) {
+      if (i === 0)        { types.push('start');    continue; }
+      if (i === TOTAL-1)  { types.push('finish');   continue; }
+      const r = Math.random();
+      if      (r < .40) types.push('trivia');
+      else if (r < .60) types.push('scenario');
+      else if (r < .70) types.push('bonus');
+      else if (r < .80) types.push('trap');
+      else if (r < .88) types.push('skip');
+      else              types.push('blank');
+    }
+    return types;
+  }
+
   window.goBack = function() { window.location.href = 'minigames.html'; };
 
   function setStatus(msg) { document.getElementById('status').textContent = msg; }
 
-  // Auto-init if coming from lobby start button
   if (params.get('auto') === '1') { window.addEventListener('load', () => initGame()); }
 </script>
 </body>
