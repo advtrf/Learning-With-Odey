@@ -19,9 +19,10 @@
     .game-layout{display:grid;grid-template-columns:1fr 260px;gap:1rem;padding:1rem;max-width:1100px;margin:0 auto}
     @media(max-width:780px){.game-layout{grid-template-columns:1fr}}
 
-    /* TERRITORY GRID */
     .board-wrap{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);padding:1rem;box-shadow:var(--shadow-md)}
-    .board-title{font-family:var(--font-hand);font-size:1.3rem;color:var(--ink-soft);margin-bottom:.8rem}
+    .board-title{font-family:var(--font-hand);font-size:1.3rem;color:var(--ink-soft);margin-bottom:.8rem;display:flex;align-items:center;gap:.6rem}
+    /* FIX: indikator ronde ditampilkan di judul papan */
+    .round-badge{font-size:.85rem;color:var(--ink-faint);margin-left:auto;font-family:var(--font-hand)}
     .terr-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
     .terr-cell{aspect-ratio:1.3;border-radius:var(--radius-md);border:2.5px solid var(--paper-lines);background:var(--paper);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .25s;padding:.3rem;text-align:center;position:relative;overflow:hidden}
     .terr-cell:hover:not(.claimed-other):not(.disabled){transform:scale(1.05);box-shadow:var(--shadow-sm)}
@@ -37,14 +38,13 @@
     .territory-categories{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.7rem}
     .cat-pill{font-size:.72rem;font-weight:700;padding:.2rem .6rem;border-radius:99px;border:1.5px solid;cursor:pointer;transition:all .15s}
     .cat-pill.sel{color:white!important}
-    .cat-pill.colorant  {color:var(--blue);  border-color:var(--blue)}
-    .cat-pill.sweetener {color:var(--yellow);border-color:var(--yellow)}
+    .cat-pill.colorant   {color:var(--blue);  border-color:var(--blue)}
+    .cat-pill.sweetener  {color:var(--yellow);border-color:var(--yellow)}
     .cat-pill.preservative{color:var(--green);border-color:var(--green)}
-    .cat-pill.flavoring {color:var(--purple);border-color:var(--purple)}
-    .cat-pill.narcotic  {color:var(--red);   border-color:var(--red)}
-    .cat-pill.psychotropic{color:#8a5b4a;   border-color:#8a5b4a}
+    .cat-pill.flavoring  {color:var(--purple);border-color:var(--purple)}
+    .cat-pill.narcotic   {color:var(--red);   border-color:var(--red)}
+    .cat-pill.psychotropic{color:#8a5b4a;    border-color:#8a5b4a}
 
-    /* SIDEBAR */
     .sidebar{display:flex;flex-direction:column;gap:.8rem}
     .card{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);padding:1rem;box-shadow:var(--shadow-sm)}
     .card-title{font-family:var(--font-hand);font-size:1.1rem;color:var(--ink-soft);margin-bottom:.7rem}
@@ -60,11 +60,12 @@
     .turn-label{font-family:var(--font-hand);font-size:.95rem;color:var(--ink-faint);margin-bottom:.3rem}
     .turn-name{font-family:var(--font-hand);font-size:1.4rem;font-weight:700;color:var(--green);margin-bottom:.6rem}
     .attack-info{font-family:var(--font-hand);font-size:.9rem;color:var(--ink-faint);margin-bottom:.5rem;font-style:italic}
+    /* FIX: progress ronde di sidebar */
+    .round-progress{font-family:var(--font-hand);font-size:.85rem;color:var(--ink-faint);margin-bottom:.5rem}
     .pass-btn{width:100%;padding:.55rem;border-radius:var(--radius-md);border:2px solid var(--paper-lines);background:var(--paper);color:var(--ink-faint);font-family:var(--font-hand);font-size:1rem;cursor:pointer;transition:all .15s}
     .pass-btn:hover:not(:disabled){border-color:var(--green);color:var(--green)}
     .pass-btn:disabled{opacity:.4;cursor:default}
 
-    /* QUESTION */
     .q-overlay{display:none;position:fixed;inset:0;background:rgba(44,36,22,.55);z-index:5000;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(5px)}
     .q-overlay.open{display:flex;animation:fadeIn .25s ease}
     .q-box{background:var(--paper);border:3px solid var(--paper-lines);border-radius:var(--radius-lg);max-width:520px;width:100%;box-shadow:var(--shadow-lg);overflow:hidden;max-height:90vh;overflow-y:auto}
@@ -90,7 +91,6 @@
     .q-continue-btn{width:100%;padding:.65rem;border-radius:var(--radius-md);border:none;background:var(--green);color:white;font-family:var(--font-hand);font-size:1.1rem;font-weight:700;cursor:pointer}
     .q-spectate{font-family:var(--font-hand);font-size:.95rem;color:var(--ink-faint);text-align:center;padding:.5rem}
 
-    /* WIN */
     .win-overlay{display:none;position:fixed;inset:0;background:rgba(44,36,22,.7);z-index:6000;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
     .win-overlay.open{display:flex}
     .win-box{background:var(--paper);border:4px solid var(--green);border-radius:var(--radius-lg);max-width:420px;width:90%;padding:2rem;text-align:center;box-shadow:var(--shadow-lg);animation:popIn .4s ease}
@@ -118,7 +118,11 @@
 
 <div class="game-layout">
   <div class="board-wrap">
-    <div class="board-title">🗺️ Territory Map — Claim by answering correctly!</div>
+    <!-- FIX: tampilkan ronde saat ini di judul -->
+    <div class="board-title">
+      🗺️ Territory Map — Claim by answering correctly!
+      <span class="round-badge" id="roundBadge">Round 1 / 56</span>
+    </div>
     <div class="territory-categories" id="catFilters"></div>
     <div class="terr-grid" id="terrGrid"></div>
   </div>
@@ -128,6 +132,8 @@
       <div class="turn-label">Current Turn</div>
       <div class="turn-name" id="turnName">Loading…</div>
       <div class="attack-info" id="attackInfo">Select an unclaimed territory to claim it!</div>
+      <!-- FIX: progress ronde -->
+      <div class="round-progress" id="roundProgress">Round 1 of max 56</div>
       <button class="pass-btn" id="passBtn" onclick="passTurn()" disabled>⏭ Pass Turn</button>
     </div>
     <div class="card">
@@ -141,7 +147,7 @@
         ⚔️ <b>Rival's</b>: Answer to attack<br>
         🏆 Most territories wins!<br>
         ❓ Each territory has 1 question<br>
-        Rounds end after all claimed
+        🔢 Max 56 rounds total
       </div>
     </div>
   </div>
@@ -179,6 +185,7 @@
 <div class="toast" id="toast"></div>
 
 <script type="module">
+  // FIX: semua import Firebase di atas
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getDatabase, ref, onValue, update, off, get }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -198,7 +205,6 @@
   const IS_HOST= (params.get('host') || sessionStorage.getItem('odey_host')) === '1';
   document.getElementById('topbarCode').textContent = ROOM || '------';
 
-  /* TERRITORY DEFINITIONS */
   const TERRITORIES = [
     {id:'pandan',      name:'Pandan',         icon:'🍃', cat:'colorant',    pts:3},
     {id:'turmeric',    name:'Turmeric',        icon:'🌿', cat:'colorant',    pts:3},
@@ -230,6 +236,10 @@
     {id:'nicotine',    name:'Nicotine',         icon:'🚬', cat:'psychotropic',pts:3},
   ];
 
+  // FIX: batas ronde maksimum = 2 × jumlah wilayah
+  // Ini memastikan setiap wilayah paling banyak diperebutkan 2 kali rata-rata
+  const MAX_ROUNDS = TERRITORIES.length * 2; // 56
+
   const QUESTIONS_BY_TERR = {
     pandan:     {q:"Pandan gives food which natural color?", opts:["Red","Green","Blue","Yellow"], ans:1, exp:"Pandan's chlorophyll produces a distinctive natural green color used throughout Southeast Asian cooking."},
     turmeric:   {q:"The active colorant compound in turmeric is called:", opts:["Vanillin","Curcumin","Carotene","Lycopene"], ans:1, exp:"Curcumin is the bioactive compound in turmeric responsible for its yellow-orange pigment."},
@@ -248,7 +258,7 @@
     borax:      {q:"Borax is most commonly illegally added to:", opts:["Canned fruit","Meatballs (bakso) and fish cakes","Chocolate","Fruit juice"], ans:1, exp:"Borax (sodium tetraborate) gives meatballs a bouncy, elastic texture that consumers mistakenly associate with quality."},
     msg:        {q:"MSG was first isolated from which food source?", opts:["Soy sauce","Seaweed broth (kombu)","Parmesan cheese","Tomatoes"], ans:1, exp:"Kikunae Ikeda first isolated glutamate from kombu (kelp) broth in 1908 after noticing its distinctive savory taste."},
     vanillin:   {q:"Vanillin is an artificial version of the aroma from:", opts:["Banana","Pineapple","Vanilla beans","Strawberry"], ans:2, exp:"Vanillin is the primary aromatic compound in vanilla beans, now synthesized chemically as an affordable alternative."},
-    isoamyl:    {q:"Isoamyl acetate mimics the aroma of which fruit?", opts:["Strawberry","Pineapple","Banana","Cherry"], ans:2, exp:"Isoamyl acetate is the ester responsible for banana's distinctive aroma. Interestingly, it's based on the now-rare Gros Michel variety."},
+    isoamyl:    {q:"Isoamyl acetate mimics the aroma of which fruit?", opts:["Strawberry","Pineapple","Banana","Cherry"], ans:2, exp:"Isoamyl acetate is the ester responsible for banana's distinctive aroma."},
     morphine:   {q:"Morphine is derived from which plant?", opts:["Cannabis sativa","Coca plant","Opium poppy","Tobacco plant"], ans:2, exp:"Morphine is an opiate alkaloid extracted from the latex of Papaver somniferum (opium poppy)."},
     heroin:     {q:"Heroin (diacetylmorphine) was originally marketed as:", opts:["An anesthetic","A non-addictive cough medicine","A sleeping aid","An antidepressant"], ans:1, exp:"Bayer marketed heroin in 1898 as a 'non-addictive' substitute for morphine. This claim proved catastrophically wrong."},
     cocaine:    {q:"Cocaine's mechanism blocks the reuptake of which neurotransmitter?", opts:["Serotonin only","Dopamine, serotonin, and norepinephrine","GABA","Acetylcholine"], ans:1, exp:"Cocaine blocks reuptake transporters for dopamine, serotonin, AND norepinephrine simultaneously — producing intense stimulation."},
@@ -264,7 +274,7 @@
   const PLAYER_COLORS = ['#4a6fa5','#a0453a','#4a7c59','#b8922a','#6b5b8a','#8a5b4a'];
   const CAT_COLORS = { colorant:'#4a6fa5', sweetener:'#b8922a', preservative:'#4a7c59', flavoring:'#6b5b8a', narcotic:'#a0453a', psychotropic:'#8a5b4a' };
 
-  let qTimer = null;
+  let qTimerInterval = null;
   let qTimeLeft = 30;
   let waitingForAnswer = false;
   let pendingClaim = null;
@@ -283,7 +293,6 @@
       grid.appendChild(cell);
     });
 
-    // Category filters
     const cats = [...new Set(TERRITORIES.map(t => t.cat))];
     const cf = document.getElementById('catFilters');
     const all = document.createElement('div');
@@ -311,6 +320,7 @@
     });
   }
 
+  // FIX: menggunakan get yang diimport di atas
   async function attemptClaim(terrId) {
     const snap = await get(ref(db, 'rooms/' + ROOM));
     const room = snap.val();
@@ -360,7 +370,7 @@
       btn.className = 'q-opt';
       btn.innerHTML = `<span class="q-opt-letter">${letters[i]}</span>${opt}`;
       btn.disabled = !isMyTurn;
-      btn.onclick = () => answerQuestion(i, q, qData, isMyTurn);
+      btn.onclick = () => answerQuestion(i, q, qData);
       optsEl.appendChild(btn);
     });
 
@@ -374,21 +384,22 @@
       qTimeLeft = 30;
       document.getElementById('qTimer').textContent = 30;
       document.getElementById('qTimer').classList.remove('urgent');
-      clearInterval(qTimer);
-      qTimer = setInterval(() => {
+      clearInterval(qTimerInterval);
+      qTimerInterval = setInterval(() => {
         qTimeLeft--;
         const el = document.getElementById('qTimer');
         el.textContent = qTimeLeft;
         if (qTimeLeft <= 10) el.classList.add('urgent');
-        if (qTimeLeft <= 0) { clearInterval(qTimer); answerQuestion(-1, q, qData, true); }
+        if (qTimeLeft <= 0) { clearInterval(qTimerInterval); answerQuestion(-1, q, qData, true); }
       }, 1000);
     }
   }
 
+  // FIX: answerQuestion menggunakan get yang sudah diimport
   async function answerQuestion(chosen, q, qData, timeout = false) {
     if (waitingForAnswer) return;
     waitingForAnswer = true;
-    clearInterval(qTimer);
+    clearInterval(qTimerInterval);
 
     const correct = chosen === q.ans;
     document.querySelectorAll('.q-opt').forEach((btn, i) => {
@@ -423,14 +434,18 @@
     await advanceTurn(snap.val());
   };
 
+  // FIX: advanceTurn sekarang juga menambah roundCount dan mengecek batas ronde
   async function advanceTurn(room) {
     const players = room.gameState?.players || room.players || {};
     const order = Object.keys(players).sort((a,b) => (players[a].joinedAt||0) - (players[b].joinedAt||0));
     const currIdx = order.indexOf(room.gameState?.currentTurn || order[0]);
     const next = (currIdx + 1) % order.length;
+    const newRound = (room.gameState?.roundCount || 0) + 1;
+
     await update(ref(db), {
       [`rooms/${ROOM}/gameState/currentTurn`]: order[next],
-      [`rooms/${ROOM}/gameState/currentQuestion`]: null
+      [`rooms/${ROOM}/gameState/currentQuestion`]: null,
+      [`rooms/${ROOM}/gameState/roundCount`]: newRound
     });
   }
 
@@ -493,10 +508,15 @@
     const claimed = gs.claimed || {};
     const currentTurn = gs.currentTurn;
     const isMyTurn = currentTurn === MY_PID;
+    const roundCount = gs.roundCount || 0;
 
     document.getElementById('turnName').textContent = currentTurn ? (players[currentTurn]?.name || '…') + (isMyTurn ? ' (You!)' : '') : 'Starting…';
     document.getElementById('attackInfo').textContent = isMyTurn ? 'Select a territory to claim or attack!' : 'Wait for your turn…';
     document.getElementById('passBtn').disabled = !isMyTurn || !!gs.currentQuestion;
+
+    // FIX: update tampilan ronde
+    document.getElementById('roundBadge').textContent = `Round ${roundCount + 1} / ${MAX_ROUNDS}`;
+    document.getElementById('roundProgress').textContent = `Round ${roundCount + 1} of max ${MAX_ROUNDS}`;
 
     renderTerritories(claimed, players);
     renderScores(players, claimed);
@@ -507,27 +527,39 @@
       showQuestion(gs.currentQuestion, isAnswering);
     }
 
-    // Check end: all territories claimed
     const totalClaimed = Object.keys(claimed).length;
-    if (totalClaimed >= TERRITORIES.length && !document.getElementById('winOverlay').classList.contains('open')) {
+    const winOverlayOpen = document.getElementById('winOverlay').classList.contains('open');
+
+    // Win: semua wilayah diklaim
+    if (totalClaimed >= TERRITORIES.length && !winOverlayOpen) {
       off(ref(db, 'rooms/' + ROOM));
-      showWin(players, claimed);
+      showWin(players, claimed, 'all territories claimed!');
+      return;
+    }
+
+    // FIX: kondisi game over saat batas ronde tercapai
+    if (roundCount >= MAX_ROUNDS && !winOverlayOpen) {
+      off(ref(db, 'rooms/' + ROOM));
+      showWin(players, claimed, `max ${MAX_ROUNDS} rounds reached`);
     }
   });
 
-  function showWin(players, claimed) {
+  function showWin(players, claimed, reason) {
     const terrCount = {};
     if (claimed) Object.values(claimed).forEach(pid => { terrCount[pid] = (terrCount[pid]||0)+1; });
     const arr = Object.entries(players).sort((a,b) => (b[1].score||0)-(a[1].score||0));
     const winner = arr[0];
     document.getElementById('winTitle').textContent = (winner?.[1]?.name || '?') + ' Dominates! 🗺️';
-    document.getElementById('winSub').textContent = 'All territories claimed — final standings:';
+    document.getElementById('winSub').textContent = `Game ended — ${reason}. Final standings:`;
     const rows = document.getElementById('winRows');
     rows.innerHTML = '';
     arr.forEach(([pid,p],i) => {
       const div = document.createElement('div');
       div.className = 'win-row' + (i===0?' first':'');
-      div.innerHTML = `<span>${i===0?'🥇':i===1?'🥈':'🥉'}</span><span style="font-family:var(--font-hand);flex:1">${p.name}</span><span style="font-family:var(--font-hand);color:var(--green)">${terrCount[pid]||0}🏴</span><span style="font-family:var(--font-hand);color:var(--blue);margin-left:.5rem">${p.score||0}pt</span>`;
+      div.innerHTML = `<span>${i===0?'🥇':i===1?'🥈':'🥉'}</span>
+        <span style="font-family:var(--font-hand);flex:1">${p.name}${pid===MY_PID?' (you)':''}</span>
+        <span style="font-family:var(--font-hand);color:var(--green)">${terrCount[pid]||0}🏴</span>
+        <span style="font-family:var(--font-hand);color:var(--blue);margin-left:.5rem">${p.score||0}pt</span>`;
       rows.appendChild(div);
     });
     document.getElementById('winOverlay').classList.add('open');
