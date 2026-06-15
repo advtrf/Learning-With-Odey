@@ -26,7 +26,6 @@
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     body{font-family:var(--font-ui);background:var(--paper);color:var(--ink);min-height:100vh;overflow-x:hidden}
 
-    /* ── HERO ── */
     .games-hero{background:var(--paper-dark);border-bottom:2px solid var(--paper-lines);padding:2.5rem 2rem 2rem;text-align:center;position:relative;overflow:hidden}
     .games-hero h1{font-family:var(--font-hand);color:var(--yellow);font-size:clamp(2rem,5vw,3.2rem);display:inline-block;position:relative}
     .games-hero h1::after{content:'';position:absolute;bottom:-6px;left:0;right:0;height:4px;background:var(--green);border-radius:2px;transform:rotate(-0.5deg)}
@@ -35,11 +34,9 @@
     .hero-deco.d1{top:-10px;left:20px}
     .hero-deco.d2{bottom:-10px;right:20px;transform:rotate(15deg)}
 
-    /* ── SECTION TITLE ── */
     .section-title{font-family:var(--font-hand);font-size:1.6rem;color:var(--ink);margin:2.5rem 0 1.2rem;display:flex;align-items:center;gap:.6rem}
     .section-title::after{content:'';flex:1;height:2px;background:var(--paper-lines);border-radius:1px}
 
-    /* ── GAME CARDS GRID ── */
     .games-container{max-width:1100px;margin:0 auto;padding:0 1.5rem 4rem}
     .games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.2rem;margin-bottom:3rem}
 
@@ -73,7 +70,6 @@
     .game-card-play:hover{filter:brightness(.93);transform:translateY(-1px)}
     .players-badge{position:absolute;top:.5rem;right:.5rem;background:rgba(255,255,255,.9);border:1.5px solid var(--paper-lines);border-radius:99px;padding:.15rem .6rem;font-size:.72rem;font-weight:700;color:var(--ink-soft)}
 
-    /* ── ACTIVE ROOMS ── */
     .rooms-section{margin-top:1rem}
     .rooms-list{display:flex;flex-direction:column;gap:.7rem}
     .room-item{display:flex;align-items:center;gap:1rem;padding:.9rem 1.2rem;background:white;border:2px solid var(--paper-lines);border-radius:var(--radius-md);transition:all .2s;cursor:pointer}
@@ -88,7 +84,6 @@
     .rooms-empty{text-align:center;padding:2rem;color:var(--ink-faint);font-family:var(--font-hand);font-size:1.1rem;border:2px dashed var(--paper-lines);border-radius:var(--radius-md)}
     .rooms-loading{text-align:center;padding:1.5rem;color:var(--ink-faint);font-style:italic;font-size:.9rem}
 
-    /* ── MODAL: CREATE ROOM ── */
     .modal-overlay{display:none;position:fixed;inset:0;background:rgba(44,36,22,.5);z-index:3000;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(4px)}
     .modal-overlay.open{display:flex;animation:fadeIn .2s ease}
     .modal{background:var(--paper);border:3px solid var(--paper-lines);border-radius:var(--radius-lg);box-shadow:8px 12px 0 rgba(44,36,22,.2);max-width:480px;width:100%;position:relative;overflow:hidden;max-height:90vh;overflow-y:auto}
@@ -117,7 +112,6 @@
     .modal-submit.purple{background:var(--purple);color:white}
     .modal-submit:hover{filter:brightness(1.1);transform:translateY(-2px);box-shadow:var(--shadow-md)}
 
-    /* ── LOBBY WAITING ── */
     .lobby-overlay{display:none;position:fixed;inset:0;background:rgba(44,36,22,.6);z-index:4000;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(6px)}
     .lobby-overlay.open{display:flex;animation:fadeIn .25s ease}
     .lobby-box{background:var(--paper);border:3px solid var(--paper-lines);border-radius:var(--radius-lg);max-width:520px;width:100%;box-shadow:var(--shadow-lg);overflow:hidden}
@@ -147,7 +141,6 @@
     .pulse{animation:pulse 1.5s ease-in-out infinite}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 
-    /* ── JOIN BY CODE ── */
     .join-section{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);padding:1.5rem;margin-top:1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
     .join-section h3{font-family:var(--font-hand);font-size:1.2rem;color:var(--ink);flex-shrink:0}
     .join-input{flex:1;min-width:140px;padding:.6rem .9rem;border:2px solid var(--paper-lines);border-radius:var(--radius-sm);background:var(--paper);color:var(--ink);font-family:var(--font-ui);font-size:1rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;outline:none}
@@ -157,7 +150,6 @@
     .join-btn{padding:.6rem 1.5rem;border-radius:var(--radius-sm);border:2px solid var(--blue);background:var(--blue);color:white;font-family:var(--font-hand);font-size:1.1rem;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
     .join-btn:hover{filter:brightness(1.1)}
 
-    /* SHARED */
     @keyframes fadeIn{from{opacity:0}to{opacity:1}}
     @keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
     .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--ink);color:white;font-family:var(--font-hand);font-size:1.1rem;padding:.7rem 1.5rem;border-radius:99px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none}
@@ -192,7 +184,6 @@
 
     <div class="games-grid">
 
-      <!-- ROLL & MOVE -->
       <div class="game-card roll">
         <div class="game-card-banner">🎲</div>
         <div class="players-badge">👥 2–6 players</div>
@@ -208,7 +199,6 @@
         </div>
       </div>
 
-      <!-- TERRITORY CONTROL -->
       <div class="game-card terr">
         <div class="game-card-banner">🗺️</div>
         <div class="players-badge">👥 2–6 players</div>
@@ -224,7 +214,6 @@
         </div>
       </div>
 
-      <!-- COOPERATIVE CRISIS -->
       <div class="game-card coop">
         <div class="game-card-banner">🦠</div>
         <div class="players-badge">👥 2–6 players</div>
@@ -240,7 +229,6 @@
         </div>
       </div>
 
-      <!-- CARD BATTLE -->
       <div class="game-card card">
         <div class="game-card-banner">🃏</div>
         <div class="players-badge">👥 2–6 players</div>
@@ -345,7 +333,6 @@
 
 <div class="toast" id="toast"></div>
 
-<!-- FIREBASE -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getDatabase, ref, set, get, push, onValue, off, update, remove, serverTimestamp }
@@ -365,11 +352,12 @@
   const db  = getDatabase(app);
 
   /* ── STATE ── */
+  // FIX: nama file diseragamkan dengan gameinit.html (menggunakan format "game-xxx.html")
   const GAME_META = {
-    roll: { name:'BioTrail',           icon:'🎲', color:'blue',   file:'gameroll.html'      },
-    terr: { name:'ChemClaim',          icon:'🗺️', color:'green',  file:'gameterritory.html' },
-    coop: { name:'Pandemic Protocol',  icon:'🦠', color:'red',    file:'gamecoop.html'      },
-    card: { name:'Toxin Duel',         icon:'🃏', color:'purple', file:'gamecard.html'      }
+    roll: { name:'BioTrail',           icon:'🎲', color:'blue',   file:'game-roll.html'      },
+    terr: { name:'ChemClaim',          icon:'🗺️', color:'green',  file:'game-territory.html' },
+    coop: { name:'Pandemic Protocol',  icon:'🦠', color:'red',    file:'game-coop.html'      },
+    card: { name:'Toxin Duel',         icon:'🃏', color:'purple', file:'game-card.html'      }
   };
 
   let currentGameType = null;
@@ -378,6 +366,7 @@
   let isHost = false;
   let maxPlayers = 4;
   let roomListener = null;
+  let lobbyListenerRef = null;
 
   /* ── HELPERS ── */
   function genCode() {
@@ -491,7 +480,8 @@
 
   window.leaveRoom = async function() {
     if (!currentRoomCode || !currentPlayerId) return;
-    if (roomListener) { off(ref(db, 'rooms/' + currentRoomCode)); roomListener = null; }
+    // FIX: matikan listener menggunakan ref yang disimpan, bukan ref baru
+    if (lobbyListenerRef) { off(lobbyListenerRef); lobbyListenerRef = null; }
     await remove(ref(db, 'rooms/' + currentRoomCode + '/players/' + currentPlayerId));
     if (isHost) await remove(ref(db, 'rooms/' + currentRoomCode));
     document.getElementById('lobbyOverlay').classList.remove('open');
@@ -503,19 +493,20 @@
   };
 
   window.startGame = async function() {
-  if (!isHost) return;
-  // Redirect ke game-init.html dulu untuk setup gameState
-  const meta = GAME_META[currentGameType];
-  window.location.href = 'gameinit.html?room=' + currentRoomCode + '&pid=' + currentPlayerId + '&host=1&auto=1';
-};
+    if (!isHost) return;
+    // Redirect ke gameinit.html untuk setup gameState
+    window.location.href = 'gameinit.html?room=' + currentRoomCode + '&pid=' + currentPlayerId + '&host=1&auto=1';
+  };
 
   function openLobby(code) {
     document.getElementById('lobbyCode').textContent = code;
     document.getElementById('lobbyOverlay').classList.add('open');
 
-    if (roomListener) { off(ref(db, 'rooms/' + (currentRoomCode || code))); }
+    // FIX: matikan listener lama sebelum buat yang baru
+    if (lobbyListenerRef) { off(lobbyListenerRef); }
+    lobbyListenerRef = ref(db, 'rooms/' + code);
 
-    roomListener = onValue(ref(db, 'rooms/' + code), snap => {
+    roomListener = onValue(lobbyListenerRef, snap => {
       if (!snap.exists()) {
         showToast('Room was closed by host');
         document.getElementById('lobbyOverlay').classList.remove('open');
@@ -524,8 +515,8 @@
       const room = snap.val();
       const meta = GAME_META[room.game];
 
-      document.getElementById('lobbyIcon').textContent     = meta.icon;
-      document.getElementById('lobbyGameName').textContent = room.gameName;
+      document.getElementById('lobbyIcon').textContent      = meta.icon;
+      document.getElementById('lobbyGameName').textContent  = room.gameName;
       document.getElementById('lobbyRoomLabel').textContent = room.roomLabel;
 
       const players = room.players || {};
@@ -566,15 +557,16 @@
       document.getElementById('lobbyStatus').textContent =
         count < room.maxPlayers ? 'Share code ' + code + ' with friends!' : 'Room full — ready to start!';
 
+      // FIX: blok if ditutup dengan benar; redirect host sudah terjadi via startGame()
+      // Non-host perlu di-redirect saat status berubah ke 'playing'
       if (room.status === 'playing') {
-  off(ref(db, 'rooms/' + code));
-  // Host sudah redirect via startGame
-  // Player lain redirect ke game langsung
-  if (!isHost) {
-    const meta = GAME_META[room.game];
-    const url = meta.file + '?room=' + code + '&pid=' + currentPlayerId + '&host=0';
-    window.location.href = url;
-  }
+        off(lobbyListenerRef);
+        lobbyListenerRef = null;
+        if (!isHost) {
+          const gameFile = meta.file;
+          window.location.href = gameFile + '?room=' + code + '&pid=' + currentPlayerId + '&host=0';
+        }
+      } // ← kurung penutup if yang sebelumnya hilang
     });
   }
 
