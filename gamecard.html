@@ -19,11 +19,9 @@
     .game-layout{display:grid;grid-template-columns:1fr 280px;gap:1rem;padding:1rem;max-width:1100px;margin:0 auto}
     @media(max-width:800px){.game-layout{grid-template-columns:1fr}}
 
-    /* ARENA */
     .arena{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);padding:1.2rem;box-shadow:var(--shadow-md)}
     .arena-title{font-family:var(--font-hand);font-size:1.3rem;color:var(--purple);margin-bottom:1rem;display:flex;align-items:center;gap:.6rem}
 
-    /* PLAYER ZONES */
     .player-zones{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.8rem;margin-bottom:1.2rem}
     .player-zone{border:2.5px solid var(--paper-lines);border-radius:var(--radius-md);padding:.7rem;background:var(--paper);transition:all .2s;position:relative}
     .player-zone.my-zone{border-color:var(--purple);background:var(--purple-pale)}
@@ -37,7 +35,6 @@
     .hp-pip{width:10px;height:10px;border-radius:2px;background:var(--green);border:1px solid var(--green-light);transition:background .3s}
     .hp-pip.lost{background:var(--paper-lines)}
 
-    /* CARD HAND */
     .hand-label{font-family:var(--font-hand);font-size:.95rem;color:var(--ink-faint);margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem}
     .card-hand{display:flex;gap:.6rem;flex-wrap:wrap;min-height:90px;padding:.4rem;background:var(--paper-dark);border-radius:var(--radius-md);border:2px dashed var(--paper-lines);margin-bottom:1rem}
     .hand-card{width:80px;height:110px;border-radius:var(--radius-md);border:2.5px solid;background:white;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.4rem;text-align:center;cursor:pointer;transition:all .25s;position:relative;flex-shrink:0}
@@ -57,13 +54,11 @@
     .hand-card.type-special {border-color:var(--purple);background:var(--purple-pale)}
     .hand-card.type-special .hc-type-badge{background:var(--purple);color:white}
 
-    /* PLAY AREA */
     .play-area{background:var(--paper-dark);border:2px dashed var(--paper-lines);border-radius:var(--radius-md);padding:1rem;margin-bottom:.8rem;min-height:80px;display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap}
     .play-area-label{font-family:var(--font-hand);font-size:.9rem;color:var(--ink-faint);text-align:center}
     .played-card{width:70px;height:95px;border-radius:var(--radius-md);border:2.5px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.3rem;text-align:center;animation:cardPlay .3s ease}
     @keyframes cardPlay{0%{transform:scale(0) rotate(-10deg)}100%{transform:scale(1) rotate(0deg)}}
 
-    /* ACTION BAR */
     .action-bar{display:flex;gap:.6rem;flex-wrap:wrap}
     .act-btn{padding:.6rem 1.2rem;border-radius:var(--radius-md);border:2px solid;font-family:var(--font-hand);font-size:1rem;font-weight:700;cursor:pointer;transition:all .15s}
     .act-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:var(--shadow-sm)}
@@ -72,7 +67,6 @@
     .act-btn.draw  {background:var(--blue-pale);  color:var(--blue);  border-color:var(--blue)}
     .act-btn.pass  {background:var(--paper);      color:var(--ink-faint);border-color:var(--paper-lines)}
 
-    /* SIDEBAR */
     .sidebar{display:flex;flex-direction:column;gap:.8rem}
     .card-s{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);padding:1rem;box-shadow:var(--shadow-sm)}
     .card-s-title{font-family:var(--font-hand);font-size:1.1rem;color:var(--ink-soft);margin-bottom:.6rem}
@@ -81,7 +75,6 @@
     .turn-name{font-family:var(--font-hand);font-size:1.4rem;font-weight:700;color:var(--purple);margin:.3rem 0 .5rem}
     .deck-info{font-family:var(--font-hand);font-size:.85rem;color:var(--ink-faint)}
 
-    /* SCORE */
     .score-row{display:flex;align-items:center;gap:.5rem;padding:.35rem .4rem;border-radius:var(--radius-sm);margin-bottom:.25rem}
     .score-row.me{background:var(--purple-pale);border:1.5px solid var(--purple-pale)}
     .score-row.active{background:var(--yellow-pale);border:1.5px solid var(--yellow-light)}
@@ -89,14 +82,12 @@
     .sr-name{font-family:var(--font-hand);font-size:.9rem;font-weight:700;flex:1}
     .sr-pts{font-family:var(--font-hand);font-size:.9rem;color:var(--purple);font-weight:700}
 
-    /* LOG */
     .log-scroll{max-height:130px;overflow-y:auto}
     .log-item{font-family:var(--font-hand);font-size:.82rem;color:var(--ink-soft);padding:.1rem 0;border-bottom:1px dashed var(--paper-lines)}
     .log-item.atk{color:var(--red)}
     .log-item.def{color:var(--blue)}
     .log-item.pts{color:var(--green)}
 
-    /* QUESTION */
     .q-overlay{display:none;position:fixed;inset:0;background:rgba(44,36,22,.6);z-index:5000;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(6px)}
     .q-overlay.open{display:flex;animation:fadeIn .25s ease}
     .q-box{background:var(--paper);border:3px solid var(--purple);border-radius:var(--radius-lg);max-width:530px;width:100%;box-shadow:var(--shadow-lg);overflow:hidden;max-height:92vh;overflow-y:auto}
@@ -124,7 +115,6 @@
     .q-cont{width:100%;padding:.65rem;border-radius:var(--radius-md);border:none;background:var(--purple);color:white;font-family:var(--font-hand);font-size:1.1rem;font-weight:700;cursor:pointer}
     .q-spectate{font-family:var(--font-hand);font-size:.95rem;color:var(--ink-faint);text-align:center;padding:.5rem;font-style:italic}
 
-    /* TARGET PICKER */
     .target-overlay{display:none;position:fixed;inset:0;background:rgba(44,36,22,.5);z-index:4500;align-items:center;justify-content:center;padding:1rem}
     .target-overlay.open{display:flex;animation:fadeIn .2s ease}
     .target-box{background:var(--paper);border:3px solid var(--red);border-radius:var(--radius-lg);max-width:380px;width:100%;padding:1.5rem;box-shadow:var(--shadow-lg)}
@@ -134,7 +124,6 @@
     .target-btn:hover{border-color:var(--red);background:var(--red-pale);color:var(--red)}
     .target-cancel{width:100%;margin-top:.7rem;padding:.5rem;border-radius:var(--radius-sm);border:2px solid var(--paper-lines);background:var(--paper);color:var(--ink-faint);font-family:var(--font-hand);font-size:1rem;cursor:pointer}
 
-    /* WIN */
     .win-overlay{display:none;position:fixed;inset:0;background:rgba(44,36,22,.75);z-index:6000;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
     .win-overlay.open{display:flex;animation:fadeIn .3s ease}
     .win-box{background:var(--paper);border:4px solid var(--purple);border-radius:var(--radius-lg);max-width:430px;width:90%;padding:2rem;text-align:center;box-shadow:var(--shadow-lg);animation:popIn .4s ease}
@@ -162,46 +151,32 @@
 </div>
 
 <div class="game-layout">
-  <!-- ARENA -->
   <div class="arena">
     <div class="arena-title">🃏 Battle Arena — Answer to earn cards, play cards to dominate!</div>
-
-    <!-- PLAYER ZONES -->
     <div class="player-zones" id="playerZones"></div>
-
-    <!-- MY HAND -->
     <div class="hand-label">🤚 Your Hand <span id="handCount" style="color:var(--ink-faint)">(0 cards)</span></div>
     <div class="card-hand" id="cardHand"></div>
-
-    <!-- SELECTED CARD INFO -->
     <div id="selectedCardInfo" style="display:none;padding:.5rem .8rem;background:var(--purple-pale);border:1.5px solid var(--purple);border-radius:var(--radius-md);margin-bottom:.7rem;font-family:var(--font-hand);font-size:.95rem;color:var(--purple)"></div>
-
-    <!-- PLAY AREA -->
     <div class="play-area" id="playArea">
       <div class="play-area-label">Cards played this turn will appear here</div>
     </div>
-
-    <!-- ACTION BAR -->
     <div class="action-bar">
-      <button class="act-btn draw"  id="drawBtn"  onclick="drawCard()"   disabled>🃏 Draw Card (Answer Q)</button>
-      <button class="act-btn play"  id="playBtn"  onclick="playSelected()"disabled>▶️ Play Selected</button>
-      <button class="act-btn pass"  id="passBtn"  onclick="passTurn()"   disabled>⏭ End Turn</button>
+      <button class="act-btn draw"  id="drawBtn"  onclick="drawCard()"    disabled>🃏 Draw Card (Answer Q)</button>
+      <button class="act-btn play"  id="playBtn"  onclick="playSelected()" disabled>▶️ Play Selected</button>
+      <button class="act-btn pass"  id="passBtn"  onclick="passTurn()"    disabled>⏭ End Turn</button>
     </div>
   </div>
 
-  <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="turn-card">
       <div class="turn-label">Current Turn</div>
       <div class="turn-name" id="turnName">Loading…</div>
-      <div class="deck-info" id="deckInfo">🃏 Deck: — cards remaining</div>
+      <div class="deck-info" id="deckInfo">🃏 Turn — / 20</div>
     </div>
-
     <div class="card-s">
       <div class="card-s-title">🏆 Scores</div>
       <div id="scoreRows"></div>
     </div>
-
     <div class="card-s" style="background:var(--paper-dark)">
       <div class="card-s-title">🃏 Card Types</div>
       <div style="font-size:.75rem;color:var(--ink-soft);line-height:1.8">
@@ -212,7 +187,6 @@
         <em>Answer correctly to draw!</em>
       </div>
     </div>
-
     <div class="card-s">
       <div class="card-s-title">📜 Log</div>
       <div class="log-scroll" id="gameLog"></div>
@@ -266,6 +240,7 @@
 <div class="toast" id="toast"></div>
 
 <script type="module">
+  // FIX: semua import Firebase di atas — tidak ada dynamic import di dalam fungsi
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getDatabase, ref, onValue, update, off, get }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -284,29 +259,22 @@
   const MY_PID = params.get('pid')  || sessionStorage.getItem('odey_pid');
   document.getElementById('topbarCode').textContent = ROOM || '------';
 
-  /* ══════════════════════════════════
-     CARD DEFINITIONS
-  ══════════════════════════════════ */
   const CARD_POOL = [
-    // ATTACK
     { id:'rhodamine_strike',  type:'attack',  icon:'☠️', name:'Rhodamine Strike',  effect:'steal_pts', value:10, desc:'Steal 10 pts from target' },
     { id:'formalin_dose',     type:'attack',  icon:'💀', name:'Formalin Dose',     effect:'steal_pts', value:15, desc:'Steal 15 pts from target' },
     { id:'borax_trap',        type:'attack',  icon:'🪤', name:'Borax Trap',        effect:'skip_turn', value:0,  desc:'Target skips next turn' },
     { id:'metanil_poison',    type:'attack',  icon:'🟡', name:'Metanil Poison',    effect:'steal_pts', value:8,  desc:'Steal 8 pts from target' },
     { id:'heroin_sabotage',   type:'attack',  icon:'💉', name:'Heroin Sabotage',   effect:'discard',   value:1,  desc:'Target discards 1 card' },
     { id:'cocaine_rush',      type:'attack',  icon:'⚡', name:'Cocaine Rush',      effect:'steal_pts', value:12, desc:'Steal 12 pts from target' },
-    // DEFENSE
     { id:'citric_shield',     type:'defense', icon:'🍋', name:'Citric Shield',     effect:'shield',    value:1,  desc:'Block the next attack against you' },
     { id:'bpom_clearance',    type:'defense', icon:'✅', name:'BPOM Clearance',    effect:'shield',    value:2,  desc:'Block next 2 attacks against you' },
     { id:'vitamin_c_armor',   type:'defense', icon:'💊', name:'Vitamin C Armor',   effect:'shield',    value:1,  desc:'Block next attack + heal 5 pts' },
     { id:'agar_barrier',      type:'defense', icon:'🌊', name:'Agar Barrier',      effect:'shield',    value:1,  desc:'Block next attack against you' },
-    // BOOST
     { id:'msg_power',         type:'boost',   icon:'🧂', name:'MSG Power',         effect:'gain_pts',  value:15, desc:'Gain 15 points' },
     { id:'stevia_rush',       type:'boost',   icon:'🍃', name:'Stevia Rush',       effect:'gain_pts',  value:10, desc:'Gain 10 points' },
     { id:'beta_carotene',     type:'boost',   icon:'🥕', name:'Beta-Carotene',     effect:'gain_pts',  value:8,  desc:'Gain 8 points' },
     { id:'agar_fuel',         type:'boost',   icon:'🍮', name:'Agar Fuel',         effect:'gain_pts',  value:12, desc:'Gain 12 points' },
     { id:'caffeine_spike',    type:'boost',   icon:'☕', name:'Caffeine Spike',    effect:'draw_extra',value:1,  desc:'Draw 1 extra card this turn' },
-    // SPECIAL
     { id:'sdg3_protocol',     type:'special', icon:'🌿', name:'SDG 3 Protocol',    effect:'gain_pts',  value:25, desc:'Gain 25 points — protect public health!' },
     { id:'bpom_raid',         type:'special', icon:'🔬', name:'BPOM Raid',         effect:'steal_all', value:5,  desc:'Steal 5 pts from ALL other players' },
     { id:'recall_order',      type:'special', icon:'📋', name:'Recall Order',      effect:'skip_all',  value:0,  desc:'All other players skip next turn' },
@@ -314,7 +282,6 @@
     { id:'schedule1_bust',    type:'special', icon:'🚨', name:'Schedule I Bust',   effect:'steal_pts', value:20, desc:'Steal 20 pts from highest-scoring player' },
   ];
 
-  /* QUESTIONS FOR DRAWING CARDS */
   const DRAW_QUESTIONS = [
     { q:"Which substance is a Schedule I narcotic with no medical use?", opts:["Codeine","Heroin","Morphine","Caffeine"], ans:1, exp:"Heroin (diacetylmorphine) is Schedule I — highest addiction risk, zero legal medical application." },
     { q:"What is the Acceptable Daily Intake (ADI) concept based on?", opts:["Maximum dose ever tested","No-Observed-Adverse-Effect Level divided by 100","The dose that kills 50% of lab animals","Consumer preference surveys"], ans:1, exp:"ADI = NOAEL ÷ 100 (safety factor). This means you'd need 100× the ADI daily to approach any risk." },
@@ -336,14 +303,13 @@
   /* STATE */
   let selectedCardIdx = null;
   let myHand = [];
-  let qTimer = null;
+  let qTimerInterval = null;
   let qTimeLeft = 30;
   let waitingForAnswer = false;
   let pendingCardDraw = null;
   let roomPlayers = {};
   const MAX_TURNS = 20;
 
-  /* RENDER PLAYER ZONES */
   function renderPlayerZones(players, currentTurn, shields, skipNext) {
     const zones = document.getElementById('playerZones');
     zones.innerHTML = '';
@@ -362,8 +328,6 @@
         <div class="pz-pts">${p.score||0} pts</div>
         <div class="pz-hp" id="hp-${pid}"></div>`;
       zones.appendChild(div);
-
-      // HP pips (based on score, 0–60 range)
       const hpEl = document.getElementById('hp-' + pid);
       const maxHp = 6;
       const filledHp = Math.min(maxHp, Math.ceil(((p.score||0) / 60) * maxHp));
@@ -375,7 +339,6 @@
     });
   }
 
-  /* RENDER MY HAND */
   function renderHand(hand) {
     myHand = hand || [];
     const el = document.getElementById('cardHand');
@@ -419,7 +382,6 @@
     });
   }
 
-  /* PLAY CARD */
   window.playSelected = function() {
     if (selectedCardIdx === null || selectedCardIdx >= myHand.length) return;
     const card = CARD_POOL.find(c => c.id === myHand[selectedCardIdx]);
@@ -458,6 +420,7 @@
     document.getElementById('targetOverlay').classList.remove('open');
   };
 
+  // FIX: menggunakan get yang sudah diimport di atas, bukan dynamic import
   async function executeCard(card, targetPid) {
     const snap = await get(ref(db, 'rooms/' + ROOM));
     const room = snap.val();
@@ -466,7 +429,6 @@
     const shields = gs.shields || {};
     const updates = {};
 
-    // Remove card from hand
     const newHand = [...(gs.hands?.[MY_PID] || [])];
     newHand.splice(selectedCardIdx, 1);
     updates[`rooms/${ROOM}/gameState/hands/${MY_PID}`] = newHand;
@@ -474,11 +436,13 @@
     document.getElementById('selectedCardInfo').style.display = 'none';
 
     const myScore = players[MY_PID]?.score || 0;
+    // FIX: gunakan roomPlayers (state lokal) untuk nama — tidak perlu request Firebase ekstra
+    const myName = roomPlayers[MY_PID]?.name || 'Player';
 
     switch (card.effect) {
       case 'gain_pts':
         updates[`rooms/${ROOM}/gameState/players/${MY_PID}/score`] = myScore + card.value;
-        addLog(`${players[MY_PID]?.name} played ${card.name} — gained ${card.value} pts!`, 'pts');
+        addLog(`${myName} played ${card.name} — gained ${card.value} pts!`, 'pts');
         break;
 
       case 'steal_pts':
@@ -487,17 +451,17 @@
           if ((shields[targetPid] || 0) > 0) {
             const newShield = (shields[targetPid] || 0) - 1;
             updates[`rooms/${ROOM}/gameState/shields/${targetPid}`] = newShield;
-            addLog(`${players[MY_PID]?.name} attacked ${players[targetPid]?.name} — BLOCKED by shield!`, 'def');
+            addLog(`${myName} attacked ${players[targetPid]?.name} — BLOCKED by shield!`, 'def');
           } else {
             const stolen = Math.min(card.value, targetScore);
             updates[`rooms/${ROOM}/gameState/players/${MY_PID}/score`]   = myScore + stolen;
             updates[`rooms/${ROOM}/gameState/players/${targetPid}/score`] = targetScore - stolen;
-            addLog(`${players[MY_PID]?.name} stole ${stolen} pts from ${players[targetPid]?.name}!`, 'atk');
+            addLog(`${myName} stole ${stolen} pts from ${players[targetPid]?.name}!`, 'atk');
           }
         }
         break;
 
-      case 'steal_all':
+      case 'steal_all': {
         let totalStolen = 0;
         Object.entries(players).forEach(([pid, p]) => {
           if (pid === MY_PID) return;
@@ -510,11 +474,11 @@
           }
         });
         updates[`rooms/${ROOM}/gameState/players/${MY_PID}/score`] = myScore + totalStolen;
-        addLog(`${players[MY_PID]?.name} used BPOM Raid — stole from everyone!`, 'atk');
+        addLog(`${myName} used BPOM Raid — stole from everyone!`, 'atk');
         break;
+      }
 
       case 'schedule1_bust': {
-        // Steal from highest-scoring player
         let highPid = null, highScore = -1;
         Object.entries(players).forEach(([pid, p]) => {
           if (pid !== MY_PID && (p.score||0) > highScore) { highPid = pid; highScore = p.score||0; }
@@ -522,12 +486,12 @@
         if (highPid) {
           if ((shields[highPid]||0) > 0) {
             updates[`rooms/${ROOM}/gameState/shields/${highPid}`] = (shields[highPid]||0) - 1;
-            addLog(`${players[MY_PID]?.name} targeted ${players[highPid]?.name} — BLOCKED!`, 'def');
+            addLog(`${myName} targeted ${players[highPid]?.name} — BLOCKED!`, 'def');
           } else {
             const stolen = Math.min(card.value, highScore);
-            updates[`rooms/${ROOM}/gameState/players/${MY_PID}/score`]   = myScore + stolen;
-            updates[`rooms/${ROOM}/gameState/players/${highPid}/score`]  = highScore - stolen;
-            addLog(`${players[MY_PID]?.name} busted ${players[highPid]?.name} — stole ${stolen} pts!`, 'atk');
+            updates[`rooms/${ROOM}/gameState/players/${MY_PID}/score`]  = myScore + stolen;
+            updates[`rooms/${ROOM}/gameState/players/${highPid}/score`] = highScore - stolen;
+            addLog(`${myName} busted ${players[highPid]?.name} — stole ${stolen} pts!`, 'atk');
           }
         }
         break;
@@ -538,13 +502,13 @@
         if (card.id === 'vitamin_c_armor') {
           updates[`rooms/${ROOM}/gameState/players/${MY_PID}/score`] = myScore + 5;
         }
-        addLog(`${players[MY_PID]?.name} activated ${card.name}!`, 'def');
+        addLog(`${myName} activated ${card.name}!`, 'def');
         break;
 
       case 'skip_turn':
         if (targetPid) {
           updates[`rooms/${ROOM}/gameState/skipNext/${targetPid}`] = true;
-          addLog(`${players[MY_PID]?.name} forced ${players[targetPid]?.name} to skip next turn!`, 'atk');
+          addLog(`${myName} forced ${players[targetPid]?.name} to skip next turn!`, 'atk');
         }
         break;
 
@@ -552,7 +516,7 @@
         Object.keys(players).forEach(pid => {
           if (pid !== MY_PID) updates[`rooms/${ROOM}/gameState/skipNext/${pid}`] = true;
         });
-        addLog(`${players[MY_PID]?.name} used Recall Order — everyone else skips!`, 'atk');
+        addLog(`${myName} used Recall Order — everyone else skips!`, 'atk');
         break;
 
       case 'draw_extra':
@@ -564,12 +528,11 @@
           const tHand = [...gs.hands[targetPid]];
           tHand.pop();
           updates[`rooms/${ROOM}/gameState/hands/${targetPid}`] = tHand;
-          addLog(`${players[MY_PID]?.name} forced ${players[targetPid]?.name} to discard!`, 'atk');
+          addLog(`${myName} forced ${players[targetPid]?.name} to discard!`, 'atk');
         }
         break;
     }
 
-    // Show played card in arena
     showPlayedCard(card);
     await update(ref(db), updates);
     document.getElementById('playBtn').disabled = true;
@@ -585,7 +548,7 @@
     area.appendChild(div);
   }
 
-  /* DRAW CARD (triggers question) */
+  // FIX: drawCard menggunakan get yang sudah diimport
   window.drawCard = async function() {
     const snap = await get(ref(db, 'rooms/' + ROOM));
     const gs = snap.val()?.gameState || {};
@@ -594,7 +557,6 @@
     const hand = gs.hands?.[MY_PID] || [];
     if (hand.length >= 5) { showToast('Hand full! Play a card first.'); return; }
 
-    // Pick random card from pool
     const randomCard = CARD_POOL[Math.floor(Math.random() * CARD_POOL.length)];
     const qi = Math.floor(Math.random() * DRAW_QUESTIONS.length);
     await update(ref(db), {
@@ -631,23 +593,25 @@
     document.getElementById('qOverlay').classList.add('open');
 
     if (isMyTurn) {
-      qTimeLeft = 30; document.getElementById('qTimer').textContent = 30;
+      qTimeLeft = 30;
+      document.getElementById('qTimer').textContent = 30;
       document.getElementById('qTimer').classList.remove('urgent');
-      clearInterval(qTimer);
-      qTimer = setInterval(() => {
+      clearInterval(qTimerInterval);
+      qTimerInterval = setInterval(() => {
         qTimeLeft--;
         const el = document.getElementById('qTimer');
         el.textContent = qTimeLeft;
         if (qTimeLeft <= 10) el.classList.add('urgent');
-        if (qTimeLeft <= 0) { clearInterval(qTimer); answerQ(-1, q, qData, true); }
+        if (qTimeLeft <= 0) { clearInterval(qTimerInterval); answerQ(-1, q, qData, true); }
       }, 1000);
     }
   }
 
+  // FIX: answerQ tidak lagi menggunakan dynamic import untuk score atau nama pemain
   async function answerQ(chosen, q, qData, timeout = false) {
     if (waitingForAnswer) return;
     waitingForAnswer = true;
-    clearInterval(qTimer);
+    clearInterval(qTimerInterval);
     const correct = chosen === q.ans;
 
     document.querySelectorAll('.q-opt').forEach((b, i) => {
@@ -662,15 +626,21 @@
     if (correct) {
       const card = CARD_POOL.find(c => c.id === qData.rewardCard);
       res.textContent = `✅ Correct! You earned: ${card?.icon} ${card?.name}! ` + q.exp;
-      const snap = await get(ref(db, 'rooms/' + ROOM + '/gameState/hands/' + MY_PID));
-      const hand = snap.val() || [];
+
+      // FIX: gunakan get yang diimport, dan roomPlayers untuk nama
+      const handSnap = await get(ref(db, 'rooms/' + ROOM + '/gameState/hands/' + MY_PID));
+      const hand = handSnap.val() || [];
       hand.push(qData.rewardCard);
+
+      const scoreSnap = await get(ref(db, 'rooms/' + ROOM + '/gameState/players/' + MY_PID + '/score'));
+      const oldScore = scoreSnap.val() || 0;
+
       await update(ref(db), {
         [`rooms/${ROOM}/gameState/hands/${MY_PID}`]: hand,
-        [`rooms/${ROOM}/gameState/players/${MY_PID}/score`]:
-          ((await get(ref(db, 'rooms/' + ROOM + '/gameState/players/' + MY_PID + '/score'))).val() || 0) + 5
+        [`rooms/${ROOM}/gameState/players/${MY_PID}/score`]: oldScore + 5
       });
-      addLog(`${(await get(ref(db, 'rooms/'+ROOM+'/gameState/players/'+MY_PID+'/name'))).val() || 'Player'} drew ${card?.name}!`, 'pts');
+      // FIX: nama diambil dari roomPlayers (state lokal), bukan request Firebase ekstra
+      addLog(`${roomPlayers[MY_PID]?.name || 'Player'} drew ${card?.name}!`, 'pts');
     } else {
       res.textContent = `${timeout ? '⏰ Time up!' : '❌ Wrong!'} No card drawn. ` + q.exp;
     }
@@ -707,12 +677,10 @@
       [`rooms/${ROOM}/gameState/turnCount`]: newTurn
     });
 
-    // Clear play area
     document.getElementById('playArea').innerHTML = '<div class="play-area-label">Cards played this turn will appear here</div>';
     selectedCardIdx = null;
   };
 
-  /* RENDER SCORES */
   function renderScores(players, currentTurn) {
     const rows = document.getElementById('scoreRows');
     const arr = Object.entries(players).sort((a,b) => (b[1].score||0) - (a[1].score||0));
@@ -733,7 +701,6 @@
     log.insertBefore(item, log.firstChild);
   }
 
-  /* FIREBASE LISTENER */
   onValue(ref(db, 'rooms/' + ROOM), snap => {
     if (!snap.exists()) { window.location.href = 'minigames.html'; return; }
     const room = snap.val();
@@ -753,7 +720,6 @@
     renderPlayerZones(players, currentTurn, shields, skipNext);
     renderScores(players, currentTurn);
 
-    // My hand
     const hand = gs.hands?.[MY_PID] || [];
     renderHand(hand);
 
@@ -761,14 +727,12 @@
     document.getElementById('passBtn').disabled = !isMyTurn || !!gs.currentQuestion;
     document.getElementById('playBtn').disabled = selectedCardIdx === null || !isMyTurn;
 
-    // Question
     if (gs.currentQuestion && !document.getElementById('qOverlay').classList.contains('open')) {
       const isAnswering = gs.currentQuestion.askedTo === MY_PID;
       if (!isAnswering) document.getElementById('qActiveName').textContent = players[gs.currentQuestion.askedTo]?.name || '…';
       showQuestion(gs.currentQuestion, isAnswering);
     }
 
-    // End game: max turns reached
     if (turnCount >= MAX_TURNS && !document.getElementById('winOverlay').classList.contains('open')) {
       off(ref(db, 'rooms/' + ROOM));
       showWin(players);
