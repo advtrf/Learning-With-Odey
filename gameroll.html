@@ -24,7 +24,6 @@
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     body{font-family:var(--font-ui);background:var(--paper);color:var(--ink);min-height:100vh;overflow-x:hidden}
 
-    /* ── TOP BAR ── */
     .topbar{background:var(--paper-dark);border-bottom:2px solid var(--paper-lines);padding:.7rem 1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
     .topbar-logo{font-family:var(--font-hand);font-size:1.3rem;font-weight:700;color:var(--blue);text-decoration:none}
     .topbar-logo span{color:var(--green)}
@@ -32,11 +31,9 @@
     .topbar-room{font-size:.8rem;color:var(--ink-faint);margin-left:auto}
     .topbar-code{font-family:var(--font-hand);font-size:1rem;font-weight:700;color:var(--blue);letter-spacing:2px}
 
-    /* ── LAYOUT ── */
     .game-layout{display:grid;grid-template-columns:1fr 280px;gap:1rem;padding:1rem;max-width:1200px;margin:0 auto;align-items:start}
     @media(max-width:800px){.game-layout{grid-template-columns:1fr}}
 
-    /* ── BOARD ── */
     .board-wrap{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);padding:1rem;box-shadow:var(--shadow-md);overflow:hidden}
     .board-title{font-family:var(--font-hand);font-size:1.3rem;color:var(--ink-soft);margin-bottom:.8rem;display:flex;align-items:center;gap:.5rem}
     .board-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:3px}
@@ -55,10 +52,8 @@
     .player-token{position:absolute;width:14px;height:14px;border-radius:50%;border:1.5px solid white;font-size:.55rem;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);animation:pop .3s ease}
     @keyframes pop{0%{transform:scale(0)}100%{transform:scale(1)}}
 
-    /* ── SIDEBAR ── */
     .sidebar{display:flex;flex-direction:column;gap:.8rem}
 
-    /* SCOREBOARD */
     .score-card{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);padding:1rem;box-shadow:var(--shadow-sm)}
     .score-title{font-family:var(--font-hand);font-size:1.1rem;color:var(--ink-soft);margin-bottom:.7rem}
     .score-row{display:flex;align-items:center;gap:.6rem;padding:.4rem .5rem;border-radius:var(--radius-sm);margin-bottom:.3rem;transition:background .2s}
@@ -69,7 +64,6 @@
     .score-pts{font-family:var(--font-hand);font-size:1rem;font-weight:700;color:var(--blue);white-space:nowrap}
     .score-pos{font-size:.7rem;color:var(--ink-faint);margin-left:.2rem}
 
-    /* TURN INFO */
     .turn-card{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);padding:1rem;box-shadow:var(--shadow-sm)}
     .turn-title{font-family:var(--font-hand);font-size:1rem;color:var(--ink-faint);margin-bottom:.5rem}
     .turn-name{font-family:var(--font-hand);font-size:1.4rem;font-weight:700;color:var(--ink);margin-bottom:.6rem}
@@ -83,13 +77,11 @@
     .roll-btn:hover:not(:disabled){filter:brightness(1.1);transform:translateY(-2px);box-shadow:var(--shadow-sm)}
     .roll-btn:disabled{opacity:.4;cursor:default;transform:none}
 
-    /* LEGEND */
     .legend-card{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);padding:1rem;box-shadow:var(--shadow-sm)}
     .legend-title{font-family:var(--font-hand);font-size:1rem;color:var(--ink-faint);margin-bottom:.6rem}
     .legend-item{display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem;font-size:.78rem;color:var(--ink-soft)}
     .legend-dot{width:14px;height:14px;border-radius:3px;border:1.5px solid;flex-shrink:0}
 
-    /* ── QUESTION MODAL ── */
     .q-overlay{display:none;position:fixed;inset:0;background:rgba(44,36,22,.55);z-index:5000;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(5px)}
     .q-overlay.open{display:flex;animation:fadeIn .25s ease}
     .q-box{background:var(--paper);border:3px solid var(--paper-lines);border-radius:var(--radius-lg);max-width:520px;width:100%;box-shadow:var(--shadow-lg);overflow:hidden;max-height:90vh;overflow-y:auto}
@@ -117,11 +109,9 @@
     .q-continue-btn:hover{filter:brightness(1.1)}
     .q-spectate-msg{font-family:var(--font-hand);font-size:1rem;color:var(--ink-faint);text-align:center;padding:.5rem;font-style:italic}
 
-    /* CELL EFFECT POPUP */
     .cell-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:white;border:3px solid var(--paper-lines);border-radius:var(--radius-lg);padding:1.5rem 2.5rem;text-align:center;font-family:var(--font-hand);font-size:1.4rem;z-index:4500;box-shadow:var(--shadow-lg);transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
     .cell-popup.show{transform:translate(-50%,-50%) scale(1)}
 
-    /* WIN SCREEN */
     .win-overlay{display:none;position:fixed;inset:0;background:rgba(44,36,22,.7);z-index:6000;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
     .win-overlay.open{display:flex;animation:fadeIn .3s ease}
     .win-box{background:var(--paper);border:4px solid var(--yellow);border-radius:var(--radius-lg);max-width:440px;width:90%;padding:2rem;text-align:center;box-shadow:var(--shadow-lg);animation:popIn .4s ease}
@@ -135,13 +125,11 @@
     .win-back-btn{padding:.75rem 2rem;border-radius:var(--radius-md);border:none;background:var(--blue);color:white;font-family:var(--font-hand);font-size:1.2rem;font-weight:700;cursor:pointer;transition:all .2s}
     .win-back-btn:hover{filter:brightness(1.1)}
 
-    /* LOG */
     .log-card{background:white;border:2.5px solid var(--paper-lines);border-radius:var(--radius-lg);padding:.8rem 1rem;box-shadow:var(--shadow-sm);max-height:150px;overflow-y:auto}
     .log-title{font-family:var(--font-hand);font-size:.95rem;color:var(--ink-faint);margin-bottom:.5rem}
     .log-entry{font-family:var(--font-hand);font-size:.9rem;color:var(--ink-soft);padding:.15rem 0;border-bottom:1px dashed var(--paper-lines)}
     .log-entry:last-child{border-bottom:none}
 
-    /* SHARED */
     @keyframes fadeIn{from{opacity:0}to{opacity:1}}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
     .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--ink);color:white;font-family:var(--font-hand);font-size:1.1rem;padding:.7rem 1.5rem;border-radius:99px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none}
@@ -158,15 +146,12 @@
 
 <div class="game-layout">
 
-  <!-- BOARD -->
   <div class="board-wrap">
     <div class="board-title">🗺️ BioTrail Board <span style="font-size:.85rem;color:var(--ink-faint);margin-left:.5rem">— 40 squares to the finish!</span></div>
     <div class="board-grid" id="boardGrid"></div>
   </div>
 
-  <!-- SIDEBAR -->
   <div class="sidebar">
-
     <div class="turn-card">
       <div class="turn-title">Current Turn</div>
       <div class="turn-name" id="turnName">Loading…</div>
@@ -195,7 +180,6 @@
       <div class="log-title">📜 Game Log</div>
       <div id="gameLog"></div>
     </div>
-
   </div>
 </div>
 
@@ -233,8 +217,9 @@
 <div class="toast" id="toast"></div>
 
 <script type="module">
+  // FIX: semua import Firebase diletakkan di awal modul — tidak ada dynamic import di dalam fungsi
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, onValue, update, off }
+  import { getDatabase, ref, onValue, update, off, get }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
   const firebaseConfig = {
@@ -250,7 +235,6 @@
   const app = initializeApp(firebaseConfig);
   const db  = getDatabase(app);
 
-  /* ── PARAMS ── */
   const params = new URLSearchParams(location.search);
   const ROOM   = params.get('room') || sessionStorage.getItem('odey_room');
   const MY_PID = params.get('pid')  || sessionStorage.getItem('odey_pid');
@@ -258,30 +242,15 @@
 
   document.getElementById('topbarCode').textContent = ROOM || '------';
 
-  /* ── BOARD DEFINITION ── */
   const TOTAL = 40;
-  // Cell types distributed across 40 cells
-  const CELL_TYPES = (() => {
-    const types = [];
-    for (let i = 0; i < TOTAL; i++) {
-      if (i === 0)        { types.push('start');    continue; }
-      if (i === TOTAL-1)  { types.push('finish');   continue; }
-      const r = Math.random();
-      if (r < .40) types.push('trivia');
-      else if (r < .60) types.push('scenario');
-      else if (r < .70) types.push('bonus');
-      else if (r < .80) types.push('trap');
-      else if (r < .88) types.push('skip');
-      else types.push('blank');
-    }
-    return types;
-  })();
-
   const CELL_ICONS = {
     start:'🚀', finish:'🏁', trivia:'❓', scenario:'🧪', bonus:'⭐', trap:'💀', skip:'⏭️', blank:'⬜'
   };
 
-  /* ── QUESTIONS DATABASE ── */
+  // FIX: CELL_TYPES tidak lagi digenerate random di client.
+  // Diambil dari Firebase (sudah dibuat host di gameinit.html)
+  let CELL_TYPES = null;
+
   const QUESTIONS = {
     trivia: [
       { q:"What enzyme causes apple browning when exposed to air?", opts:["Polyphenol oxidase","Amylase","Lipase","Protease"], ans:0, exp:"Polyphenol oxidase (PPO) reacts with oxygen to produce melanin, causing browning." },
@@ -312,18 +281,15 @@
     ]
   };
 
-  /* ── STATE ── */
-  let gameState = null;
-  let myPos = 0;
   let qTimer = null;
   let qTimeLeft = 30;
   let waitingForAnswer = false;
 
   /* ── BUILD BOARD ── */
-  function buildBoard() {
+  // FIX: buildBoard sekarang menerima layout dari Firebase, bukan menggenerate sendiri
+  function buildBoard(cellTypes) {
     const grid = document.getElementById('boardGrid');
     grid.innerHTML = '';
-    // Snake pattern: row 0 left→right, row 1 right→left, etc.
     for (let row = 0; row < 4; row++) {
       const cells = [];
       for (let col = 0; col < 10; col++) {
@@ -333,7 +299,7 @@
       }
       if (row % 2 === 1) cells.reverse();
       cells.forEach(i => {
-        const t = CELL_TYPES[i];
+        const t = cellTypes[i];
         const cell = document.createElement('div');
         cell.className = 'board-cell type-' + t;
         cell.id = 'cell-' + i;
@@ -345,7 +311,6 @@
 
   /* ── RENDER TOKENS ── */
   function renderTokens(players) {
-    // Clear old tokens
     document.querySelectorAll('.player-token').forEach(t => t.remove());
     const byPos = {};
     Object.entries(players).forEach(([pid, p]) => {
@@ -368,12 +333,11 @@
   }
 
   /* ── RENDER SCOREBOARD ── */
-  const PLAYER_COLORS = ['#4a6fa5','#a0453a','#4a7c59','#b8922a','#6b5b8a','#8a5b4a'];
   function renderScores(players, currentTurn) {
     const rows = document.getElementById('scoreRows');
     const arr = Object.entries(players).sort((a,b) => (b[1].score||0) - (a[1].score||0));
     rows.innerHTML = '';
-    arr.forEach(([pid, p], rank) => {
+    arr.forEach(([pid, p]) => {
       const div = document.createElement('div');
       const isMe = pid === MY_PID;
       const isTurn = pid === currentTurn;
@@ -396,6 +360,7 @@
   }
 
   /* ── DICE ROLL ── */
+  // FIX: tidak ada lagi dynamic import — semua Firebase fn sudah tersedia dari import awal
   window.rollDice = async function() {
     if (!ROOM || !MY_PID) return;
     document.getElementById('rollBtn').disabled = true;
@@ -410,18 +375,19 @@
     diceEl.textContent = faces[roll];
     document.getElementById('diceResult').textContent = 'Rolled ' + roll;
 
-    // Compute new position
-    const snap = await (await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js")).get(ref(db, 'rooms/' + ROOM));
+    // FIX: gunakan `get` yang sudah diimport di atas
+    const snap = await get(ref(db, 'rooms/' + ROOM));
     const room = snap.val();
     const players = room.gameState?.players || room.players || {};
     const me = players[MY_PID];
     const oldPos = me?.position || 0;
     let newPos = Math.min(oldPos + roll, TOTAL - 1);
-    const cellType = CELL_TYPES[newPos];
+
+    // FIX: gunakan CELL_TYPES yang sudah diambil dari Firebase
+    const cellType = CELL_TYPES ? CELL_TYPES[newPos] : 'blank';
 
     addLog(`${me?.name} rolled ${roll} → square ${newPos + 1} (${cellType})`);
 
-    // Update position in Firebase
     const updates = {};
     updates[`rooms/${ROOM}/gameState/players/${MY_PID}/position`] = newPos;
 
@@ -447,10 +413,10 @@
     } else if (cellType === 'finish') {
       updates[`rooms/${ROOM}/gameState/players/${MY_PID}/position`] = TOTAL - 1;
       await update(ref(db), updates);
-      endGame();
+      const finalSnap = await get(ref(db, 'rooms/' + ROOM));
+      endGame(finalSnap.val()?.gameState?.players || players);
     } else if (cellType === 'trivia' || cellType === 'scenario') {
       await update(ref(db), updates);
-      // Trigger question for everyone
       const pool = cellType === 'trivia' ? QUESTIONS.trivia : QUESTIONS.scenario;
       const qi = Math.floor(Math.random() * pool.length);
       await update(ref(db), {
@@ -467,7 +433,6 @@
     const order = Object.keys(players).sort((a,b) => (players[a].joinedAt||0) - (players[b].joinedAt||0));
     const currIdx = order.indexOf(room.gameState?.currentTurn || order[0]);
     let next = (currIdx + 1) % order.length;
-    // Skip players who have skipNext flag
     if (players[order[next]]?.skipNext) {
       await update(ref(db), {
         [`rooms/${ROOM}/gameState/players/${order[next]}/skipNext`]: false
@@ -508,11 +473,11 @@
     document.getElementById('qOverlay').classList.add('open');
 
     if (isMyTurn) {
-      startQTimer(q, qData);
+      startQTimer(q);
     }
   }
 
-  function startQTimer(q, qData) {
+  function startQTimer(q) {
     qTimeLeft = 30;
     document.getElementById('qTimer').textContent = 30;
     clearInterval(qTimer);
@@ -523,13 +488,13 @@
       if (qTimeLeft <= 10) el.classList.add('urgent');
       if (qTimeLeft <= 0) {
         clearInterval(qTimer);
-        // Time's up — treat as wrong
-        answerQuestion(-1, q, qData, true);
+        answerQuestion(-1, q, true, true);
       }
     }, 1000);
   }
 
-  async function answerQuestion(chosen, q, qData, timeout = false) {
+  // FIX: tidak ada lagi dynamic import di dalam answerQuestion
+  async function answerQuestion(chosen, q, isMyTurn, timeout = false) {
     if (waitingForAnswer) return;
     waitingForAnswer = true;
     clearInterval(qTimer);
@@ -538,7 +503,7 @@
     const opts = document.querySelectorAll('.q-opt');
     opts.forEach((btn, i) => {
       btn.disabled = true;
-      if (i === q.ans)      btn.classList.add('correct');
+      if (i === q.ans)       btn.classList.add('correct');
       else if (i === chosen) btn.classList.add('wrong');
     });
 
@@ -548,7 +513,8 @@
       (correct ? '✅ Correct! +15 points. ' : (timeout ? '⏰ Time up! 0 points. ' : '❌ Wrong! 0 points. ')) + q.exp;
 
     if (correct) {
-      const snap = await (await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js")).get(ref(db, 'rooms/' + ROOM + '/gameState/players/' + MY_PID + '/score'));
+      // FIX: gunakan get yang sudah diimport
+      const snap = await get(ref(db, 'rooms/' + ROOM + '/gameState/players/' + MY_PID + '/score'));
       const oldScore = snap.val() || 0;
       await update(ref(db), { [`rooms/${ROOM}/gameState/players/${MY_PID}/score`]: oldScore + 15 });
       addLog(`${document.getElementById('turnName').textContent} answered correctly! +15pts`);
@@ -561,8 +527,8 @@
     waitingForAnswer = false;
     document.getElementById('qOverlay').classList.remove('open');
     document.getElementById('qTimer').classList.remove('urgent');
-    // Advance turn
-    const snap = await (await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js")).get(ref(db, 'rooms/' + ROOM));
+    // FIX: gunakan get yang sudah diimport
+    const snap = await get(ref(db, 'rooms/' + ROOM));
     await advanceTurn(snap.val());
   };
 
@@ -578,15 +544,18 @@
   }
 
   /* ── FIREBASE LISTENER ── */
-  function toastOnce(msg) { showToast(msg); }
-
-  onValue(ref(db, 'rooms/' + ROOM), async snap => {
+  onValue(ref(db, 'rooms/' + ROOM), snap => {
     if (!snap.exists()) { window.location.href = 'minigames.html'; return; }
     const room = snap.val();
     const gs = room.gameState || {};
     const players = gs.players || room.players || {};
 
-    // Assign colors on first render
+    // FIX: ambil boardLayout dari Firebase pertama kali tersedia, lalu bangun papan
+    if (!CELL_TYPES && gs.boardLayout) {
+      CELL_TYPES = gs.boardLayout;
+      buildBoard(CELL_TYPES);
+    }
+
     const colorArr = ['#4a6fa5','#a0453a','#4a7c59','#b8922a','#6b5b8a','#8a5b4a'];
     Object.entries(players).forEach(([pid, p], i) => {
       if (!p.color) players[pid] = { ...p, color: colorArr[i % colorArr.length] };
@@ -603,7 +572,6 @@
 
     document.getElementById('rollBtn').disabled = !isMyTurn || gs.currentQuestion != null;
 
-    // Handle question
     if (gs.currentQuestion && !gs.currentQuestion.answeredAt) {
       if (!document.getElementById('qOverlay').classList.contains('open')) {
         const isAnswering = gs.currentQuestion.askedTo === MY_PID;
@@ -636,7 +604,7 @@
       const div = document.createElement('div');
       div.className = 'win-score-row' + (i === 0 ? ' first' : '');
       div.innerHTML = `<span style="font-size:1.2rem">${i===0?'🥇':i===1?'🥈':'🥉'}</span>
-        <span style="font-family:var(--font-hand);font-size:1.1rem;flex:1">${p.name}</span>
+        <span style="font-family:var(--font-hand);font-size:1.1rem;flex:1">${p.name}${pid===MY_PID?' (you)':''}</span>
         <span style="font-family:var(--font-hand);font-size:1.1rem;font-weight:700;color:var(--blue)">${p.score||0} pts</span>`;
       sc.appendChild(div);
     });
@@ -649,8 +617,6 @@
     setTimeout(() => t.classList.remove('show'), 2500);
   }
 
-  /* ── INIT ── */
-  buildBoard();
   if (!ROOM || !MY_PID) {
     showToast('No room found — redirecting…');
     setTimeout(() => window.location.href = 'minigames.html', 2000);
